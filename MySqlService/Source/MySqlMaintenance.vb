@@ -5,12 +5,17 @@ Imports System.Text.RegularExpressions
 Imports MySql.Data.MySqlClient
 
 Public Class MySqlMaintenance
+
     Public Event BackupProgressChanged As EventHandler(Of ProgressChangedEventArgs)
+
     Public Event RestoreProgressChanged As EventHandler(Of ProgressChangedEventArgs)
+
     Private ReadOnly _Client As MySqlClient
+
     Friend Sub New(Client As MySqlClient)
         _Client = Client
     End Sub
+
     ''' <summary>
     ''' Creates a database on the MySQL server according to the data provided to <see cref="MySqlClient"/>.
     ''' </summary>
@@ -47,6 +52,7 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
+
     ''' <summary>
     ''' Restores the database using only the backup file path.
     ''' </summary>
@@ -75,6 +81,7 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteRestoreAsync(FilePath As String, Progress As IProgress(Of Integer)) As Task
         Await ExecuteRestoreAsync(FilePath, Nothing, Progress)
     End Function
+
     Private Overloads Async Function ExecuteRestoreAsync(FilePath As String, Optional Connection As DbConnection = Nothing, Optional Progress As IProgress(Of Integer) = Nothing) As Task
         If String.IsNullOrWhiteSpace(FilePath) Then
             Throw New ArgumentException("FilePath inválido.", NameOf(FilePath))
@@ -118,6 +125,7 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
+
     ''' <summary>
     ''' Performs a backup using only the file path.
     ''' </summary>
@@ -146,6 +154,7 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteBackupAsync(FilePath As String, Progress As IProgress(Of Integer)) As Task
         Await ExecuteBackupAsync(FilePath, Nothing, Progress)
     End Function
+
     Private Overloads Async Function ExecuteBackupAsync(FilePath As String, Optional Connection As DbConnection = Nothing, Optional Progress As IProgress(Of Integer) = Nothing) As Task
         If String.IsNullOrWhiteSpace(FilePath) Then
             Throw New ArgumentException("FilePath inválido.", NameOf(FilePath))
@@ -188,4 +197,5 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
+
 End Class

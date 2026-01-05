@@ -49,6 +49,7 @@ Public Class ColorPicker
     End Sub
 
     Public Event ColorChanged As EventHandler
+
     Public Shared ReadOnly Property DefaultCustomColors As Color()
         Get
             Dim initialColors As Color() = New Color(15) {}
@@ -100,6 +101,7 @@ Public Class ColorPicker
             SetEditorCustomColors()
         End Set
     End Property
+
     Public Overrides Property MinimumSize As Size
         Get
             Return Me.DefaultMinimumSize
@@ -111,6 +113,7 @@ Public Class ColorPicker
     <Browsable(False)>
     <DefaultValue(False)>
     Public Property ShouldSerializeCustomColors As Boolean
+
     Protected Overrides ReadOnly Property DefaultMinimumSize As Size
         Get
             Dim extraSize As Integer = extraSize + 2 * CInt(0)
@@ -177,6 +180,7 @@ Public Class ColorPicker
             RestoreEditorServiceReference()
         End If
     End Sub
+
     <DllImport("user32.dll")>
     Protected Shared Function GetAsyncKeyState(ByVal vKey As Keys) As Short
     End Function
@@ -284,6 +288,7 @@ Public Class ColorPicker
             pInfo.SetValue(Palette, newColor, Nothing)
         End If
     End Sub
+
     Private Sub CompareCustomColors()
         If _CustomColors IsNot Nothing AndAlso OrigColors IsNot Nothing Then
             For i As Integer = 0 To _CustomColors.Length - 1
@@ -368,6 +373,7 @@ Public Class ColorPicker
             OnColorChanged(CType(Value, Color))
         End If
     End Sub
+
     Private Sub Service_ColorUIAvailable(ByVal sender As Object, ByVal e As ColorPicker.EditorServiceEventArgs)
         If e.ColorUI IsNot Nothing Then
             If ColorUI Is Nothing Then
@@ -390,6 +396,7 @@ Public Class ColorPicker
             _ColorUIWnd = Nothing
         End If
     End Sub
+
     Private Sub Tab_Deselecting(ByVal sender As Object, ByVal e As TabControlCancelEventArgs)
         If _AllowTabOut AndAlso GetAsyncKeyState(Keys.Tab) <> 0 Then
             If (Control.ModifierKeys And (Keys.Alt Or Keys.Control)) = Keys.None Then
@@ -407,6 +414,7 @@ Public Class ColorPicker
             End If
         End If
     End Sub
+
     Private Class ColorEditorService
         Implements IServiceProvider, IWindowsFormsEditorService
 
@@ -415,6 +423,7 @@ Public Class ColorPicker
         Public Event ColorChanged As EventHandler
 
         Public Event ColorUIAvailable As EventHandler(Of EditorServiceEventArgs)
+
         Public Sub CloseDropDownInternal()
             closeEditor = True
         End Sub
@@ -474,7 +483,9 @@ Public Class ColorPicker
             Public cy As Integer
             Public flags As Integer
         End Structure
+
     End Class
+
     Private Class EditorServiceEventArgs
         Inherits EventArgs
 
@@ -483,6 +494,7 @@ Public Class ColorPicker
         Public Sub New(ByVal colorUI As Control)
             _ColorUI = colorUI
         End Sub
+
         Public ReadOnly Property ColorUI As Control
             Get
                 Return _ColorUI
@@ -490,4 +502,5 @@ Public Class ColorPicker
         End Property
 
     End Class
+
 End Class

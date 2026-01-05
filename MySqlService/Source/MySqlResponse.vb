@@ -7,6 +7,7 @@ Public Class MySqlResponse
     Private ReadOnly _Data As List(Of Dictionary(Of String, Object))
     Private ReadOnly _AffectedRows As Long
     Private ReadOnly _LastInsertedID As Long
+
     Friend Sub New(Optional Data As List(Of Dictionary(Of String, Object)) = Nothing, Optional AffectedRows As Long = 0, Optional LastInsertedID As Long = 0)
         _Data = Data
         _AffectedRows = AffectedRows
@@ -44,6 +45,7 @@ Public Class MySqlResponse
             End If
         End Get
     End Property
+
     ''' <summary>
     ''' Gets the returned data as a list of dictionaries (column/value).
     ''' </summary>
@@ -52,6 +54,7 @@ Public Class MySqlResponse
             Return _Data
         End Get
     End Property
+
     ''' <summary>
     ''' Gets the returned data as a <see cref="DataTable"/>.
     ''' Each dictionary key becomes a column, and each item becomes a row.
@@ -88,4 +91,5 @@ Public Class MySqlResponse
         Next Dict
         Return Table
     End Function
+
 End Class

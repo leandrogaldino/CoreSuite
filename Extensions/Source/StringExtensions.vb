@@ -3,6 +3,7 @@ Imports System.Text
 
 Namespace Extensions
     Public Module StringExtensions
+
         ''' <summary>
         ''' Reverses the order of characters in a string.
         ''' </summary>
@@ -41,6 +42,7 @@ Namespace Extensions
             If String.IsNullOrEmpty(Text) Then Return String.Empty
             Return String.Join(" ", Text.Split(" "c).Reverse())
         End Function
+
         ''' <summary>
         ''' Counts the number of words in a string.
         ''' </summary>
@@ -85,6 +87,7 @@ Namespace Extensions
             Next
             Return SbReturn.ToString()
         End Function
+
         ''' <summary>
         ''' Returns a new string with the first letter of each word capitalized
         ''' and the remaining letters in lowercase.
@@ -106,6 +109,7 @@ Namespace Extensions
               Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Text.ToLower()),
               Nothing)
         End Function
+
         ''' <summary>
         ''' Converts a string to CamelCase format.
         ''' Words are separated by spaces, underscores, or hyphens, with the first word lowercase
@@ -118,6 +122,7 @@ Namespace Extensions
             Dim words = Text.Split(New Char() {" "c, "_"c, "-"c}, StringSplitOptions.RemoveEmptyEntries)
             Return String.Join("", words.Select(Function(w, i) If(i = 0, w.ToLower(), Char.ToUpper(w(0)) & w.Substring(1).ToLower())))
         End Function
+
         ''' <summary>
         ''' Replaces the first occurrence of a specific substring in a string
         ''' with another provided substring.
@@ -152,5 +157,6 @@ Namespace Extensions
         Public Function RemoveExtraSpaces(Text As String) As String
             Return String.Join(" ", Text.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
         End Function
+
     End Module
 End Namespace

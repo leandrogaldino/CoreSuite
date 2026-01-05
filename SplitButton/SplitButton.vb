@@ -1,6 +1,7 @@
-﻿Imports System.Drawing
+﻿Imports System.ComponentModel
+Imports System.Drawing
 Imports System.Windows.Forms
-Imports System.ComponentModel
+
 Public Class SplitButton
     Inherits NoFocusCueButton
     Private _BmpSplit As Bitmap
@@ -24,15 +25,18 @@ Public Class SplitButton
             Split(Color.Gainsboro)
         End Set
     End Property
+
     Public Sub New()
         Width = 125
         Split(Color.Gainsboro)
 
     End Sub
+
     Protected Overrides Sub InitLayout()
         MyBase.InitLayout()
         Split(Color.Gainsboro)
     End Sub
+
     Protected Overrides Sub OnClick(e As EventArgs)
         If Position() Then
             If ButtonMenuStrip IsNot Nothing Then ButtonMenuStrip.Show(Me, 0, Height)
@@ -40,18 +44,22 @@ Public Class SplitButton
             MyBase.OnClick(e)
         End If
     End Sub
+
     Protected Overrides Sub OnSizeChanged(e As EventArgs)
         MyBase.OnSizeChanged(e)
         Split(Color.Gainsboro)
     End Sub
+
     Protected Overrides Sub OnMouseEnter(e As EventArgs)
         MyBase.OnMouseEnter(e)
         Split(Color.Silver)
     End Sub
+
     Protected Overrides Sub OnMouseLeave(e As EventArgs)
         MyBase.OnMouseLeave(e)
         Split(Color.Gainsboro)
     End Sub
+
     Private Function Position() As Boolean
         Dim Pos As Boolean = False
         Dim X As Integer = PointToClient(MousePosition).X

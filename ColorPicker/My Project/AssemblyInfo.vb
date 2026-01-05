@@ -1,5 +1,4 @@
-﻿Imports System
-Imports System.Reflection
+﻿Imports System.Reflection
 Imports System.Runtime.InteropServices
 
 ' As informações gerais sobre um assembly são controladas por
@@ -23,7 +22,7 @@ Imports System.Runtime.InteropServices
 ' As informações da versão de um assembly consistem nos quatro valores a seguir:
 '
 '      Versão Principal
-'      Versão Secundária 
+'      Versão Secundária
 '      Número da Versão
 '      Revisão
 '

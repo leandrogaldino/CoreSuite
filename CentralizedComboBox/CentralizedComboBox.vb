@@ -1,6 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
-Imports System.Drawing
 
 ''' <summary>
 ''' A customized ComboBox that centers text in both the edit control and the dropdown items.
@@ -28,6 +27,7 @@ Public Class CentralizedComboBox
         Public hwndEdit As IntPtr
         Public hwndList As IntPtr
     End Structure
+
     <DllImport("user32.dll", SetLastError:=True)>
     Private Shared Function GetWindowLong(ByVal hWnd As IntPtr, ByVal nIndex As Integer) As Integer
     End Function
@@ -86,4 +86,5 @@ Public Class CentralizedComboBox
         End If
         e.DrawFocusRectangle()
     End Sub
+
 End Class

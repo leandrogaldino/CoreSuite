@@ -3,6 +3,7 @@
 Partial Public NotInheritable Class FileManager
 
     Public Class CopyDirectoryInfo
+
         Public Sub New()
         End Sub
 
@@ -16,6 +17,7 @@ Partial Public NotInheritable Class FileManager
     End Class
 
     Public Class DeleteDirectoryInfo
+
         Public Sub New()
         End Sub
 

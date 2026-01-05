@@ -1,31 +1,47 @@
 ﻿Imports System.ComponentModel
 Imports System.Drawing
 Imports System.Windows.Forms
+
 Public Class ToggleButton
     Inherits Control
+
 #Region "EVENTS"
+
     <Category("Propriedade Alterada")>
     Public Event StateChanged(sender As Control, e As EventArgs)
+
 #End Region
+
 #Region "ENUMS"
+
     Public Enum ToggleButtonStates
         [OFF]
         [ON]
     End Enum
+
 #End Region
+
 #Region "FIELDS"
+
     Private _BorderColor As Color = SystemColors.WindowFrame
     Private _State As ToggleButtonStates = ToggleButtonStates.OFF
+
 #End Region
+
 #Region "CONSTRUCTOR"
+
     Public Sub New()
         Size = New Size(75, 20)
         Cursor = Cursors.Hand
         SetStyle(ControlStyles.Selectable, True)
     End Sub
+
 #End Region
+
 #Region "PROPERTIES"
+
 #Region "HIDDEN PROPRTIES"
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -37,6 +53,7 @@ Public Class ToggleButton
             MyBase.BackColor = value
         End Set
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -48,6 +65,7 @@ Public Class ToggleButton
             MyBase.BackgroundImage = value
         End Set
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -59,6 +77,7 @@ Public Class ToggleButton
             MyBase.BackgroundImageLayout = value
         End Set
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -70,6 +89,7 @@ Public Class ToggleButton
             MyBase.Font = value
         End Set
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -81,6 +101,7 @@ Public Class ToggleButton
             MyBase.ForeColor = value
         End Set
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -92,6 +113,7 @@ Public Class ToggleButton
             MyBase.RightToLeft = value
         End Set
     End Property
+
     <Browsable(False)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     Public Overloads ReadOnly Property Text As String
@@ -99,6 +121,7 @@ Public Class ToggleButton
             Return If(State = ToggleButtonStates.OFF, OffStyle.Text, OnStyle.Text)
         End Get
     End Property
+
     <Browsable(False)>
     <EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
@@ -110,8 +133,11 @@ Public Class ToggleButton
             MyBase.AllowDrop = value
         End Set
     End Property
+
 #End Region
+
 #Region "OVERRIDED PROPERTIES"
+
     <DefaultValue(GetType(Cursor), "Hand")>
     Public Overrides Property Cursor As Cursor
         Get
@@ -121,16 +147,21 @@ Public Class ToggleButton
             MyBase.Cursor = value
         End Set
     End Property
+
 #End Region
+
 #Region "NEW PROPERTIES"
+
     <TypeConverter(GetType(ExpandableObjectConverter))>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <Category("Aparência")>
     Public Property OffStyle() As Style = New Style(Me) With {.Text = "OFF"}
+
     <TypeConverter(GetType(ExpandableObjectConverter))>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <Category("Aparência")>
     Public Property OnStyle() As Style = New Style(Me) With {.Text = "ON"}
+
     ''' <summary>
     ''' A cor da borda do controle.
     ''' </summary>
@@ -146,6 +177,7 @@ Public Class ToggleButton
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' O estado do controle.
     ''' </summary>
@@ -165,14 +197,19 @@ Public Class ToggleButton
             Invalidate()
         End Set
     End Property
+
 #End Region
+
 #End Region
+
 #Region "OVERRIDED SUBS"
+
     Protected Overrides Sub OnHandleCreated(e As EventArgs)
         MyBase.OnHandleCreated(e)
         OffStyle.Font = Font
         OnStyle.Font = Font
     End Sub
+
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
         MyBase.OnPaint(e)
         Dim ControlArea As Rectangle
@@ -306,6 +343,7 @@ Public Class ToggleButton
         ControlPaint.DrawBorder(CreateGraphics, ControlArea, If(Focused, SystemColors.Highlight, _BorderColor), ButtonBorderStyle.Solid)
 
     End Sub
+
     Protected Overrides Sub OnClick(e As EventArgs)
         MyBase.OnClick(e)
         If State = ToggleButtonStates.OFF Then
@@ -314,26 +352,33 @@ Public Class ToggleButton
             State = ToggleButtonStates.OFF
         End If
     End Sub
+
     Protected Overrides Sub OnGotFocus(ByVal e As EventArgs)
         Invalidate()
         MyBase.OnGotFocus(e)
     End Sub
+
     Protected Overrides Sub OnLostFocus(ByVal e As EventArgs)
         MyBase.OnLostFocus(e)
         Invalidate()
     End Sub
+
     Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
         If Not Focused Then Focus()
         MyBase.OnMouseDown(e)
     End Sub
+
     Protected Overrides Sub OnKeyDown(e As KeyEventArgs)
         MyBase.OnKeyDown(e)
         If e.KeyCode = Keys.Enter Or e.KeyCode = Keys.Space Then
             State = If(State = ToggleButtonStates.OFF, ToggleButtonStates.ON, ToggleButtonStates.OFF)
         End If
     End Sub
+
 #End Region
+
 #Region "PRIVATE FUNCTIONS"
+
     Private Function GetStringAlign(ByVal Align As ContentAlignment) As StringAlignment()
         Select Case Align
             Case Is = ContentAlignment.TopLeft
@@ -358,8 +403,11 @@ Public Class ToggleButton
                 Return {StringAlignment.Center, StringAlignment.Center}
         End Select
     End Function
+
 #End Region
+
 #Region "INTERNAL CLASSES"
+
     Public Class Style
         Private ReadOnly _Control As ToggleButton
         Private _ScratchVisible As Boolean = True
@@ -374,9 +422,11 @@ Public Class ToggleButton
         Private _TextForeColor As Color = SystemColors.ControlText
         Private _TextBackColor As Color = SystemColors.Window
         Private _TextAlign As ContentAlignment = ContentAlignment.MiddleCenter
+
         Public Sub New(Optional ByVal Control As ToggleButton = Nothing)
             _Control = Control
         End Sub
+
         ''' <summary>
         ''' Define se o risco do gatilho está visível.
         ''' </summary>
@@ -392,6 +442,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a cor do risco do gatilho.
         ''' </summary>
@@ -406,6 +457,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a cor da borda do gatilho.
         ''' </summary>
@@ -420,6 +472,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a cor de fundo do gatilho.
         ''' </summary>
@@ -434,6 +487,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a imagem de fundo do gatilho. Essa propriedade sobrepõem a propriedade Text.
         ''' </summary>
@@ -448,6 +502,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a porcentagem ocupada pelo gatilho em relação a area total do controle.
         ''' </summary>
@@ -464,6 +519,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a espessura da borda do gatilho.
         ''' </summary>
@@ -480,6 +536,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define o texto do controle.
         ''' </summary>
@@ -493,6 +550,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a fonte do texto do controle.
         ''' </summary>
@@ -506,6 +564,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a cor do texto do controle.
         ''' </summary>
@@ -520,6 +579,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define a cor de fundo do texto do controle.
         ''' </summary>
@@ -534,6 +594,7 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         ''' <summary>
         ''' Define o alinhamento do texto do controle.
         ''' </summary>
@@ -548,9 +609,13 @@ Public Class ToggleButton
                 If _Control IsNot Nothing Then _Control.Refresh()
             End Set
         End Property
+
         Public Overrides Function ToString() As String
             Return Nothing
         End Function
+
     End Class
+
 #End Region
+
 End Class

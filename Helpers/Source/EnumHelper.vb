@@ -1,10 +1,12 @@
 ﻿Imports System.ComponentModel
 Imports System.Reflection
+
 ''' <summary>
 ''' Provides helper methods for working with Enum types and their metadata,
 ''' such as <see cref="DescriptionAttribute"/>.
 ''' </summary>
 Public Class EnumHelper
+
     ''' <summary>
     ''' Gets the enum value whose <see cref="DescriptionAttribute"/> matches the specified description.
     ''' </summary>
@@ -119,4 +121,5 @@ Public Class EnumHelper
         Dim Attribute = CType(FieldInfo.GetCustomAttribute(GetType(DescriptionAttribute)), DescriptionAttribute)
         Return Attribute?.Description
     End Function
+
 End Class

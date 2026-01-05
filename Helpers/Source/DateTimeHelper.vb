@@ -22,7 +22,6 @@ Public Class DateTimeHelper
         Return TimeZoneInfo.ConvertTimeFromUtc(UtcDate, Tz)
     End Function
 
-
     ''' <summary>
     ''' Converts a date and time in the Brasília time zone to the number of
     ''' milliseconds since the Unix Epoch (1970-01-01 00:00:00 UTC).
@@ -54,4 +53,5 @@ Public Class DateTimeHelper
         Dim BsbNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Tz)
         Return BsbNow
     End Function
+
 End Class

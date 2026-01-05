@@ -12,6 +12,7 @@ Public Class DataGridViewClipboart
     Private _ContextPoint As Point
     Private _ClickedColumnIndex As Integer
     Private _ClickedRowIndex As Integer
+
     Public Sub New()
         _ToolStripMenuItemCopyCell = New ToolStripMenuItem() With {.Text = "Copiar Celula", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.CellCopy}
         _ToolStripMenuItemCopyRow = New ToolStripMenuItem() With {.Text = "Copiar Linha", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.RowCopy}
@@ -56,6 +57,7 @@ Public Class DataGridViewClipboart
             End If
         End Set
     End Property
+
     Public Property DataGridView As DataGridView
         Get
             Return _DataGridView
@@ -70,6 +72,7 @@ Public Class DataGridViewClipboart
             End If
         End Set
     End Property
+
     Private Sub Dgv_MouseDown(sender As Object, e As MouseEventArgs)
         Dim Click As DataGridView.HitTestInfo = _DataGridView.HitTest(e.X, e.Y)
         If Click.Type = DataGridViewHitTestType.Cell And e.Button = MouseButtons.Right Then
@@ -80,6 +83,7 @@ Public Class DataGridViewClipboart
             _ClickedRowIndex = Click.RowIndex
         End If
     End Sub
+
     Private Sub Dgv_MouseUp(sender As Object, e As MouseEventArgs)
         If _ShowContext Then
             _ContextMenuStrip.Show(_DataGridView.PointToScreen(_ContextPoint))
@@ -98,6 +102,7 @@ Public Class DataGridViewClipboart
 
         Clipboard.SetText(Text)
     End Sub
+
     Private Sub CopyRowClick(sender As Object, e As EventArgs)
         Dim Row As DataGridViewRow = _DataGridView.Rows(_ClickedRowIndex)
         Dim RowCellsText As New List(Of String)

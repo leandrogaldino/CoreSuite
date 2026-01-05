@@ -17,8 +17,11 @@ Public MustInherit Class CUITypeEditor
     Protected Friend Property Caption As String = "UITypeEditor"
 
     Protected MustOverride Function GetEditControl(PropertyName As String, CurrentValue As Object) As Control
+
     Protected MustOverride Function GetEditedValue(EditControl As Control, PropertyName As String, OldValue As Object) As Object
+
     Protected MustOverride Sub LoadValues(Context As ITypeDescriptorContext, Provider As IServiceProvider, Value As Object)
+
     Protected MustOverride Function SetEditStyle(context As ITypeDescriptorContext) As UITypeEditorEditStyle
 
     ''' <summary>
@@ -93,6 +96,7 @@ Public MustInherit Class CUITypeEditor
     ''' Represents an item in a list for use in the editor UI.
     ''' </summary>
     Protected Friend Class ListItem
+
         ''' <summary>
         ''' Gets or sets the control associated with this list item.
         ''' </summary>
@@ -119,5 +123,7 @@ Public MustInherit Class CUITypeEditor
         Public Overrides Function ToString() As String
             Return Name
         End Function
+
     End Class
+
 End Class

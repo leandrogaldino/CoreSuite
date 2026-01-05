@@ -138,4 +138,5 @@ Public Class ColoredProgressBar
         MyBase.OnResize(e)
         Invalidate()
     End Sub
+
 End Class

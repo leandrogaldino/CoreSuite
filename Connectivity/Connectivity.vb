@@ -2,9 +2,13 @@
 Imports System.Net.Http
 
 Public Class Connectivity
+
     Public Event ConnectivityChanged(sender As Object, e As ConnectivityEventArgs)
+
     Public Event Connected(sender As Object, e As EventArgs)
+
     Public Event Disconnected(sender As Object, e As EventArgs)
+
     Private ReadOnly _Addresses() As String = {
         "https://www.google.com/",
         "https://www.microsoft.com/",
@@ -86,12 +90,15 @@ Public Class Connectivity
         Next
         Return False
     End Function
+
 End Class
 
 Public Class ConnectivityEventArgs
     Inherits EventArgs
     Public ReadOnly Property InternetAvailable As Boolean
+
     Public Sub New(internetAvailable As Boolean)
         Me.InternetAvailable = internetAvailable
     End Sub
+
 End Class

@@ -1,9 +1,11 @@
 ﻿Imports System.IO
+
 ''' <summary>
 ''' Provides helper methods for file system operations such as
 ''' checking file locks and safely deleting files or directories.
 ''' </summary>
 Public Class FileHelper
+
     ''' <summary>
     ''' Attempts to delete a file if it is not currently in use by another process.
     ''' </summary>
@@ -26,6 +28,7 @@ Public Class FileHelper
         End Try
         Return Deleted
     End Function
+
     ''' <summary>
     ''' Attempts to delete a directory and its contents.
     ''' The operation fails if any file within the directory is locked or in use.
@@ -47,6 +50,7 @@ Public Class FileHelper
         End Try
         Return Deleted
     End Function
+
     ''' <summary>
     ''' Determines whether a file is currently locked by another process.
     ''' </summary>
@@ -67,4 +71,5 @@ Public Class FileHelper
         End Try
         Return False
     End Function
+
 End Class

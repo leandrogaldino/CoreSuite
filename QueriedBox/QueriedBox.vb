@@ -7,17 +7,19 @@ Imports System.Reflection
 Imports System.Windows.Forms
 Imports System.Windows.Forms.Design
 Imports CoreSuite.Helpers
+
 Public Class QueriedBox
     Inherits TextBox
-#Region "EVENTS"
+
     <Category("Propriedade Alterada")>
     Public Event FreezedPrimaryKeyChanged(sender As Object, e As EventArgs)
+
     <Category("Propriedade Alterada")>
     Public Event FreezedPrimaryKeyChanging(sender As Object, e As EventArgs)
+
     <Category("Ação")>
     Public Event HyperlinkClicked(sender As Object, e As EventArgs)
-#End Region
-#Region "FIELDS"
+
     Private DropDownResultsForm As FormDropDownResults
     Private _CtrlHyperLink As Boolean = False
     Private _IsHyperLink As Boolean = False
@@ -45,8 +47,7 @@ Public Class QueriedBox
     Private _KeyDown As Boolean
     Private _Freezing As Boolean
     Private _RawFreezedValues As New List(Of (String, String, Object)) From {("Table", "Field", New Object())}
-#End Region
-#Region "OVERRIDED PROPERTIES"
+
     Public Overrides Property Multiline As Boolean
         Get
             Return MyBase.Multiline
@@ -58,29 +59,28 @@ Public Class QueriedBox
             MyBase.Multiline = value
         End Set
     End Property
-#End Region
-#Region "PROPERTIES"
-#Region "MISCELLANEOUS"
+
     ''' <summary>
     ''' Depura a consulta configurada no controle quando o texto é alterado.
     ''' </summary>
     <Category("Diversos")>
     <Description("Depura a consulta configurada no controle quando o texto é alterado.")>
     Public Property DebugOnTextChanged As Boolean
-#End Region
-#Region "QUERY"
+
     ''' <summary>
     ''' Define se o resultado deve ser distinguido (Ocultar resultados idênticos provenientes da Query).
     ''' </summary>
     <Category("Query")>
     <Description("Define se o resultado deve ser distinguido (Ocultar resultados idênticos provenientes da Query).")>
     Public Property Distinct As Boolean
+
     ''' <summary>
     ''' Define um valor caso o resultado seja nulo.
     ''' </summary>
     <Category("Query")>
     <Description("Define um valor caso o resultado seja nulo.")>
     Public Property IfNull As String
+
     ''' <summary>
     ''' Define o nome da tabela principal.
     ''' </summary>
@@ -88,6 +88,7 @@ Public Class QueriedBox
     <Description("Define o nome da tabela principal.")>
     <MergableProperty(False)>
     Public Property MainTableName As String
+
     ''' <summary>
     ''' Define o apelido da tabela principal.
     ''' </summary>
@@ -95,6 +96,7 @@ Public Class QueriedBox
     <Description("Define o apelido da tabela principal.")>
     <MergableProperty(False)>
     Public Property MainTableAlias As String
+
     ''' <summary>
     ''' Define o nome do campo atribuido como Primary Key na tabela principal.
     ''' </summary>
@@ -102,6 +104,7 @@ Public Class QueriedBox
     <Description("Define o nome do campo atribuido como Primary Key na tabela principal.")>
     <MergableProperty(False)>
     Public Property MainReturnFieldName As String
+
     ''' <summary>
     ''' Define o nome da tabela a qual está relacionada aos resultados que serão exibidos.
     ''' </summary>
@@ -109,6 +112,7 @@ Public Class QueriedBox
     <Description("Define o nome da tabela a qual está relacionada aos resultados que serão exibidos.")>
     <MergableProperty(False)>
     Public Property DisplayTableName As String
+
     ''' <summary>
     ''' Define o apelido da tabela a qual está relacionada aos resultados que serão exibidos.
     ''' </summary>
@@ -116,24 +120,28 @@ Public Class QueriedBox
     <Description("Define o apelido da tabela a qual está relacionada aos resultados que serão exibidos.")>
     <MergableProperty(False)>
     Public Property DisplayTableAlias As String
+
     ''' <summary>
     ''' Define o nome do campo que será congelado no controle quando escolhido pelo usuário.
     ''' </summary>
     <Category("Query")>
     <Description("Define o nome do campo que será congelado no controle quando escolhido pelo usuário.")>
     Public Property DisplayFieldName As String
+
     ''' <summary>
     ''' Define o apelido do campo que será congelado no controle quando escolhido pelo usuário.
     ''' </summary>
     <Category("Query")>
     <Description("Define o apelido do campo que será congelado no controle quando escolhido pelo usuário.")>
     Public Property DisplayFieldAlias As String
+
     ''' <summary>
     ''' Define o nome do campo da tabela que está atribuído como PRIMARYKEY.
     ''' </summary>
     <Category("Query")>
     <Description("Define o nome do campo da tabela que está atribuído como Primary Key.")>
     Public Property DisplayMainFieldName As String
+
     ''' <summary>
     ''' Define o nome do campo da tabela a ser pesquisado.
     ''' </summary>
@@ -141,6 +149,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Integer), "1000")>
     <Description("Define o máximo de resultados que podem ser retornados pela pesquisa.")>
     Public Property Limit As Integer = 1000
+
     ''' <summary>
     ''' Define os outros campos que serão mostrados nos resultados da pesquisa.
     ''' </summary>
@@ -149,6 +158,7 @@ Public Class QueriedBox
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
     Public Property OtherFields As New Collection(Of OtherField)
+
     ''' <summary>
     ''' Define o nome do campo da tabela a ser pesquisado.
     ''' </summary>
@@ -157,6 +167,7 @@ Public Class QueriedBox
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
     Public Property Conditions As New Collection(Of Condition)
+
     ''' <summary>
     ''' Define os parâmetos utilizados nas condições da Query.
     ''' </summary>
@@ -165,6 +176,7 @@ Public Class QueriedBox
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
     Public Property Parameters As New Collection(Of Parameter)
+
     ''' <summary>
     ''' Define o nome do campo da tabela a ser pesquisado.
     ''' </summary>
@@ -173,8 +185,7 @@ Public Class QueriedBox
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
     Public Property Relations As New Collection(Of Relation)
-#End Region
-#Region "APARENCIA"
+
     ''' <summary>
     ''' Define como a largura da coluna será ajustada nos resultados.
     ''' </summary>
@@ -182,6 +193,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Color), "Blue")>
     <Description("Define como a largura da coluna será ajustada nos resultados.")>
     Public Property DisplayFieldAutoSizeColumnMode As DataGridViewAutoSizeColumnMode
+
     ''' <summary>
     ''' Define cor do texto para quando um resultado da pesquisa for selecionado.
     ''' </summary>
@@ -200,6 +212,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor de fundo do grid.
     ''' </summary>
@@ -218,6 +231,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor de seleção do grid.
     ''' </summary>
@@ -236,6 +250,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor do texto do grid.
     ''' </summary>
@@ -254,6 +269,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor de seleção do texto do grid.
     ''' </summary>
@@ -272,6 +288,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a fonte do cabeçalho do grid como negrito.
     ''' </summary>
@@ -279,6 +296,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Boolean), "False")>
     <Description("Define a fonte do cabeçalho do grid como negrito.")>
     Public Property GridHeadersBold As Boolean = False
+
     ''' <summary>
     ''' Define o cabeçalho do grid como visível.
     ''' </summary>
@@ -286,6 +304,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Boolean), "True")>
     <Description("Define o cabeçalho do grid como visível.")>
     Public Property GridHeaderVisible As Boolean = True
+
     ''' <summary>
     ''' Define a cor de fundo do cabeçalho do grid.
     ''' </summary>
@@ -304,6 +323,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor do texto do cabeçalho do grid.
     ''' </summary>
@@ -322,6 +342,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor de fundo da label que informa quantos caracteres faltam.
     ''' </summary>
@@ -340,6 +361,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define a cor do texto da label que informa quantos caracteres faltam.
     ''' </summary>
@@ -358,6 +380,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define se o Grid mostrará linhas verticais no DropDown.
     ''' </summary>
@@ -366,6 +389,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Boolean), "True")>
     <Description("Define se o Grid mostrará linhas verticais no DropDown.")>
     Public Property ShowVerticalGridLines As Boolean = True
+
     ''' <summary>
     ''' Define a cor da borda do DropDown.
     ''' </summary>
@@ -384,6 +408,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define o quanto o painel será esticado automaticamente para a direita até mostrar todos os resultados.
     ''' </summary>
@@ -399,6 +424,7 @@ Public Class QueriedBox
             If value Then DropDownStretchRight = 0
         End Set
     End Property
+
     ''' <summary>
     ''' Define o quanto o painel será esticado para baixo.
     ''' </summary>
@@ -406,6 +432,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Integer), "120")>
     <Description("Define o quanto o painel será esticado para baixo.")>
     Public Property DropDownStretchDown As Integer = 120
+
     ''' <summary>
     ''' Define o quanto o painel será esticado para a esquerda.
     ''' </summary>
@@ -413,6 +440,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Integer), "0")>
     <Description("Define o quanto o painel será esticado para a esquerda.")>
     Public Property DropDownStretchLeft As Integer
+
     ''' <summary>
     ''' Define o quanto o painel será esticado para a direita.
     ''' </summary>
@@ -428,8 +456,7 @@ Public Class QueriedBox
             _DropDownStretchRight = value
         End Set
     End Property
-#End Region
-#Region "COMPORTAMENTO"
+
     ''' <summary>
     ''' Define um prefixo que será congelado com o resultado.
     ''' </summary>
@@ -437,6 +464,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(String), Nothing)>
     <Description("Define um prefixo que será congelado com o resultado.")>
     Public Property Prefix As String
+
     ''' <summary>
     ''' Define um sufixo que será congelado com o resultado.
     ''' </summary>
@@ -444,6 +472,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(String), Nothing)>
     <Description("Define um sufixo que será congelado com o resultado.")>
     Public Property Suffix As String
+
     ''' <summary>
     ''' Limpa todo o conteúdo cado um valor seja descongelado.
     ''' </summary>
@@ -451,6 +480,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Boolean), "False")>
     <Description("Limpa todo o conteúdo cado um valor seja descongelado.")>
     Public Property ClearOnUnfreeze As Boolean
+
     ''' <summary>
     ''' Define se será mostrado o inicio do conteúdo ao sair do controle.
     ''' </summary>
@@ -466,6 +496,7 @@ Public Class QueriedBox
     <DefaultValue(GetType(Boolean), "False")>
     <Description("Define se será mostrado o inicio do conteúdo ao congelar um resultado.")>
     Public Property ShowStartOnFreeze As Boolean = False
+
     ''' <summary>
     ''' Define a quantidade de caracteres necessários para iniciar a pesquisa.
     ''' </summary>
@@ -481,6 +512,7 @@ Public Class QueriedBox
             _CharactersToQuery = value
         End Set
     End Property
+
     ''' <summary>
     ''' Define se as pesquisas estão habilitadas.
     ''' </summary>
@@ -496,6 +528,7 @@ Public Class QueriedBox
             _QueryEnabled = value
         End Set
     End Property
+
     ''' <summary>
     ''' Define o intervalo em que será feita uma nova pesquisa entre cada caractere digitado.
     ''' </summary>
@@ -511,6 +544,7 @@ Public Class QueriedBox
             _QueryInterval = value
         End Set
     End Property
+
     ''' <summary>
     ''' Define se será permitido o uso de hyperlinks em registros selecionados com a tecla control.
     ''' </summary>
@@ -519,16 +553,14 @@ Public Class QueriedBox
     <Category("Comportamento")>
     <Description("Define se será permitido o uso de hyperlinks em registros selecionados com a tecla control.")>
     Public Property AllowHyperlink As Boolean = False
-#End Region
-#Region "DADOS"
+
     ''' <summary>
     ''' Define a Conexão a ser utilizada em todos os controles para o acesso aos dados.
     ''' </summary>
     ''' <returns></returns>
     <Description("Define a Conexão a ser utilizada em todos os controles para o acesso aos dados.")>
     Public Shared Property Connection As DbConnection
-#End Region
-#Region "HIDDEN PROPERTIES"
+
     ''' <summary>
     ''' Retorna se existe um registro selecionado.
     ''' </summary>
@@ -540,6 +572,7 @@ Public Class QueriedBox
             Return _IsFreezed
         End Get
     End Property
+
     ''' <summary>
     ''' Retorna a chave primária do registro selecionado ou 0 quando não há registro selecionado.
     ''' </summary>
@@ -552,6 +585,7 @@ Public Class QueriedBox
             Return _FreezedPrimaryKey
         End Get
     End Property
+
     ''' <summary>
     ''' Retorna o valor do registro selecionado.
     ''' </summary>
@@ -564,6 +598,7 @@ Public Class QueriedBox
             Return _FreezedValue
         End Get
     End Property
+
     ''' <summary>
     ''' Retorna a cor padrão de quando um registro é deselecionado (Mesma cor de fundo do controle).
     ''' </summary>
@@ -576,9 +611,7 @@ Public Class QueriedBox
             Return _UnFreezeColor
         End Get
     End Property
-#End Region
-#End Region
-#Region "OVERRIDED SUBS"
+
     Protected Overrides Sub OnHandleCreated(ByVal e As EventArgs)
         MyBase.OnHandleCreated(e)
         If DesignMode AndAlso Site IsNot Nothing Then
@@ -593,6 +626,7 @@ Public Class QueriedBox
             End If
         End If
     End Sub
+
     Public Overrides Property ForeColor As Color
         Get
             Return MyBase.ForeColor
@@ -604,6 +638,7 @@ Public Class QueriedBox
             End If
         End Set
     End Property
+
     Protected Overrides Sub OnEnter(e As EventArgs)
         MyBase.OnEnter(e)
         SelectionStart = Text.Length
@@ -617,6 +652,7 @@ Public Class QueriedBox
             _FirstEnter = True
         End If
     End Sub
+
     Protected Overrides Sub OnLeave(e As EventArgs)
         MyBase.OnLeave(e)
         If QueryEnabled Then
@@ -632,6 +668,7 @@ Public Class QueriedBox
             SelectionStart = 0
         End If
     End Sub
+
     <DebuggerStepThrough>
     Protected Overrides Sub OnTextChanged(e As EventArgs)
         MyBase.OnTextChanged(e)
@@ -678,12 +715,14 @@ Public Class QueriedBox
         End If
         _KeyDown = False
     End Sub
+
     Protected Overrides Sub OnForeColorChanged(e As EventArgs)
         MyBase.OnForeColorChanged(e)
         If QueryEnabled Then
             _UnFreezeColor = ForeColor
         End If
     End Sub
+
     Protected Overrides Sub OnPreviewKeyDown(e As PreviewKeyDownEventArgs)
         MyBase.OnPreviewKeyDown(e)
         Dim Row As Long
@@ -733,6 +772,7 @@ Public Class QueriedBox
             End If
         End If
     End Sub
+
     Protected Overrides Sub OnKeyDown(e As KeyEventArgs)
         MyBase.OnKeyDown(e)
         _KeyDown = True
@@ -747,12 +787,14 @@ Public Class QueriedBox
             End Select
         End If
     End Sub
+
     Protected Overrides Sub OnKeyUp(e As KeyEventArgs)
         MyBase.OnKeyUp(e)
         If QueryEnabled Then
             FormatTextBox(False)
         End If
     End Sub
+
     Protected Overrides Sub OnMouseClick(e As MouseEventArgs)
         MyBase.OnMouseClick(e)
         If QueryEnabled Then
@@ -762,8 +804,7 @@ Public Class QueriedBox
             End If
         End If
     End Sub
-#End Region
-#Region "PUBLIC SUBS"
+
     ''' <summary>
     ''' Congela manualmente um registro usando as propriedades definidas no controle.
     ''' </summary>
@@ -832,6 +873,7 @@ Public Class QueriedBox
             End If
         End If
     End Sub
+
     ''' <summary>
     ''' Seleciona manualmente um registro espcificando ignorando as propredades definidas no controle.
     ''' </summary>
@@ -872,6 +914,7 @@ Public Class QueriedBox
             End If
         End If
     End Sub
+
     ''' <summary>
     ''' Descongela manualmente um registro.
     ''' </summary>
@@ -896,11 +939,11 @@ Public Class QueriedBox
             CloseDropDown()
         End If
     End Sub
+
     Public Sub DebugQuery()
         Debug.Print(GetQuery())
     End Sub
-#End Region
-#Region "PRIVATE SUBS"
+
     Private Sub AutoFreeze()
         Dim OldPrimaryKey As Long
         Dim MainValue As String
@@ -951,6 +994,7 @@ Public Class QueriedBox
             _Freezing = False
         End If
     End Sub
+
     Private Sub AutoUnfreeze()
         Dim OldPrimaryKey As Long
         If QueryEnabled Then
@@ -974,6 +1018,7 @@ Public Class QueriedBox
             QueryEnabled = True
         End If
     End Sub
+
     <DebuggerStepThrough>
     Private Sub CloseDropDown()
         If DropDownResultsForm IsNot Nothing Then
@@ -981,6 +1026,7 @@ Public Class QueriedBox
             DropDownResultsForm = Nothing
         End If
     End Sub
+
     Private Sub FormatTextBox(ByVal ShowAsLink As Boolean)
         If Not _CtrlHyperLink Then Return
         If ShowAsLink Then
@@ -993,6 +1039,7 @@ Public Class QueriedBox
             _IsHyperLink = False
         End If
     End Sub
+
     <DebuggerStepThrough>
     Private Sub Form_Deactivate(sender As Object, e As EventArgs)
         If DropDownResultsForm IsNot Nothing AndAlso DropDownResultsForm.DgvResults.SelectedRows.Count = 1 Then
@@ -1002,10 +1049,12 @@ Public Class QueriedBox
         End If
         CloseDropDown()
     End Sub
+
     Private Sub DropDownResultsForm_FormClosed(ByVal sender As Object, ByVal e As FormClosedEventArgs)
         DropDownResultsForm.Dispose()
         DropDownResultsForm = Nothing
     End Sub
+
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
         Dim Query As String
         Dim ParameterList As Dictionary(Of String, Object)
@@ -1087,8 +1136,7 @@ Public Class QueriedBox
             Throw ex
         End Try
     End Sub
-#End Region
-#Region "PRIVATE FUNCTIONS"
+
     Private Function GetQuery() As String
         Dim Query As String
         Query = String.Format("SELECT {0}{1}{2}{3}.{4} AS 'mainid',{1}{2}{8}{5}.{6}{9} AS '{7}'",
@@ -1116,7 +1164,7 @@ Public Class QueriedBox
         Next o
         Query += String.Format("{0}FROM {1} AS {2}",
                                vbNewLine, '0
-                               MainTableName, '1 
+                               MainTableName, '1
                                If(MainTableAlias = Nothing, MainTableName, MainTableAlias)) '2)
         For Each r As Relation In Relations
             Query += String.Format("{0}{1} JOIN {2} AS {3} ON {3}.{4} {5} {6}.{7}",
@@ -1142,6 +1190,7 @@ Public Class QueriedBox
         Next r
         Return Query
     End Function
+
     Private Sub ValidateTick()
         Dim FieldHeaders As New List(Of String)
         Dim ParametersNames As New List(Of String)
@@ -1250,6 +1299,7 @@ Public Class QueriedBox
             End If
         Next i
     End Sub
+
     Private Function ExecuteQuery(Query As String, Optional Parameters As Dictionary(Of String, Object) = Nothing) As DataTable
         Dim Table As New DataTable
         Dim Par As DbParameter
@@ -1283,8 +1333,7 @@ Public Class QueriedBox
             End Using
         End Using
     End Function
-#End Region
-#Region "PUBLIC FUNCTIONS"
+
     ''' <summary>
     ''' Retorna se o dropdown de resultados está visível ou não.
     ''' </summary>
@@ -1300,6 +1349,7 @@ Public Class QueriedBox
             End If
         End If
     End Function
+
     ''' <summary>
     ''' Retorna o valor congelado referente à tabela e campo informados.
     ''' </summary>
@@ -1316,21 +1366,23 @@ Public Class QueriedBox
         End If
         Return Match.Item3
     End Function
-#End Region
-#Region "INTERNAL CLASSES"
+
     Public Class Condition
+
         ''' <summary>
         ''' Define o nome ou apelido da tabela do banco de dados onde será aplicada a condição.
         ''' </summary>
         <Description("Define o nome ou apelido da tabela do banco de dados onde será aplicada a condição.")>
         <Category("Query")>
         Public Property TableNameOrAlias As String
+
         ''' <summary>
         ''' Define o nome do campo do banco de dados onde será aplicada a condição.
         ''' </summary>
         <Description("Define o nome do campo do banco de dados onde será aplicada a condição.")>
         <Category("Query")>
         Public Property FieldName As String
+
         ''' <summary>
         ''' Define o operador da condição. Para o operador BETWEEN, separar os dois valores por ponto e vírgula (;).
         ''' </summary>
@@ -1338,12 +1390,14 @@ Public Class QueriedBox
         <Category("Query")>
         <TypeConverter(GetType(OperatorFilterCollection))>
         Public Property [Operator] As String
+
         ''' <summary>
         ''' Define o valor a ser testado na condição.
         ''' </summary>
         <Description("Define o valor a ser testado na condição.")>
         <Category("Query")>
         Public Property Value As String
+
         Public Overrides Function ToString() As String
             If TableNameOrAlias <> Nothing And FieldName <> Nothing And [Operator] <> Nothing And Value <> Nothing Then
                 If [Operator] = "BETWEEN" Then
@@ -1367,8 +1421,10 @@ Public Class QueriedBox
         End Function
 
     End Class
+
     Class OperatorFilterCollection
         Inherits StringConverter
+
         Private Shared ReadOnly _OperatorList As New List(Of String) From {
                 "=",
                 "<>",
@@ -1379,71 +1435,86 @@ Public Class QueriedBox
                 "BETWEEN",
                 "LIKE"
             }
+
         Public Overrides Function GetStandardValuesSupported(ByVal context As ITypeDescriptorContext) As Boolean
             Return True
         End Function
+
         Public Overrides Function GetStandardValuesExclusive(ByVal context As ITypeDescriptorContext) As Boolean
             Return True
         End Function
+
         Public Overrides Function GetStandardValues(ByVal context As ITypeDescriptorContext) As StandardValuesCollection
             Return New StandardValuesCollection(_OperatorList)
         End Function
+
     End Class
+
     Public Class OtherField
+
         ''' <summary>
         ''' Define o nome da tabela a qual está relacionada aos resultados que serão exibidos.
         ''' </summary>
         <Description("Define o nome da tabela a qual está relacionada aos resultados que serão exibidos.")>
         <Category("Query")>
         Public Property DisplayTableName As String
+
         ''' <summary>
         ''' Define o apelido da tabela a qual está relacionada aos resultados que serão exibidos.
         ''' </summary>
         <Description("Define o apelido da tabela a qual está relacionada aos resultados que serão exibidos.")>
         <Category("Query")>
         Public Property DisplayTableAlias As String
+
         ''' <summary>
         ''' Define o nome do campo que será que será exibido em conjunto nos resultados da pesquisa.
         ''' </summary>
         <Description("Define o nome do campo que será que será exibido em conjunto nos resultados da pesquisa.")>
         <Category("Query")>
         Public Property DisplayFieldName As String
+
         ''' <summary>
         ''' Define o apelido do campo que será que será exibido em conjunto nos resultados da pesquisa.
         ''' </summary>
         <Description("Define o apelido do campo que será que será exibido em conjunto nos resultados da pesquisa.")>
         <Category("Query")>
         Public Property DisplayFieldAlias As String
+
         ''' <summary>
         ''' Define o nome do campo da tabela que está atribuído como Primary Key.
         ''' </summary>
         <Description("Define o nome do campo da tabela que está atribuído como Primary Key.")>
         <Category("Query")>
         Public Property DisplayMainFieldName As String
+
         ''' <summary>
         ''' Define se o valor desse campo será congelado no controle.
         ''' </summary>
         <Description("Define se o valor desse campo será congelado no controle.")>
         <Category("Comportamento")>
         Public Property Freeze As Boolean
+
         ''' <summary>
         ''' Define um prefixo que será congelado com o resultado.
         ''' </summary>
         <Category("Comportamento")>
         <Description("Define um prefixo que será congelado com o resultado.")>
         Public Property Prefix As String
+
         ''' <summary>
         ''' Define um sufixo que será congelado com o resultado.
         ''' </summary>
         <Category("Comportamento")>
         <Description("Define um sufixo que será congelado com o resultado.")>
         Public Property Suffix As String
+
         ''' <summary>
         ''' Define um valor a ser retornado caso a consulta retorne um valor nulo para esse campo.
         ''' </summary>
         <Description("Define um valor a ser retornado caso a consulta retorne um valor nulo para esse campo.")>
         <Category("Query")>
         Public Property IfNull As String
+
         ''' <summary>
         ''' Define como a largura da coluna será ajustada nos resultados.
         ''' </summary>
@@ -1451,6 +1522,7 @@ Public Class QueriedBox
         <DefaultValue(GetType(Color), "Blue")>
         <Description("Define como a largura da coluna será ajustada nos resultados.")>
         Public Property DisplayFieldAutoSizeColumnMode As DataGridViewAutoSizeColumnMode
+
         Public Overrides Function ToString() As String
             If DisplayTableName <> Nothing Or DisplayFieldName <> Nothing Then
                 Return If(DisplayTableAlias = Nothing, DisplayTableName, DisplayTableAlias) & "." & If(DisplayFieldAlias = Nothing, DisplayFieldName, DisplayFieldAlias)
@@ -1458,20 +1530,25 @@ Public Class QueriedBox
                 Return "Undefined " & MyBase.GetType.Name
             End If
         End Function
+
     End Class
+
     Public Class Parameter
+
         ''' <summary>
         ''' Define o nome do parâmetro utilizado na Query.
         ''' </summary>
         <Description("Define o nome do parâmetro utilizado nas condições da Query.")>
         <Category("Query")>
         Public Property ParameterName As String
+
         ''' <summary>
         ''' Define o valor do parâmetro utilizado na Query.
         ''' </summary>
         <Description("Define o valor do parâmetro utilizado nas condições da Query.")>
         <Category("Query")>
         Public Property ParameterValue As String
+
         Public Overrides Function ToString() As String
             If ParameterName <> Nothing And ParameterValue <> Nothing Then
                 Return ParameterName & " = " & ParameterValue
@@ -1481,8 +1558,11 @@ Public Class QueriedBox
                 Return "New Undefined" & MyBase.GetType.Name
             End If
         End Function
+
     End Class
+
     Public Class Relation
+
         ''' <summary>
         ''' Define condições adicionais para o relacionamento.
         ''' </summary>
@@ -1498,6 +1578,7 @@ Public Class QueriedBox
         <TypeConverter(GetType(RelationFilterCollection))>
         <Category("Query")>
         Public Property RelationType As String
+
         ''' <summary>
         ''' Define o operador a ser utilizado na relação.
         ''' </summary>
@@ -1505,44 +1586,52 @@ Public Class QueriedBox
         <Category("Query")>
         <TypeConverter(GetType(OperatorFilterCollection))>
         Public Property [Operator] As String
+
         ''' <summary>
         ''' Define o nome da tabela que será relacionada.
         ''' </summary>
         <Description("Define o nome da tabela que será relacionada.")>
         <Category("Query")>
         Public Property RelateTableName As String
+
         ''' <summary>
         ''' Define o apelido da tabela que será relacionada.
         ''' </summary>
         <Description("Define o apelido da tabela que será relacionada.")>
         <Category("Query")>
         Public Property RelateTableAlias As String
+
         ''' <summary>
         ''' Define o nome do campo que se será relacionado.
         ''' </summary>
         <Description("Define o nome do campo que se será relacionado.")>
         <Category("Query")>
         Public Property RelateFieldName As String
+
         ''' <summary>
         ''' Define o nome da tabela que será relacionada com a tabela principal.
         ''' </summary>
         <Description("Define o nome da tabela que será relacionada com a tabela principal.")>
         <Category("Query")>
         Public Property WithTableName As String
+
         ''' <summary>
         ''' Define o apelido da tabela que se será relacionada com a tabela principal.
         ''' </summary>
         <Description("Define o apelido da tabela que se será relacionada com a tabela principal.")>
         <Category("Query")>
         Public Property WithTableAlias As String
+
         ''' <summary>
         ''' Define o nome do campo que será relacionado com o campo da tabela principal.
         ''' </summary>
         <Description("Define o nome do campo que será relacionado com o campo da tabela principal.")>
         <Category("Query")>
         Public Property WithFieldName As String
+
         Public Sub New()
         End Sub
+
         Public Overrides Function ToString() As String
             If RelateTableName = Nothing Or WithTableName = Nothing Or RelateFieldName = Nothing Or WithFieldName = Nothing Or [Operator] = Nothing Or RelationType = Nothing Then
                 Return "New Undefined " & MyBase.GetType.Name
@@ -1553,37 +1642,45 @@ Public Class QueriedBox
             End If
         End Function
 
-
     End Class
+
     Class RelationFilterCollection
         Inherits StringConverter
+
         Private Shared ReadOnly _JoinList As New List(Of String) From {
             "LEFT",
             "RIGHT",
             "INNER",
             "CROSS"
         }
+
         Public Overrides Function GetStandardValuesSupported(ByVal context As ITypeDescriptorContext) As Boolean
             Return True
         End Function
+
         Public Overrides Function GetStandardValuesExclusive(ByVal context As ITypeDescriptorContext) As Boolean
             Return True
         End Function
+
         Public Overrides Function GetStandardValues(ByVal context As ITypeDescriptorContext) As StandardValuesCollection
             Return New StandardValuesCollection(_JoinList)
         End Function
+
     End Class
+
     Private Class QueriedTextBoxControlDesignerActionList
         Inherits DesignerActionList
         Private ReadOnly Control As QueriedBox
         Private ReadOnly Designer As ControlDesigner
         Private ReadOnly ActionList As DesignerActionList
+
         Public Sub New(ByVal Designer As ControlDesigner, ByVal ActionList As DesignerActionList)
             MyBase.New(Designer.Component)
             Me.Designer = Designer
             Me.ActionList = ActionList
             Control = CType(Designer.Control, QueriedBox)
         End Sub
+
         Public Overrides Function GetSortedActionItems() As DesignerActionItemCollection
             Dim Items = New DesignerActionItemCollection From {
                 New DesignerActionPropertyItem("QueryEnabled", "QueryEnabled", "Category1", "Define se as pesquisas estão habilitadas."),
@@ -1609,6 +1706,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("QueryEnabled").SetValue(Component, value)
             End Set
         End Property
+
         Public Property QueryInterval As Integer
             Get
                 Return Control.QueryInterval
@@ -1617,6 +1715,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("QueryInterval").SetValue(Component, value)
             End Set
         End Property
+
         Public Property CharactersToQuery As Integer
             Get
                 Return Control.CharactersToQuery
@@ -1625,6 +1724,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("CharactersToQuery").SetValue(Component, value)
             End Set
         End Property
+
         Public Property MainTableName As String
             Get
                 Return Control.MainTableName
@@ -1633,6 +1733,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("MainTableName").SetValue(Component, value)
             End Set
         End Property
+
         Public Property MainTableAlias As String
             Get
                 Return Control.MainTableAlias
@@ -1641,6 +1742,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("MainTableAlias").SetValue(Component, value)
             End Set
         End Property
+
         Public Property MainReturnFieldName As String
             Get
                 Return Control.MainReturnFieldName
@@ -1649,6 +1751,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("MainReturnFieldName").SetValue(Component, value)
             End Set
         End Property
+
         Public Property DisplayTableName As String
             Get
                 Return Control.DisplayTableName
@@ -1657,6 +1760,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("DisplayTableName").SetValue(Component, value)
             End Set
         End Property
+
         Public Property DisplayTableAlias As String
             Get
                 Return Control.DisplayTableAlias
@@ -1665,6 +1769,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("DisplayTableAlias").SetValue(Component, value)
             End Set
         End Property
+
         Public Property DisplayFieldName As String
             Get
                 Return Control.DisplayFieldName
@@ -1673,6 +1778,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("DisplayFieldName").SetValue(Component, value)
             End Set
         End Property
+
         Public Property DisplayFieldAlias As String
             Get
                 Return Control.DisplayFieldAlias
@@ -1681,6 +1787,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("DisplayFieldAlias").SetValue(Component, value)
             End Set
         End Property
+
         Public Property DisplayMainFieldName As String
             Get
                 Return Control.DisplayMainFieldName
@@ -1689,6 +1796,7 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("DisplayMainFieldName").SetValue(Component, value)
             End Set
         End Property
+
         Public Property Limit As Integer
             Get
                 Return Control.Limit
@@ -1697,11 +1805,14 @@ Public Class QueriedBox
                 TypeDescriptor.GetProperties(Component)("Limit").SetValue(Component, value)
             End Set
         End Property
+
     End Class
+
     Private Class FormDropDownResults
         Inherits Form
         Public Textbox As Control
         Private ReadOnly _QueriedBox As QueriedBox
+
         Public Sub New(ByVal SearchBox As QueriedBox)
             SuspendLayout()
             _QueriedBox = SearchBox
@@ -1716,6 +1827,7 @@ Public Class QueriedBox
             KeyPreview = True
             ResumeLayout(True)
         End Sub
+
         Private Sub InitializeComponent()
             Dim sg As Boolean = _QueriedBox.ShowVerticalGridLines
             PanelContainer = New Panel With {
@@ -1765,6 +1877,7 @@ Public Class QueriedBox
             PanelContainer.Controls.AddRange({DgvResults, LblCharsRemaining})
             Controls.Add(PanelContainer)
         End Sub
+
         Private Sub DgvResults_DataSourceChanged(sender As Object, e As EventArgs) Handles DgvResults.DataSourceChanged
             If DgvResults.Rows.Count = 0 Then
                 DgvResults.Visible = False
@@ -1772,14 +1885,17 @@ Public Class QueriedBox
                 LblCharsRemaining.Visible = True
             End If
         End Sub
+
         Private Sub DropDownResults_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             Application.AddMessageFilter(New PopupWindowHelperMessageFilter(Me, Textbox))
         End Sub
+
         Private Sub EnableDoubleBuffered(ByVal dgv As DataGridView)
             Dim DgvType As Type = dgv.[GetType]()
             Dim pi As PropertyInfo = DgvType.GetProperty("DoubleBuffered", BindingFlags.Instance Or BindingFlags.NonPublic)
             pi.SetValue(dgv, True, Nothing)
         End Sub
+
         Protected Overrides ReadOnly Property CreateParams As CreateParams
             Get
                 Dim ret As CreateParams = MyBase.CreateParams
@@ -1790,12 +1906,14 @@ Public Class QueriedBox
                 Return ret
             End Get
         End Property
+
         Private Sub DataGridView_PreviewKeyDown(sender As Object, e As PreviewKeyDownEventArgs) Handles DgvResults.PreviewKeyDown
             If e.KeyCode = Keys.Tab Then
                 Close()
                 Me.Select()
             End If
         End Sub
+
         Private Sub DataGridView_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles DgvResults.MouseDoubleClick
             Dim Click As DataGridView.HitTestInfo = DgvResults.HitTest(e.X, e.Y)
             If Click.Type = DataGridViewHitTestType.Cell Then
@@ -1804,10 +1922,12 @@ Public Class QueriedBox
                 Close()
             End If
         End Sub
+
         Friend WithEvents DgvResults As DataGridView
         Friend WithEvents LblCharsRemaining As Label
         Friend WithEvents PanelContainer As Panel
     End Class
+
     Private Class PopupWindowHelperMessageFilter
         Implements IMessageFilter
         Private Const WM_LBUTTONDOWN As Integer = &H201
@@ -1818,10 +1938,12 @@ Public Class QueriedBox
         Private Const WM_NCMBUTTONDOWN As Integer = &HA7
         Private ReadOnly TextBox As Control = Nothing
         Public Property Popup As Form = Nothing
+
         Public Sub New(ByVal popupW As Form, ByVal textbox As Control)
             Popup = popupW
             Me.TextBox = textbox
         End Sub
+
         <DebuggerStepThrough>
         Private Sub OnMouseDown()
             Dim cursorPos As Point = Cursor.Position
@@ -1838,6 +1960,7 @@ Public Class QueriedBox
                 End If
             End If
         End Sub
+
         <DebuggerStepThrough>
         Private Function IMessageFilter_PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
             If Popup IsNot Nothing Then
@@ -1848,8 +1971,11 @@ Public Class QueriedBox
             End If
             Return False
         End Function
+
     End Class
+
     Private Class Flags
+
         <Flags()>
         Public Enum WindowStyles As UInteger
             WS_OVERLAPPED = 0
@@ -1906,11 +2032,9 @@ Public Class QueriedBox
             WS_EX_COMPOSITED = 33554432
             WS_EX_NOACTIVATE = 134217728
         End Enum
+
     End Class
 
-#End Region
-#Region "COMPONENTS"
     Private WithEvents Timer As Timer
-#End Region
 
 End Class

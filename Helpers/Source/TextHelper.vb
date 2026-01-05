@@ -3,6 +3,7 @@
 ''' and simple text parsing operations.
 ''' </summary>
 Public Class TextHelper
+
     ''' <summary>
     ''' Generates a random string composed of multiple sets of characters.
     ''' </summary>
@@ -29,6 +30,7 @@ Public Class TextHelper
         Dim RandomString As String = String.Join(SetSeparator, Sets)
         Return RandomString
     End Function
+
     ''' <summary>
     ''' Generates a random file name using the current date/time,
     ''' a GUID, and a system-generated random component.
@@ -49,6 +51,7 @@ Public Class TextHelper
         End If
         Return Filename.ToString
     End Function
+
     ''' <summary>
     ''' Builds a character set string based on the specified
     ''' character filter options.
@@ -81,6 +84,7 @@ Public Class TextHelper
         Next
         Return CharSet.ToString()
     End Function
+
     ''' <summary>
     ''' Extracts the value of a specified key from a JSON string.
     ''' </summary>
@@ -107,7 +111,9 @@ Public Class TextHelper
             Return Nothing
         End Try
     End Function
+
 End Class
+
 ''' <summary>
 ''' Defines character filter options used to compose
 ''' character sets for random string generation.

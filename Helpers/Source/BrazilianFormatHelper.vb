@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+
 ''' <summary>
 ''' Provides utility methods for formatting and validating
 ''' common Brazilian data formats, including ZIP codes (CEP),
@@ -19,6 +20,7 @@ Public Class BrazilianFormatHelper
             Return ZipCode
         End If
     End Function
+
     ''' <summary>
     ''' Determines whether the provided string is a valid Brazilian ZIP code (CEP).
     ''' </summary>
@@ -83,6 +85,7 @@ Public Class BrazilianFormatHelper
         End If
         Return Phone
     End Function
+
     ''' <summary>
     ''' Determines the phone number type based on its format.
     ''' </summary>
@@ -211,11 +214,11 @@ Public Class BrazilianFormatHelper
             Else
                 Return False
             End If
-
         Else
             Return False
         End If
     End Function
+
     ''' <summary>
     ''' Determines whether the provided string is a valid Brazilian natural person document (CPF).
     ''' </summary>
@@ -255,7 +258,9 @@ Public Class BrazilianFormatHelper
             Return False
         End If
     End Function
+
 End Class
+
 ''' <summary>
 ''' Defines the supported phone number formats.
 ''' </summary>

@@ -1,9 +1,11 @@
 ﻿Imports System.Reflection
+
 ''' <summary>
 ''' Provides utility methods to retrieve custom attributes
 ''' from types, members, and enumerations using reflection.
 ''' </summary>
 Public Class AttributeHelper
+
     ''' <summary>
     ''' Retrieves an attribute from a member of a class, structure, or enumeration
     ''' based on the member name.
@@ -40,4 +42,5 @@ Public Class AttributeHelper
         End If
         Return CType(Member.GetCustomAttribute(GetType(TAttribute)), TAttribute)
     End Function
+
 End Class

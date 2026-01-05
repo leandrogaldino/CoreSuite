@@ -10,8 +10,11 @@ Imports CoreSuite.Helpers
 ''' </summary>
 Public Class PictureViewer
     Inherits Panel
+
     Public Event PictureAdded(Path As String)
+
     Public Event PictureRemoved(Path As String)
+
     Friend WithEvents TlpControls As TableLayoutPanel
     Friend WithEvents PbxPicture As PictureBox
     Friend WithEvents LblCounter As Label
@@ -34,6 +37,7 @@ Public Class PictureViewer
     ''' Por padrão, utiliza o diretório temporário do sistema.
     ''' </summary>
     Public Property TempDirectory As String = Path.GetTempPath()
+
     ''' <summary>
     ''' Obtém ou define o número máximo de imagens que podem ser carregadas no controle.
     ''' </summary>
@@ -60,6 +64,7 @@ Public Class PictureViewer
             Return _Pictures
         End Get
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem atualmente selecionada no controle.
     ''' </summary>
@@ -75,6 +80,7 @@ Public Class PictureViewer
             _SelectedIndex = _Pictures.IndexOf(_SelectedPicture)
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Primeiro".
     ''' </summary>
@@ -89,6 +95,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Anterior".
     ''' </summary>
@@ -103,6 +110,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Próximo".
     ''' </summary>
@@ -117,6 +125,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Último".
     ''' </summary>
@@ -131,6 +140,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Salvar".
     ''' </summary>
@@ -145,6 +155,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Remover".
     ''' </summary>
@@ -159,6 +170,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a imagem exibida no botão "Incluir".
     ''' </summary>
@@ -173,6 +185,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a máscara de formatação exibida no contador.
     ''' Os placeholders {0}, {1} e {2} representam:
@@ -190,6 +203,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define se a barra de controle será exibida.
     ''' </summary>
@@ -204,7 +218,6 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
-
 
     ''' <summary>
     ''' Obtém ou define se a barra de contador será exibida.
@@ -238,6 +251,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a cor de fundo da barra de contador.
     ''' </summary>
@@ -252,6 +266,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Obtém ou define a cor de fundo da barra de controle.
     ''' </summary>
@@ -266,6 +281,7 @@ Public Class PictureViewer
             Invalidate()
         End Set
     End Property
+
     ''' <summary>
     ''' Inicializa uma nova instância do <see cref="PictureViewer"/>.
     ''' </summary>
@@ -274,6 +290,7 @@ Public Class PictureViewer
         _Pictures = New List(Of String)
         RefreshControls()
     End Sub
+
     Private Sub InitializeComponents()
         BtnFirst = New NoFocusCueButton With {
             .Anchor = AnchorStyles.None,
@@ -386,6 +403,7 @@ Public Class PictureViewer
         Size = New Size(240, 150)
         CounterMask = "{0}/{1}"
     End Sub
+
     Private Sub ShowSelectedPicture()
         If _SelectedPicture IsNot Nothing Then
             If PbxPicture.Image IsNot Nothing Then PbxPicture.Image.Dispose()
@@ -397,6 +415,7 @@ Public Class PictureViewer
             PbxPicture.Image = Nothing
         End If
     End Sub
+
     ''' <summary>
     ''' Adiciona uma única imagem ao controle.
     ''' Caso a imagem já exista, ela não será duplicada.
@@ -416,6 +435,7 @@ Public Class PictureViewer
             RefreshControls()
         End If
     End Sub
+
     ''' <summary>
     ''' Adiciona múltiplas imagens ao controle.
     ''' Caso alguma imagem já exista, ela não será duplicada.
@@ -444,6 +464,7 @@ Public Class PictureViewer
             RefreshControls()
         End If
     End Sub
+
     ''' <summary>
     ''' Remove uma imagem previamente adicionada ao controle.
     ''' </summary>
@@ -463,11 +484,13 @@ Public Class PictureViewer
         ShowSelectedPicture()
         RefreshControls()
     End Sub
+
     Public Sub Clear()
         For Each Picture In _Pictures.ToList()
             RemovePicture(Picture)
         Next Picture
     End Sub
+
     Private Sub BtnInclude_Click(sender As Object, e As EventArgs) Handles BtnInclude.Click
         Using OpenFileDialog As New OpenFileDialog()
             OpenFileDialog.Filter = "Imagens|*.jpg;*.jpeg;*.png;*.bmp|Todos os arquivos|*.*"
@@ -485,6 +508,7 @@ Public Class PictureViewer
             End If
         End Using
     End Sub
+
     Private Sub BtnSavePicture_Click(sender As Object, e As EventArgs) Handles BtnSave.Click
         Using SaveFileDialog As New SaveFileDialog()
             SaveFileDialog.Filter = "JPEG Image|*.jpg|PNG Image|*.png|BMP Image|*.bmp"
@@ -513,29 +537,35 @@ Public Class PictureViewer
             End If
         End Using
     End Sub
+
     Private Sub BtnRemovePicture_Click(sender As Object, e As EventArgs) Handles BtnRemove.Click
         RemovePicture(_SelectedPicture)
     End Sub
+
     Private Sub BtnPrevious_Click(sender As Object, e As EventArgs) Handles BtnPrevious.Click
         SelectedPicture = Pictures(_Pictures.IndexOf(SelectedPicture) - 1)
         ShowSelectedPicture()
         RefreshControls()
     End Sub
+
     Private Sub BtnNext_Click(sender As Object, e As EventArgs) Handles BtnNext.Click
         SelectedPicture = Pictures(_Pictures.IndexOf(SelectedPicture) + 1)
         ShowSelectedPicture()
         RefreshControls()
     End Sub
+
     Private Sub BtnFirst_Click(sender As Object, e As EventArgs) Handles BtnFirst.Click
         SelectedPicture = Pictures(0)
         ShowSelectedPicture()
         RefreshControls()
     End Sub
+
     Private Sub BtnLast_Click(sender As Object, e As EventArgs) Handles BtnLast.Click
         SelectedPicture = Pictures(Pictures.Count - 1)
         ShowSelectedPicture()
         RefreshControls()
     End Sub
+
     Private Sub RefreshControls()
         Dim PictureCount As Integer = Pictures.Count
         Dim PictureIndex As Integer = _Pictures.IndexOf(SelectedPicture)
@@ -568,6 +598,7 @@ Public Class PictureViewer
             BtnInclude.Enabled = True
         End If
     End Sub
+
     Private Function IsDesignTime() As Boolean
         Dim c As Control = Me
         While c IsNot Nothing
@@ -578,6 +609,7 @@ Public Class PictureViewer
         End While
         Return System.ComponentModel.LicenseManager.UsageMode = System.ComponentModel.LicenseUsageMode.Designtime
     End Function
+
     Protected Overrides Sub Dispose(disposing As Boolean)
         Try
             If disposing Then
@@ -605,4 +637,5 @@ Public Class PictureViewer
             MyBase.Dispose(disposing)
         End Try
     End Sub
+
 End Class

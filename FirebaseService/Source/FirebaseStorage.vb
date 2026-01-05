@@ -3,30 +3,35 @@ Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports CoreSuite.Helpers
+
 ''' <summary>
 ''' Provides access to Firebase Storage for file upload, download, and deletion.
 ''' </summary>
 ''' <remarks>
 ''' Upload and download progress is reported through the
 ''' <see cref="UploadProgressChanged"/> and <see cref="DownloadProgressChanged"/> events.
-''' 
+'''
 ''' Consumers should subscribe to these events before calling
 ''' <see cref="UploadFile"/> or <see cref="DownloadFile"/> to receive
 ''' progress notifications ranging from 0 to 100.
 ''' </remarks>
 Public Class FirebaseStorage
     Private ReadOnly _Client As FirebaseClient
+
     ''' <summary>
     ''' Occurs when upload progress changes.
     ''' </summary>
     Public Event UploadProgressChanged(percentage As Double)
+
     ''' <summary>
     ''' Occurs when download progress changes.
     ''' </summary>
     Public Event DownloadProgressChanged(percentage As Double)
+
     Friend Sub New(Client As FirebaseClient)
         _Client = Client
     End Sub
+
     ''' <summary>
     ''' Uploads a local file to Firebase Storage.
     ''' </summary>
@@ -100,6 +105,7 @@ Public Class FirebaseStorage
             Throw New Exception($"Falha no Download: {ex.Message}")
         End Try
     End Function
+
     ''' <summary>
     ''' Deletes a file from Firebase Storage.
     ''' </summary>
@@ -129,17 +135,20 @@ Public Class FirebaseStorage
             Throw
         End Try
     End Function
+
     Private Class ProgressableStreamContent
         Inherits HttpContent
         Private ReadOnly _Stream As Stream
         Private ReadOnly _BufferSize As Integer
         Private ReadOnly _Progress As Action(Of Long, Long)
+
         Public Sub New(Stream As Stream, BufferSize As Integer, Progress As Action(Of Long, Long))
             _Stream = Stream
             _BufferSize = BufferSize
             _Progress = Progress
             Headers.ContentLength = Stream.Length
         End Sub
+
         Protected Overrides Async Function SerializeToStreamAsync(TargetStream As Stream, Context As TransportContext) As Task
             Dim Buffer(_BufferSize - 1) As Byte
             Dim Uploaded As Long = 0
@@ -155,9 +164,12 @@ Public Class FirebaseStorage
                 Loop
             End Using
         End Function
+
         Protected Overrides Function TryComputeLength(ByRef Length As Long) As Boolean
             Length = _Stream.Length
             Return True
         End Function
+
     End Class
+
 End Class

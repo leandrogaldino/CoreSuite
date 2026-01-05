@@ -1,6 +1,7 @@
 ﻿Imports System.CodeDom.Compiler
-Imports System.Reflection
 Imports System.IO
+Imports System.Reflection
+
 Public Class CodeCompiler
     Implements IDisposable
     Private _CodeCompiler As CodeDomProvider
@@ -22,7 +23,6 @@ Public Class CodeCompiler
         JavaScript
         VisualBasic
     End Enum
-
 
     ''' <summary>
     ''' Compila um código em tempo de execução.
@@ -53,7 +53,6 @@ Public Class CodeCompiler
     ''' </summary>
     ''' <returns></returns>
     Public Function Compile() As Object
-
 
         'Instanciando o compilador em na linguagem informada no CompilarHelper.
         _CodeCompiler = CodeDomProvider.CreateProvider(GetLanguageString(_CompilerHelper.Language))
@@ -157,8 +156,10 @@ Public Class CodeCompiler
         End If
         _DisposedValue = True
     End Sub
+
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(True)
         GC.SuppressFinalize(Me)
     End Sub
+
 End Class

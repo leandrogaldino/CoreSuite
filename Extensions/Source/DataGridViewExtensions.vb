@@ -4,6 +4,7 @@ Imports System.Windows.Forms
 
 Namespace Extensions
     Public Module DataGridViewExtensions
+
         ''' <summary>
         ''' Extension method to populate a <see cref="DataGridView"/> from a collection,
         ''' preserving selection and scroll position.
@@ -52,5 +53,6 @@ Namespace Extensions
                 End If
             End If
         End Sub
+
     End Module
 End Namespace

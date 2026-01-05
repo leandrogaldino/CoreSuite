@@ -8,6 +8,7 @@
 Public Class PaginatedList(Of T)
     Inherits ObservableCollection(Of T)
     Private _PageSize As Integer
+
     ''' <summary>
     ''' Gets the list of pages, where each page is a sublist of paginated items.
     ''' </summary>
@@ -37,6 +38,7 @@ Public Class PaginatedList(Of T)
             _PageSize = value
         End Set
     End Property
+
     ''' <summary>
     ''' Creates a new paginated list with the items in reverse order.
     ''' </summary>
@@ -52,6 +54,7 @@ Public Class PaginatedList(Of T)
         Next
         Return ReversedPaginatedList
     End Function
+
     ''' <summary>
     ''' Initializes a new instance of the <see cref="PaginatedList(Of T)"/> class.
     ''' </summary>
@@ -71,6 +74,7 @@ Public Class PaginatedList(Of T)
     Protected Overrides Sub ClearItems()
         MyBase.ClearItems()
     End Sub
+
     ''' <summary>
     ''' Gets the index of the page where the specified item is located.
     ''' </summary>
@@ -103,5 +107,5 @@ Public Class PaginatedList(Of T)
         Next
         Return paginatedList
     End Function
-End Class
 
+End Class

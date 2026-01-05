@@ -2,6 +2,7 @@
 ''' Provides helper methods for mathematical operations and evaluations.
 ''' </summary>
 Public Class MathHelper
+
     ''' <summary>
     ''' Returns the closest value from a given sample set
     ''' relative to a specified target value.
@@ -79,4 +80,5 @@ Public Class MathHelper
         Next
         Return Vals.Pop()
     End Function
+
 End Class

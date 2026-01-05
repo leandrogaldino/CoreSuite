@@ -3,35 +3,49 @@ Imports System.ComponentModel.Design
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Windows.Forms.Design
+
 Public Class PercentageBox
     Inherits TextBox
+
     Public Event PercentageValueChanged(sender As Object, e As EventArgs)
+
 #Region "ENUMS"
+
     Public Enum PercentageBoxBorderStyles
         Custom
         FixedSingle
         Fixed3D
         None
     End Enum
+
     Public Enum ReturnFormat
         [Integer]
         Percent
     End Enum
+
 #End Region
+
 #Region "FIELDS"
+
     Private _DesignerHost As IDesignerHost
     Private _BorderStyle As PercentageBoxBorderStyles = PercentageBoxBorderStyles.Custom
     Private _BorderColorDefault As Color = SystemColors.WindowFrame
     Private _BorderColorFocused As Color = SystemColors.HotTrack
     Private _ShowPercentSymbol As Boolean = True
     Private _PercentageValue As Integer = 0
+
     Private ReadOnly _DecimalList As New List(Of String) From {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-"
     }
+
     Private _SuspendValueChange As Boolean
+
 #End Region
+
 #Region "PROPERTIES"
+
 #Region "OVERLOADED PROPERTIES"
+
     ''' <summary>
     ''' Indica se o controle de edição deve ter uma borda.
     ''' </summary>
@@ -53,8 +67,11 @@ Public Class PercentageBox
             End Select
         End Set
     End Property
+
 #End Region
+
 #Region "NEW PROPERTIES"
+
     ''' <summary>
     ''' Especifica se a propriedade PercentageValue vai retornar um valor inteiro ou o valor real da porcentagem.
     ''' </summary>
@@ -92,6 +109,7 @@ Public Class PercentageBox
             _SuspendValueChange = False
         End Set
     End Property
+
     ''' <summary>
     ''' Retorna o valor armazenado no controle com todas as casas decimais se a propriedade DecimalOnly for verdadeira.
     ''' </summary>
@@ -105,9 +123,9 @@ Public Class PercentageBox
                 Return _PercentageValue / 100
             End If
 
-
         End Get
     End Property
+
     ''' <summary>
     ''' Define a cor da borda quando o controle está com foco.
     ''' </summary>
@@ -125,6 +143,7 @@ Public Class PercentageBox
             End If
         End Set
     End Property
+
     ''' <summary>
     '''"Define a cor da borda quando o controle está sem foco.
     ''' </summary>
@@ -142,8 +161,11 @@ Public Class PercentageBox
             End If
         End Set
     End Property
+
 #End Region
+
 #Region "OVERRIDED PROPERTIES"
+
     Public Overrides Property Multiline As Boolean
         Get
             Return MyBase.Multiline
@@ -155,6 +177,7 @@ Public Class PercentageBox
             MyBase.Multiline = value
         End Set
     End Property
+
     <RefreshProperties(RefreshProperties.All)>
     Public Overrides Property Text As String
         Get
@@ -202,15 +225,21 @@ Public Class PercentageBox
             End If
         End Set
     End Property
+
 #End Region
+
 #End Region
+
 #Region "PUBLIC SUBS"
+
     Public Sub New()
         TextAlign = HorizontalAlignment.Right
     End Sub
+
 #End Region
 
 #Region "OVERRIDED SUBS"
+
     Protected Overrides Sub OnTextChanged(e As EventArgs)
         If Not _SuspendValueChange And Not DesignMode Then
             If ShowPercentSymbol Then
@@ -237,6 +266,7 @@ Public Class PercentageBox
         End If
         MyBase.OnTextChanged(e)
     End Sub
+
     Protected Overrides Sub OnLostFocus(e As EventArgs)
         MyBase.OnLostFocus(e)
         _SuspendValueChange = True
@@ -278,6 +308,7 @@ Public Class PercentageBox
         Me.Select(MyBase.Text.Length, 0)
         _SuspendValueChange = False
     End Sub
+
     Protected Overrides Sub WndProc(ByRef m As Message)
         MyBase.WndProc(m)
         Dim dc As IntPtr
@@ -297,6 +328,7 @@ Public Class PercentageBox
             End Using
         End If
     End Sub
+
     Protected Overrides Sub OnHandleCreated(ByVal e As EventArgs)
         MyBase.OnHandleCreated(e)
 
@@ -312,28 +344,37 @@ Public Class PercentageBox
             End If
         End If
     End Sub
+
     Protected Overrides Sub OnKeyPress(e As KeyPressEventArgs)
         MyBase.OnKeyPress(e)
         If ShowPercentSymbol And Not Char.IsControl(e.KeyChar) Then
             If Not _DecimalList.Contains(e.KeyChar) Then e.Handled = True
         End If
     End Sub
+
 #End Region
+
 #Region "PRIVATE FUNCTIONS"
+
     Private Declare Function GetWindowDC Lib "user32" (ByVal hwnd As IntPtr) As IntPtr
+
 #End Region
+
 #Region "INTERNAL CLASSES"
+
     Private Class PercentageBoxControlDesignerActionList
         Inherits DesignerActionList
         Private ReadOnly Control As PercentageBox
         Private ReadOnly Designer As ControlDesigner
         Private ReadOnly ActionList As DesignerActionList
+
         Public Sub New(ByVal Designer As ControlDesigner, ByVal ActionList As DesignerActionList)
             MyBase.New(Designer.Component)
             Me.Designer = Designer
             Me.ActionList = ActionList
             Control = CType(Designer.Control, PercentageBox)
         End Sub
+
         Public Overrides Function GetSortedActionItems() As DesignerActionItemCollection
             Dim Items = New DesignerActionItemCollection From {
                 New DesignerActionPropertyItem("PercentageValueFormat", "Percentage Value Format", "Comportamento", "Especifica se a propriedade PercentageValue vai retornar um valor inteiro ou o valor real da porcentagem."),
@@ -359,6 +400,9 @@ Public Class PercentageBox
                 TypeDescriptor.GetProperties(Component)("ShowPercentSymbol").SetValue(Component, value)
             End Set
         End Property
+
     End Class
+
 #End Region
+
 End Class

@@ -1,10 +1,12 @@
 ﻿Imports System.Reflection
 Imports System.Reflection.Emit
+
 ''' <summary>
 ''' Provides helper methods for working with reflection,
 ''' dynamic types, and runtime method invocation.
 ''' </summary>
 Public Class ReflectionHelper
+
     ''' <summary>
     ''' Determines whether a property represents a collection type.
     ''' </summary>
@@ -26,6 +28,7 @@ Public Class ReflectionHelper
             End If
         End If
     End Function
+
     ''' <summary>
     ''' Analyzes a collection property and returns the type
     ''' of its elements.
@@ -41,6 +44,7 @@ Public Class ReflectionHelper
         Dim IntIndexer = Type.GetMethod("get_Item", {GetType(Integer)})
         Return IntIndexer.ReturnType
     End Function
+
     ''' <summary>
     ''' Analyzes a collection type and returns the type
     ''' of its elements.
@@ -55,6 +59,7 @@ Public Class ReflectionHelper
         Dim IntIndexer = Type.GetMethod("get_Item", {GetType(Integer)})
         Return IntIndexer.ReturnType
     End Function
+
     ''' <summary>
     ''' Invokes a method on an object using reflection.
     ''' </summary>
@@ -86,6 +91,7 @@ Public Class ReflectionHelper
         End While
         Return Method?.Invoke(Obj, MethodParams)
     End Function
+
     ''' <summary>
     ''' Creates a runtime-generated <see cref="Type"/> with the specified
     ''' properties.
@@ -137,4 +143,5 @@ Public Class ReflectionHelper
         Dim ObjectType As Type = TypeBuilder.CreateType()
         Return ObjectType
     End Function
+
 End Class

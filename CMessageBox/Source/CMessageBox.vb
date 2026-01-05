@@ -5,7 +5,6 @@ Imports System.Net.Mime
 Imports System.Windows.Forms
 Imports System.Xml
 
-
 Public Class CMessageBox
     Private Shared _Title As String
     Private Shared _Message As String
@@ -31,6 +30,7 @@ Public Class CMessageBox
     Public Shared Property MaximumWidth As Integer = 350
     Public Shared Property AditionalExceptionInformation As New Dictionary(Of String, String)
     Public Shared Property ErrorTempFileLocation As String
+
     Private Shared Function GetImage(Type As CMessageBoxType) As Image
         Select Case Type
             Case Is = CMessageBoxType.Done
@@ -47,6 +47,7 @@ Public Class CMessageBox
                 Return WarningImage
         End Select
     End Function
+
     Private Shared Function SaveXmlError(Location As String) As String
         Dim Xml As New XmlDocument
         Dim Node As XmlNode
@@ -109,6 +110,7 @@ Public Class CMessageBox
             End Using
         End Using
     End Function
+
     Public Shared Function Show(Message As String) As DialogResult
         _Title = Nothing
         _Message = Message
@@ -117,6 +119,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Message As String, BoxType As CMessageBoxType) As DialogResult
         _Title = Nothing
         _Message = Message
@@ -125,6 +128,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Message As String, BoxType As CMessageBoxType, BoxButtons As CMessageBoxButtons) As DialogResult
         _Title = Nothing
         _Message = Message
@@ -133,6 +137,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Message As String, BoxType As CMessageBoxType, BoxButtons As CMessageBoxButtons, ex As Exception) As DialogResult
         _Title = Nothing
         _Message = Message
@@ -141,6 +146,7 @@ Public Class CMessageBox
         _Exception = ex
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Title As String, Message As String) As DialogResult
         _Title = Title
         _Message = Message
@@ -149,6 +155,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Title As String, Message As String, BoxType As CMessageBoxType) As DialogResult
         _Title = Title
         _Message = Message
@@ -157,6 +164,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Title As String, Message As String, BoxType As CMessageBoxType, BoxButtons As CMessageBoxButtons) As DialogResult
         _Title = Title
         _Message = Message
@@ -165,6 +173,7 @@ Public Class CMessageBox
         _Exception = Nothing
         Return ShowMessage()
     End Function
+
     Public Shared Function Show(Title As String, Message As String, BoxType As CMessageBoxType, BoxButtons As CMessageBoxButtons, ex As Exception) As DialogResult
         _Title = Title
         _Message = Message
@@ -173,6 +182,7 @@ Public Class CMessageBox
         _Exception = ex
         Return ShowMessage()
     End Function
+
     Private Shared Sub InitializeForm()
         Form = New Form With {
             .FormBorderStyle = FormBorderStyle.FixedSingle,
@@ -190,9 +200,11 @@ Public Class CMessageBox
         }
         AddHandler Form.FormClosed, AddressOf DeleteTempErrorFile
     End Sub
+
     Private Shared Sub DeleteTempErrorFile()
         If File.Exists(_ErrorFileName) Then File.Delete(_ErrorFileName)
     End Sub
+
     Private Shared Sub InitializeImage()
         PnImage = New Panel With {
             .Size = New Size(310, 42),
@@ -202,6 +214,7 @@ Public Class CMessageBox
         }
         Form.Controls.Add(PnImage)
     End Sub
+
     Private Shared Sub InitializeLabels()
         LblMessage = New Label With {
             .Text = _Message,
@@ -230,6 +243,7 @@ Public Class CMessageBox
         End If
         Form.Controls.Add(LblMessage)
     End Sub
+
     Private Shared Sub InitializeButtons()
         Dim LeftButtonLocation As New Point(85, 9)
         Dim MiddleButtonLocation As New Point(166, 9)
@@ -365,6 +379,7 @@ Public Class CMessageBox
                 BtnNo.Dispose()
         End Select
     End Sub
+
     Private Shared Sub InitializeExceptionHandler()
         If _BoxType = CMessageBoxType.Error Then
             LblMessage.Cursor = Cursors.Hand
@@ -448,6 +463,7 @@ Public Class CMessageBox
             TxtExceptionSteps.BringToFront()
         End If
     End Sub
+
     Private Shared Function ShowMessage() As DialogResult
         _ErrorFileName = If(String.IsNullOrEmpty(ErrorTempFileLocation), Path.Combine(Path.GetTempPath(), Guid.NewGuid.ToString() & ".xml"), Path.Combine(ErrorTempFileLocation, Guid.NewGuid.ToString() & ".xml"))
         InitializeForm()
@@ -459,11 +475,13 @@ Public Class CMessageBox
         End If
         Return Form.ShowDialog
     End Function
+
     Private Shared Sub KeyDown(sender As Object, e As KeyEventArgs) Handles Form.KeyDown
         If e.KeyCode = Keys.Escape Then
             Form.Dispose()
         End If
     End Sub
+
     Private Shared Sub UcBtnEmail_Click(sender As Object, e As EventArgs) Handles BtnSendEmailException.Click
         Dim Mail As New MailMessage
         Dim Credential As Net.NetworkCredential
@@ -485,6 +503,7 @@ Public Class CMessageBox
             Mail.Dispose()
         End Try
     End Sub
+
     Private Shared Sub UcBtnSave_Click(sender As Object, e As EventArgs) Handles BtnSaveException.Click
         SfdSave = New SaveFileDialog With {
             .Filter = "Arquivos XML (*.xml)|*.xml",
@@ -496,6 +515,7 @@ Public Class CMessageBox
             SaveXmlError(SfdSave.FileName)
         End If
     End Sub
+
     Private Shared Sub LblMessage_LblTitle_SizeChanged(sender As Object, e As EventArgs) Handles LblMessage.SizeChanged, LblTitle.SizeChanged
         If LblTitle IsNot Nothing Then
             If LblMessage.Text.Length > LblTitle.Text.Length Then
@@ -508,9 +528,11 @@ Public Class CMessageBox
         End If
         Form.Height = LblMessage.Height + 190 + If(LblTitle IsNot Nothing, LblTitle.Height, 0)
     End Sub
+
     Private Shared Sub LblTitle_SizeChanged(sender As Object, e As EventArgs) Handles LblTitle.SizeChanged
         If LblTitle IsNot Nothing Then LblMessage.Top = LblTitle.Top + LblTitle.Height + 15
     End Sub
+
     Friend Shared WithEvents SfdSave As SaveFileDialog
     Friend Shared WithEvents TtTips As ToolTip
     Friend Shared WithEvents CcContainer As ControlContainer

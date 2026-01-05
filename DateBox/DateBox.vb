@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 Imports System.Windows.Forms.Design
+
 <Designer(GetType(DateBoxDesigner))>
 Public Class DateBox
     Inherits MaskedTextBox
@@ -11,6 +12,7 @@ Public Class DateBox
     Friend WithEvents ControlContainer As New ControlContainer
     Friend WithEvents Calendar As New MonthCalendar
     Friend WithEvents Button As New PictureBox
+
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     <EditorBrowsable(EditorBrowsableState.Never), Browsable(False)>
     Overloads ReadOnly Property Mask As String
@@ -67,9 +69,11 @@ Public Class DateBox
         Controls.Add(Calendar)
         ControlContainer.DropDownControl = Calendar
     End Sub
+
     Friend Sub SetMask(Mask As String)
         MyBase.Mask = Mask
     End Sub
+
     Protected Overrides Sub OnSizeChanged(e As EventArgs)
         MyBase.OnSizeChanged(e)
         Button.Size = New Size(25, ClientSize.Height + 2)
@@ -78,11 +82,13 @@ Public Class DateBox
         Button.BackgroundImage = ButtonImage
         Button.BackgroundImageLayout = ImageLayout.Center
     End Sub
+
     Protected Overrides Sub OnBackColorChanged(e As EventArgs)
         MyBase.OnBackColorChanged(e)
         Button.BackColor = BackColor
 
     End Sub
+
     Protected Overrides Sub OnKeyDown(e As KeyEventArgs)
         MyBase.OnKeyDown(e)
 
@@ -93,26 +99,32 @@ Public Class DateBox
             e.SuppressKeyPress = True
         End If
     End Sub
+
     Protected Overrides Sub OnEnter(e As EventArgs)
         MyBase.OnEnter(e)
         BeginInvoke(CType(Sub()
                               SetMaskedTextBoxSelectAll(CType(Me, MaskedTextBox))
                           End Sub, Action))
     End Sub
+
     Private Sub SetMaskedTextBoxSelectAll(ByVal TextBox As MaskedTextBox)
         TextBox.SelectAll()
     End Sub
+
     Protected Overrides Sub OnLeave(e As EventArgs)
         MyBase.OnLeave(e)
         If IsDate(Text) Then Text = CDate(Text).ToString("dd/MM/yyyy")
     End Sub
+
     Private Sub Calendar_DateSelected(sender As Object, e As DateRangeEventArgs) Handles Calendar.DateSelected
         ControlContainer.CloseDropDown()
     End Sub
+
     Private Sub ControlContainer_Closed(sender As Object) Handles ControlContainer.Closed
         Text = Calendar.SelectionStart.ToString("dd/MM/yyyy")
         Me.Select()
     End Sub
+
     Private Sub ControlContainer_Dropped(sender As Object) Handles ControlContainer.Dropped
         If Not IsDate(Text) Then
             Calendar.SetDate(Today)
@@ -120,6 +132,7 @@ Public Class DateBox
             Calendar.SetDate(Text)
         End If
     End Sub
+
     Private Sub Button_Click(sender As Object, e As EventArgs) Handles Button.Click
         Calendar.Visible = True
     End Sub
@@ -136,22 +149,27 @@ Public Class DateBox
     End Sub
 
 End Class
+
 Friend Class DateBoxDesigner
     Inherits ControlDesigner
+
     Public Overrides Sub InitializeNewComponent(defaultValues As IDictionary)
         MyBase.InitializeNewComponent(defaultValues)
         Dim Control As DateBox = CType(Me.Control, DateBox)
         Control.Text = String.Empty
         Control.SetMask("00/00/0000")
     End Sub
+
     Public Overrides ReadOnly Property Verbs As DesignerVerbCollection
         Get
             Return New DesignerVerbCollection()
         End Get
     End Property
+
     Public Overrides ReadOnly Property ActionLists As DesignerActionListCollection
         Get
             Return New DesignerActionListCollection()
         End Get
     End Property
+
 End Class

@@ -21,8 +21,8 @@ Public Class FluidResizer
     ''' </summary>
     ''' <param name="TargetSize">O tamanho alvo que o controle deve alcançar.</param>
     ''' <remarks>
-    ''' O redimensionamento é feito gradualmente em passos, com incrementos calculados 
-    ''' para garantir uma transição suave. 
+    ''' O redimensionamento é feito gradualmente em passos, com incrementos calculados
+    ''' para garantir uma transição suave.
     ''' </remarks>
     Public Sub SetSize(TargetSize As Size)
         ' Verifica se o redimensionamento já está em andamento antes de iniciar outro
@@ -56,4 +56,5 @@ Public Class FluidResizer
             _IsResizing = False
         End If
     End Sub
+
 End Class

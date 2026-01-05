@@ -1,28 +1,29 @@
 ﻿Imports System.Reflection
 Imports System.Runtime.CompilerServices
-Imports CoreSuite.Helpers
 Imports CoreSuite.Attributes
+Imports CoreSuite.Helpers
 
 Namespace Extensions
     Public Module CollectionExtensions
+
         ''' <summary>
-        ''' Attempts to return the single element of a sequence. 
+        ''' Attempts to return the single element of a sequence.
         ''' If no element exists, a new instance of the element's type is created and returned.
         ''' </summary>
         ''' <typeparam name="T">The type of element in the sequence.</typeparam>
         ''' <param name="Source">The sequence to search.</param>
         ''' <param name="Predicate">An optional function to filter the elements.</param>
         ''' <returns>
-        ''' The single element of the sequence matching the predicate, 
+        ''' The single element of the sequence matching the predicate,
         ''' or a new instance of <typeparamref name="T"/> if none exists.
         ''' </returns>
         ''' <remarks>
         ''' <para>
-        ''' Use this extension when you expect at most one item from a collection, 
+        ''' Use this extension when you expect at most one item from a collection,
         ''' but want to ensure a valid object is returned even if the sequence is empty.
         ''' </para>
         ''' <para>
-        ''' If the type <typeparamref name="T"/> does not have a parameterless constructor, 
+        ''' If the type <typeparamref name="T"/> does not have a parameterless constructor,
         ''' <c>Nothing</c> is returned.
         ''' </para>
         ''' </remarks>
@@ -49,7 +50,7 @@ Namespace Extensions
         ''' <para>
         ''' Each public property of the collection's item type becomes a column in the <see cref="DataTable"/>.
         ''' Properties marked with <see cref="IgnoreInToTableAttribute"/> are ignored.
-        ''' Lazy-loaded properties (<c>Lazy(Of T)</c>) are represented as strings showing the type 
+        ''' Lazy-loaded properties (<c>Lazy(Of T)</c>) are represented as strings showing the type
         ''' without evaluating the value.
         ''' </para>
         ''' <para>
@@ -100,5 +101,6 @@ Namespace Extensions
 
             Return Table
         End Function
+
     End Module
 End Namespace

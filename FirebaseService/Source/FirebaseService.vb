@@ -5,7 +5,7 @@
 ''' <remarks>
 ''' This class acts as a *facade* for the main Firebase services,
 ''' ensuring that all of them use the same <see cref="FirebaseClient"/> instance.
-''' 
+'''
 ''' It can be initialized through the constructor or later via the <see cref="Initialize"/> method.
 ''' </remarks>
 Public Class FirebaseService
@@ -13,7 +13,6 @@ Public Class FirebaseService
     Private _Auth As FirebaseAuth
     Private _Firestore As FirebaseFirestore
     Private _Storage As FirebaseStorage
-
 
     ''' <summary>
     ''' Firebase authentication service.
@@ -51,12 +50,12 @@ Public Class FirebaseService
         End Get
     End Property
 
-
     Friend ReadOnly Property Client As FirebaseClient
         Get
             Return _Client
         End Get
     End Property
+
     ''' <summary>
     ''' Creates a FirebaseService instance without initialization.
     ''' Calling Initialize is required before using any service.
@@ -86,6 +85,7 @@ Public Class FirebaseService
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub
+
     ''' <summary>
     ''' Initializes or reinitializes the Firebase service with new credentials.
     ''' </summary>
@@ -108,4 +108,5 @@ Public Class FirebaseService
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub
+
 End Class

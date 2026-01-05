@@ -6,6 +6,7 @@ Imports System.Windows.Forms
 
 Public Class RichTextButton
     Inherits NoFocusCueButton
+
     <Browsable(False), EditorBrowsable(EditorBrowsableState.Never)>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     Public Overloads ReadOnly Property Text As String
@@ -13,18 +14,21 @@ Public Class RichTextButton
             Return String.Join("", TextParts.Select(Function(part) part.Text))
         End Get
     End Property
+
     <Category("Appearance"),
     Description("Define partes do texto com diferentes estilos." & vbCrLf & "A estilização é aplicada apenas em tempo de execução"),
     Editor(GetType(RichTextCollectionEditor), GetType(System.Drawing.Design.UITypeEditor)),
     TypeConverter(GetType(RichTextConverter)),
     DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     Public Property TextParts As New BindingList(Of RichTextPart)
+
     Public Sub New()
         AddHandler TextParts.ListChanged, Sub()
                                               Invalidate() ' Redesenha sempre que a lista mudar
                                               If DesignMode Then MyBase.Text = Text
                                           End Sub
     End Sub
+
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
         MyBase.OnPaint(e)
         If DesignMode Then Return
@@ -82,17 +86,20 @@ Public Class RichTextButton
         Next
     End Sub
 
-
     Public Class RichTextPart
         Public Property Text As String = ""
         Public Property Font As Font = New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular)
         Public Property Color As Color = SystemColors.WindowText
+
         Public Overrides Function ToString() As String
             Return $"{Text} ({Font.Name}, {Font.Size}, {Font.Style})"
         End Function
+
     End Class
+
     Public Class RichTextConverter
         Inherits ExpandableObjectConverter
+
         Public Overrides Function CanConvertTo(context As ITypeDescriptorContext, destinationType As Type) As Boolean
             If destinationType Is GetType(String) Then Return True
             Return MyBase.CanConvertTo(context, destinationType)
@@ -104,6 +111,7 @@ Public Class RichTextButton
             End If
             Return MyBase.ConvertTo(context, culture, value, destinationType)
         End Function
+
     End Class
 
     Public Class RichTextCollectionEditor
@@ -112,11 +120,11 @@ Public Class RichTextButton
         Public Sub New(type As Type)
             MyBase.New(type)
         End Sub
+
         Protected Overrides Function CreateNewItemTypes() As Type()
             Return New Type() {GetType(RichTextPart)}
         End Function
+
     End Class
+
 End Class
-
-
-

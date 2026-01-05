@@ -3,11 +3,13 @@ Imports System.ComponentModel.Design
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Windows.Forms.Design
+
 <Designer(GetType(TimeBoxDesigner))>
 Public Class TimeBox
     Inherits MaskedTextBox
 
     Private _ShowSecconds As Boolean
+
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     <EditorBrowsable(EditorBrowsableState.Never), Browsable(False)>
     <Description("")>
@@ -39,11 +41,12 @@ Public Class TimeBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define se o controle deve exibir os segundos no formato de hora.
     ''' </summary>
     ''' <value>
-    ''' <c>True</c> para exibir no formato <c>HH:mm:ss</c>; 
+    ''' <c>True</c> para exibir no formato <c>HH:mm:ss</c>;
     ''' <c>False</c> para exibir apenas horas e minutos no formato <c>HH:mm</c>.
     ''' </value>
     Public Property ShowSecconds As Boolean
@@ -61,6 +64,7 @@ Public Class TimeBox
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Define no controle apenas a parte da hora contida em um objeto <see cref="DateTime"/>.
     ''' </summary>
@@ -69,19 +73,23 @@ Public Class TimeBox
     Public Function FromDateTime([Date] As Date) As TimeSpan
         Text = [Date].TimeOfDay.ToString()
     End Function
+
     Public Sub New()
         MyBase.Width = 50
         MyBase.TextAlign = HorizontalAlignment.Center
     End Sub
+
     Protected Overrides Sub OnEnter(e As EventArgs)
         MyBase.OnEnter(e)
         BeginInvoke(CType(Sub()
                               SetMaskedTextBoxSelectAll(CType(Me, MaskedTextBox))
                           End Sub, Action))
     End Sub
+
     Private Sub SetMaskedTextBoxSelectAll(TextBox As MaskedTextBox)
         TextBox.SelectAll()
     End Sub
+
     Protected Overrides Sub OnLeave(e As EventArgs)
         MyBase.OnLeave(e)
         Dim ts As TimeSpan
@@ -93,23 +101,27 @@ Public Class TimeBox
     End Sub
 
 End Class
+
 Friend Class TimeBoxDesigner
     Inherits ControlDesigner
+
     Public Overrides Sub InitializeNewComponent(defaultValues As IDictionary)
         MyBase.InitializeNewComponent(defaultValues)
         Dim Control As TimeBox = CType(Me.Control, TimeBox)
         Control.Text = String.Empty
         Control.SetMask(If(Control.ShowSecconds, "00:00:00", "00:00"))
     End Sub
+
     Public Overrides ReadOnly Property Verbs As DesignerVerbCollection
         Get
             Return New DesignerVerbCollection()
         End Get
     End Property
+
     Public Overrides ReadOnly Property ActionLists As DesignerActionListCollection
         Get
             Return New DesignerActionListCollection()
         End Get
     End Property
-End Class
 
+End Class

@@ -1,16 +1,19 @@
 ﻿Imports System.Net.Http
 Imports System.Text
-Imports CoreSuite.Helpers
 Imports System.Web.Script.Serialization
+Imports CoreSuite.Helpers
+
 ''' <summary>
 ''' Provides access to Firebase Firestore database operations.
 ''' </summary>
 Public Class FirebaseFirestore
     Private ReadOnly _Client As FirebaseClient
     Private Const DocumentIDFieldName = "firestore_document_id"
+
     Friend Sub New(Client As FirebaseClient)
         _Client = Client
     End Sub
+
     ''' <summary>
     ''' Retrieves all sub-collections of a document or root collections.
     ''' </summary>
@@ -34,6 +37,7 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
+
     ''' <summary>
     ''' Retrieves a document from a Firestore collection.
     ''' </summary>
@@ -58,6 +62,7 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
+
     ''' <summary>
     ''' Retrieves all documents from a Firestore collection.
     ''' </summary>
@@ -151,6 +156,7 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
+
     ''' <summary>
     ''' Creates or updates a Firestore document.
     ''' </summary>
@@ -192,7 +198,6 @@ Public Class FirebaseFirestore
         Return String.Empty
     End Function
 
-
     ''' <summary>
     ''' Deletes a document from a Firestore collection.
     ''' </summary>
@@ -211,13 +216,13 @@ Public Class FirebaseFirestore
                     Throw New Exception($"Erro ao deletar documento: {ErrorJson}")
                 End If
             End Using
-
         Catch ex As HttpRequestException
             Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
     End Function
+
     ''' <summary>
     ''' Determines whether a document exists in a collection.
     ''' </summary>
@@ -244,6 +249,7 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
+
     Private Function FormatFirestoreValue(Value As Object) As String
         If TypeOf Value Is Boolean Then
             Return """booleanValue"": " & Value.ToString().ToLower()
@@ -255,6 +261,7 @@ Public Class FirebaseFirestore
             Return """stringValue"": """ & Value.ToString() & """"
         End If
     End Function
+
     Private Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
         Dim Builder As New StringBuilder()
         Builder.Append("{""fields"": {")
@@ -284,6 +291,7 @@ Public Class FirebaseFirestore
         Builder.Append("}}")
         Return Builder.ToString()
     End Function
+
     Private Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
         Dim Resultado As New Dictionary(Of String, Object)
         Try
@@ -328,6 +336,7 @@ Public Class FirebaseFirestore
         End Try
         Return Resultado
     End Function
+
     Private Function GetOperatorString([Operator] As FirestoreOperator) As String
         Select Case [Operator]
             Case FirestoreOperator.Equal : Return "EQUAL"
@@ -343,4 +352,5 @@ Public Class FirebaseFirestore
             Case Else : Return "EQUAL"
         End Select
     End Function
+
 End Class

@@ -1,9 +1,11 @@
 ﻿Imports System.Drawing
+
 ''' <summary>
 ''' Provides helper methods for common image operations such as cloning,
 ''' recoloring, color analysis, and resizing.
 ''' </summary>
 Public Class ImageHelper
+
     ''' <summary>
     ''' Creates and returns a copy of an image loaded from the specified file path.
     ''' </summary>
@@ -11,7 +13,7 @@ Public Class ImageHelper
     ''' The file system path of the image to be loaded.
     ''' </param>
     ''' <returns>
-    ''' A copy of the loaded <see cref="Image"/>; 
+    ''' A copy of the loaded <see cref="Image"/>;
     ''' or a fallback error image if the operation fails.
     ''' </returns>
     Public Shared Function GetCopyImage(ImagePath As String) As Image
@@ -25,6 +27,7 @@ Public Class ImageHelper
             Return My.Resources.ImageError
         End Try
     End Function
+
     ''' <summary>
     ''' Returns a recolored copy of an image by replacing a specific color value
     ''' with another.
@@ -52,6 +55,7 @@ Public Class ImageHelper
         Next
         Return Bmp
     End Function
+
     ''' <summary>
     ''' Returns a recolored copy of an image using a base color while preserving
     ''' the original alpha channel values.
@@ -73,6 +77,7 @@ Public Class ImageHelper
         Next
         Return Img
     End Function
+
     ''' <summary>
     ''' Retrieves all distinct colors used in an image.
     ''' </summary>
@@ -128,4 +133,5 @@ Public Class ImageHelper
             Return Image
         End If
     End Function
+
 End Class

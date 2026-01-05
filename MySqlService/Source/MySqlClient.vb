@@ -11,6 +11,7 @@ Public Class MySqlClient
     Friend Property Database As String
     Friend Property User As String
     Friend Property Password As String
+
     Friend Sub New(Server As String, Database As String, User As String, Password As String)
         Me.Server = Server
         Me.Database = Database
@@ -21,9 +22,11 @@ Public Class MySqlClient
     Friend Function GetServerConnectionString() As String
         Return String.Format("Server={0};Uid={1};Pwd={2};Pooling=True", Server, User, Password)
     End Function
+
     Friend Function GetDatabaseConnectionString() As String
         Return String.Format("Server={0};Database={1};Uid={2};Pwd={3};Pooling=True", Server, Database, User, Password)
     End Function
+
     ''' <summary>
     ''' Creates a new connection to the MySQL server without associating it with a specific database.
     ''' </summary>
@@ -56,6 +59,7 @@ Public Class MySqlClient
         Dim Connection As New MySqlConnection(GetServerConnectionString())
         Return Connection
     End Function
+
     ''' <summary>
     ''' Creates a new connection to the MySQL database configured as the default.
     ''' </summary>
@@ -89,4 +93,5 @@ Public Class MySqlClient
         Dim Connection As New MySqlConnection(GetDatabaseConnectionString())
         Return Connection
     End Function
+
 End Class

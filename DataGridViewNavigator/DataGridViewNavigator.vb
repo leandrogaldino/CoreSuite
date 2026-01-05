@@ -1,5 +1,6 @@
 ﻿Imports System.ComponentModel
 Imports System.Windows.Forms
+
 ''' <summary>
 ''' <para>Associates the DataGridView control with ToolStripButtons to navigate between available rows.</para>
 ''' <para>The value of the DataGridView's SelectionMode property is changed to FullRowSelect at runtime.<br/>The value of the DataGridView's MultiSelect property is changed to False at runtime.</para>
@@ -14,6 +15,7 @@ Public Class DataGridViewNavigator
     Private _LastButton As ToolStripButton
     Public ActionBeforeMove As Action
     Public ActionAfterMove As Action
+
     ''' <summary>
     ''' The DataGridView that will be assigned the navigation functionalities.
     ''' </summary>
@@ -30,9 +32,11 @@ Public Class DataGridViewNavigator
             End If
         End Set
     End Property
+
     Private Sub DataGridView_DataSourceChanged(sender As Object, e As EventArgs)
         If IsDefinedButtons() Then RefreshButtons()
     End Sub
+
     Private Sub DataGridView_RowEnter(sender As Object, e As DataGridViewCellEventArgs)
         If DataGridView.MultiSelect Then DataGridView.MultiSelect = False
         If DataGridView.SelectionMode <> DataGridViewSelectionMode.FullRowSelect Then DataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -40,6 +44,7 @@ Public Class DataGridViewNavigator
             RefreshButtons()
         End If
     End Sub
+
     Private Function IsDefinedButtons() As Boolean
         If FirstButton IsNot Nothing And
                 PreviousButton IsNot Nothing And
@@ -50,6 +55,7 @@ Public Class DataGridViewNavigator
             Return False
         End If
     End Function
+
     ''' <summary>
     ''' The Button that will be assigned the functionality to navigate to the first row.
     ''' </summary>
@@ -66,9 +72,11 @@ Public Class DataGridViewNavigator
             End If
         End Set
     End Property
+
     Private Sub FirstButton_Click(sender As Object, e As EventArgs)
         MoveToFirst()
     End Sub
+
     ''' <summary>
     ''' The Button that will be assigned the functionality to navigate to the previous row.
     ''' </summary>
@@ -85,9 +93,11 @@ Public Class DataGridViewNavigator
             End If
         End Set
     End Property
+
     Private Sub PreviousButton_Click(sender As Object, e As EventArgs)
         MoveToPrevious()
     End Sub
+
     ''' <summary>
     ''' The Button that will be assigned the functionality to navigate to the next row.
     ''' </summary>
@@ -104,9 +114,11 @@ Public Class DataGridViewNavigator
             End If
         End Set
     End Property
+
     Private Sub NextButton_Click(sender As Object, e As EventArgs)
         MoveToNext()
     End Sub
+
     ''' <summary>
     ''' The Button that will be assigned the functionality to navigate to the last row.
     ''' </summary>
@@ -123,9 +135,11 @@ Public Class DataGridViewNavigator
             End If
         End Set
     End Property
+
     Private Sub LastButton_Click(sender As Object, e As EventArgs)
         MoveToLast()
     End Sub
+
     ''' <summary>
     ''' Make sure the specified line will be visible in the DataGridView.
     ''' </summary>
@@ -142,6 +156,7 @@ Public Class DataGridViewNavigator
             End If
         End If
     End Sub
+
     Public Shared Sub EnsureVisibleRow(Dgv As DataGridView, RowToShow As Integer)
         If RowToShow >= 0 AndAlso RowToShow < Dgv.RowCount Then
             Dgv.Rows(RowToShow).Selected = True
@@ -154,6 +169,7 @@ Public Class DataGridViewNavigator
             End If
         End If
     End Sub
+
     ''' <summary>
     ''' Update the navigation buttons, enabling and disabling them if necessary.
     ''' </summary>
@@ -172,7 +188,9 @@ Public Class DataGridViewNavigator
             End If
         End If
     End Sub
+
     Public Property CancelNextMove As Boolean
+
     ''' <summary>
     ''' Moves to the first row of the DataGridView.
     ''' </summary>
@@ -190,6 +208,7 @@ Public Class DataGridViewNavigator
             CancelNextMove = False
         End If
     End Sub
+
     ''' <summary>
     ''' Moves to the previous row of the DataGridView.
     ''' </summary>
@@ -207,6 +226,7 @@ Public Class DataGridViewNavigator
             CancelNextMove = False
         End If
     End Sub
+
     ''' <summary>
     ''' Moves to the next row of the DataGridView.
     ''' </summary>
@@ -224,6 +244,7 @@ Public Class DataGridViewNavigator
             CancelNextMove = False
         End If
     End Sub
+
     ''' <summary>
     ''' Moves to the last row of the DataGridView.
     ''' </summary>
@@ -241,4 +262,5 @@ Public Class DataGridViewNavigator
             CancelNextMove = False
         End If
     End Sub
+
 End Class

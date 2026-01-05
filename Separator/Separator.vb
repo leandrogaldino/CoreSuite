@@ -1,7 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Windows.Forms
+
 Public Class Separator
     Inherits Control
+
     Public Sub New()
         InitializeComponent()
     End Sub
@@ -21,5 +23,6 @@ Public Class Separator
         Size = New Size(100, 18)
         Controls.Add(LblSeparator)
     End Sub
+
     Friend WithEvents LblSeparator As Label
 End Class

@@ -24,6 +24,7 @@ Public Enum AnimationScaleMode
     ''' while keeping its aspect ratio and centering it.
     ''' </summary>
     Centrer
+
 End Enum
 
 ''' <summary>
@@ -66,6 +67,7 @@ Public Class AnimatedBox
             Me.Image = Image
             Me.Delay = Delay
         End Sub
+
     End Class
 
     Private _FrameIndex As Integer
@@ -230,4 +232,5 @@ Public Class AnimatedBox
 
         MyBase.Dispose(disposing)
     End Sub
+
 End Class

@@ -1,6 +1,6 @@
 ﻿''' <summary>
 ''' Simple service provider and dependency injection container.
-''' Allows registering instances as singletons or via factories, 
+''' Allows registering instances as singletons or via factories,
 ''' and retrieving instances by type.
 ''' </summary>
 Public Class Locator

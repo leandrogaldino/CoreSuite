@@ -1,9 +1,11 @@
 ﻿Imports System.Data.Common
+
 ''' <summary>
 ''' Provides helper methods for database-related operations,
 ''' such as debugging SQL commands and inspecting generated queries.
 ''' </summary>
 Public Class DatabaseHelper
+
     ''' <summary>
     ''' Outputs a SQL command for debugging purposes by replacing
     ''' its parameters with their corresponding values in the query text.
@@ -18,4 +20,5 @@ Public Class DatabaseHelper
         Next
         Debug.Print(Query)
     End Sub
+
 End Class

@@ -1,6 +1,6 @@
 ﻿Imports System.ComponentModel
-Imports System.Windows.Forms
 Imports System.Drawing
+Imports System.Windows.Forms
 
 Public Class ControlContainer
     Inherits Component
@@ -40,6 +40,7 @@ Public Class ControlContainer
         Dropping
         Dropped
     End Enum
+
     Public Overridable ReadOnly Property CanDrop As Boolean
         Get
             If _DropDownContainer IsNot Nothing Then Return False
@@ -83,6 +84,7 @@ Public Class ControlContainer
             End If
         End Set
     End Property
+
     Public Sub CloseDropDown()
         If _DropDownContainer IsNot Nothing Then
             _DropState = ControlContainerDropDownState.Closing
@@ -162,6 +164,7 @@ Public Class ControlContainer
     Private Sub Parent_Move(ByVal sender As Object, ByVal e As EventArgs)
         CloseDropDown()
     End Sub
+
     Friend NotInheritable Class DropDownContainer
         Inherits Form
         Implements IMessageFilter
@@ -209,6 +212,7 @@ Public Class ControlContainer
         Public Delegate Sub DropWindowArgs(ByVal state As ControlContainerDropDownState)
 
         Public Event DropStateChange As DropWindowArgs
+
         Protected Overrides Sub OnClosing(ByVal e As CancelEventArgs)
             Application.RemoveMessageFilter(Me)
             Controls.RemoveAt(0)
@@ -226,6 +230,7 @@ Public Class ControlContainer
             MyBase.OnPaint(e)
             ControlPaint.DrawBorder(Me.CreateGraphics, ClientRectangle, _DropDownBorderColor, ButtonBorderStyle.Solid)
         End Sub
+
         Private Function IMessageFilter_PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
             Dim cursorPos As Point = Cursor.Position
             If Visible AndAlso (ActiveForm Is Nothing OrElse Not ActiveForm.Equals(Me)) Then
@@ -242,6 +247,7 @@ Public Class ControlContainer
             End Select
             Return False
         End Function
+
     End Class
 
 End Class

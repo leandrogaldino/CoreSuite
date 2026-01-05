@@ -71,6 +71,7 @@ Public Class MySqlService
     Private _Client As MySqlClient
     Private _Request As MySqlRequest
     Private _Maintenance As MySqlMaintenance
+
     ''' <summary>
     ''' Instance of <see cref="MySqlClient"/>, responsible for creating
     ''' connections to the MySQL server through the
@@ -81,6 +82,7 @@ Public Class MySqlService
             Return _Client
         End Get
     End Property
+
     ''' <summary>
     ''' Instance of <see cref="MySqlRequest"/>, responsible for executing
     ''' queries, CRUD operations, and stored procedures.
@@ -90,6 +92,7 @@ Public Class MySqlService
             Return _Request
         End Get
     End Property
+
     ''' <summary>
     ''' Instance of <see cref="MySqlMaintenance"/>, responsible for
     ''' administrative operations such as backup, restore,
@@ -107,6 +110,7 @@ Public Class MySqlService
     ''' </summary>
     Public Sub New()
     End Sub
+
     ''' <summary>
     ''' Initializes a new instance of <see cref="MySqlService"/> with
     ''' connection credentials and configuration.
@@ -120,6 +124,7 @@ Public Class MySqlService
         _Request = New MySqlRequest(Client)
         _Maintenance = New MySqlMaintenance(Client)
     End Sub
+
     ''' <summary>
     ''' Initializes the <see cref="MySqlService"/> instance with
     ''' connection credentials and configuration.
@@ -131,4 +136,5 @@ Public Class MySqlService
         _Request = New MySqlRequest(Client)
         _Maintenance = New MySqlMaintenance(Client)
     End Sub
+
 End Class

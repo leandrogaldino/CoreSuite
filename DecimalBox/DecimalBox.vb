@@ -1,30 +1,42 @@
 ﻿Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Windows.Forms.Design
+
 <Designer(GetType(DecimalBox.DecimalBoxDesigner))>
 Public Class DecimalBox
     Inherits TextBox
+
 #Region "ENUMS"
+
     Public Enum DecimalTextBoxBorderStyles
         Custom
         FixedSingle
         Fixed3D
         None
     End Enum
+
 #End Region
+
 #Region "FIELDS"
+
     Private _DecimalOnly As Boolean = True
     Private _DecimalPlaces As Integer = 2
     Private _DecimalValue As Decimal = 0
+
     Private ReadOnly _DecimalList As New List(Of String) From {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", ".", "+", "-"
     }
+
     Private _SuspendValueChange As Boolean
+
 #End Region
+
 #Region "PROPERTIES"
+
 #Region "NEW PROPERTIES"
 
     Private _IncludeThousandSeparator As TriState = TriState.True
+
     Public Property IncludeThousandSeparator As TriState
         Get
             Return _IncludeThousandSeparator
@@ -70,6 +82,7 @@ Public Class DecimalBox
             _SuspendValueChange = False
         End Set
     End Property
+
     ''' <summary>
     ''' Especifica a quantidade de casas decimais a serem mostradas no controle caso a propriedade DecimalOnly seja verdadeira (A propriedade DecimalValue guarda todas as casas decimais).
     ''' </summary>
@@ -92,6 +105,7 @@ Public Class DecimalBox
             _SuspendValueChange = False
         End Set
     End Property
+
     ''' <summary>
     ''' Retorna o valor armazenado no controle com todas as casas decimais se a propriedade DecimalOnly for verdadeira.
     ''' </summary>
@@ -102,8 +116,11 @@ Public Class DecimalBox
             Return _DecimalValue
         End Get
     End Property
+
 #End Region
+
 #Region "OVERRIDED PROPERTIES"
+
     Public Overrides Property Multiline As Boolean
         Get
             Return MyBase.Multiline
@@ -153,14 +170,21 @@ Public Class DecimalBox
             End If
         End Set
     End Property
+
 #End Region
+
 #End Region
+
 #Region "PUBLIC SUBS"
+
     Public Sub New()
         TextAlign = HorizontalAlignment.Right
     End Sub
+
 #End Region
+
 #Region "OVERRIDED SUBS"
+
     Protected Overrides Sub OnTextChanged(e As EventArgs)
         If Not _SuspendValueChange And Not DesignMode Then
             If DecimalOnly And IsNumeric(Text) Then
@@ -206,12 +230,17 @@ Public Class DecimalBox
             If Text.Length = 28 Then e.Handled = True
         End If
     End Sub
+
 #End Region
+
 #Region "INTERNAL CLASSES"
+
     Class DecimalBoxDesigner
         Inherits ControlDesigner
+
         Public Sub New()
         End Sub
+
         Public Overrides Sub InitializeNewComponent(ByVal defaultValues As IDictionary)
             MyBase.InitializeNewComponent(defaultValues)
             Dim myTextBox As DecimalBox = TryCast(Component, DecimalBox)
@@ -219,6 +248,9 @@ Public Class DecimalBox
                 myTextBox.Text = "0"
             End If
         End Sub
+
     End Class
+
 #End Region
+
 End Class

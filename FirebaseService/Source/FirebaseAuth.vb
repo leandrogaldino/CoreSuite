@@ -1,15 +1,18 @@
 ﻿Imports System.Net.Http
 Imports System.Text
 Imports CoreSuite.Helpers
+
 ''' <summary>
 ''' Provides Firebase Authentication features such as login, session refresh, and logout.
 ''' </summary>
 Public Class FirebaseAuth
     Private ReadOnly _Client As FirebaseClient
     Private _RefreshToken As String = String.Empty
+
     Friend Sub New(Client As FirebaseClient)
         _Client = Client
     End Sub
+
     ''' <summary>
     ''' Indicates whether a user is currently authenticated.
     ''' </summary>
@@ -18,6 +21,7 @@ Public Class FirebaseAuth
             Return Not String.IsNullOrEmpty(_Client.Token)
         End Get
     End Property
+
     ''' <summary>
     ''' Gets the current refresh token.
     ''' </summary>
@@ -26,6 +30,7 @@ Public Class FirebaseAuth
             Return _RefreshToken
         End Get
     End Property
+
     ''' <summary>
     ''' Authenticates a user using email and password.
     ''' </summary>
@@ -64,6 +69,7 @@ Public Class FirebaseAuth
         End Try
         Return String.Empty
     End Function
+
     ''' <summary>
     ''' Renews the authentication session using a refresh token.
     ''' </summary>
@@ -93,10 +99,12 @@ Public Class FirebaseAuth
             Throw
         End Try
     End Function
+
     ''' <summary>
     ''' Logs out the current user and clears the authentication token.
     ''' </summary>
     Public Sub Logout()
         _Client.Token = Nothing
     End Sub
+
 End Class

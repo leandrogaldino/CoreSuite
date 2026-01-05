@@ -2,6 +2,7 @@
 Imports System.Security.Cryptography
 Imports System.Text
 Imports System.Web.Script.Serialization
+
 Public Class Cryptography
     Private Shared ReadOnly Salt() As Byte = {&H0, &H1, &H2, &H3, &H4, &H5, &H6, &H5, &H4, &H3, &H2, &H1, &H0}
 
@@ -74,6 +75,7 @@ Public Class Cryptography
             Return String.Empty
         End If
     End Function
+
     Public Shared Function Decrypt(Text As String, Key As String) As String
         If Not String.IsNullOrEmpty(Text) Then
             Dim DecryptKey As New Rfc2898DeriveBytes(Key, Salt)
@@ -96,14 +98,18 @@ Public Class Cryptography
         End If
 
     End Function
+
 End Class
+
 Public Class Hashing
+
     Public Shared Function GetSHA256Hash(Text As String) As String
         Using Sha As SHA256 = SHA256.Create()
             Dim Bytes = Sha.ComputeHash(Encoding.UTF8.GetBytes(Text))
             Return String.Concat(Bytes.Select(Function(b) b.ToString("X2")))
         End Using
     End Function
+
     Public Shared Function HashPassword(Password As String, ByRef Salt As String, Optional Iterations As Integer = 100_000) As String
         Dim SaltBytes(15) As Byte
         Using Rng = RandomNumberGenerator.Create()
@@ -115,6 +121,7 @@ Public Class Hashing
             Return Convert.ToBase64String(Hash)
         End Using
     End Function
+
     Public Shared Function VerifyPassword(Password As String, Salt As String, StoredHash As String, Optional Iterations As Integer = 100_000) As Boolean
         Dim SaltBytes = Convert.FromBase64String(Salt)
         Using Pbkdf2 As New Rfc2898DeriveBytes(Password, SaltBytes, Iterations, HashAlgorithmName.SHA256)
@@ -122,9 +129,11 @@ Public Class Hashing
             Return Convert.ToBase64String(Hash) = StoredHash
         End Using
     End Function
+
 End Class
 
 Public Class SecureStorage
+
     Public Shared Sub Save(FilePath As String, Value As Dictionary(Of String, Object), Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser)
         If Value Is Nothing Then
             Throw New ArgumentNullException(NameOf(Value))
@@ -142,6 +151,7 @@ Public Class SecureStorage
         ProtectedData.Protect(DataBytes, Nothing, Scope)
         File.WriteAllBytes(FilePath, ProtectedDataBytes)
     End Sub
+
     Public Shared Function Load(FilePath As String, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser) As Dictionary(Of String, Object)
         If Not File.Exists(FilePath) Then
             Return New Dictionary(Of String, Object)
@@ -166,4 +176,5 @@ Public Class SecureStorage
             Return New Dictionary(Of String, Object)
         End Try
     End Function
+
 End Class

@@ -90,7 +90,6 @@ Public Class FileMerger
         End Using
     End Sub
 
-
     ' ================== RESTAURAR BACKUP SÍNCRONO ==================
     Public Shared Sub UnMerge(InputFile As String, TargetDirectory As String, Password As String, Optional Progress As IProgress(Of Integer) = Nothing)
         Try
@@ -161,11 +160,11 @@ Public Class FileMerger
                     End Using
                 End Using
             End Using
-
         Catch ex As CryptographicException
             Throw New UnauthorizedAccessException("Senha incorreta ou arquivo de backup inválido.")
         End Try
     End Sub
+
     Public Shared Function IsValidFile(filePath As String) As Boolean
         Try
             Using fs As New FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read)
@@ -275,9 +274,5 @@ Public Class FileMerger
         Dim fullUri = New Uri(fullPath)
         Return Uri.UnescapeDataString(baseUri.MakeRelativeUri(fullUri).ToString().Replace("/"c, Path.DirectorySeparatorChar))
     End Function
-
-
-
-
 
 End Class
