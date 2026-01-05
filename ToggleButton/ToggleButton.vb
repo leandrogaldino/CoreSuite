@@ -361,7 +361,7 @@ Public Class ToggleButton
 #End Region
 #Region "INTERNAL CLASSES"
     Public Class Style
-        Private _Control As ToggleButton
+        Private ReadOnly _Control As ToggleButton
         Private _ScratchVisible As Boolean = True
         Private _ScratchColor As Color = SystemColors.ControlDarkDark
         Private _SwitchRatio As Integer = 50
@@ -370,7 +370,7 @@ Public Class ToggleButton
         Private _SwitchBackColor As Color = SystemColors.ButtonFace
         Private _SwitchImage As Bitmap = Nothing
         Private _Text As String
-        Private _Font As Font = New Font("Microsoft Sans Serif", 8.25)
+        Private ReadOnly _Font As New Font("Microsoft Sans Serif", 8.25)
         Private _TextForeColor As Color = SystemColors.ControlText
         Private _TextBackColor As Color = SystemColors.Window
         Private _TextAlign As ContentAlignment = ContentAlignment.MiddleCenter

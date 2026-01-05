@@ -160,10 +160,10 @@ Public Class DataGridViewNavigator
     Public Sub RefreshButtons()
         If _FirstButton IsNot Nothing And _PreviousButton IsNot Nothing And _NextButton IsNot Nothing And _LastButton IsNot Nothing Then
             If _DataGridView.SelectedRows.Count > 0 Then
-                _FirstButton.Enabled = If(_DataGridView.SelectedRows(0).Index > 0, True, False)
-                _PreviousButton.Enabled = If(_DataGridView.SelectedRows(0).Index > 0, True, False)
-                _NextButton.Enabled = If(_DataGridView.SelectedRows(0).Index < _DataGridView.Rows.Count - 1, True, False)
-                _LastButton.Enabled = If(_DataGridView.SelectedRows(0).Index < _DataGridView.Rows.Count - 1, True, False)
+                _FirstButton.Enabled = _DataGridView.SelectedRows(0).Index > 0
+                _PreviousButton.Enabled = _DataGridView.SelectedRows(0).Index > 0
+                _NextButton.Enabled = _DataGridView.SelectedRows(0).Index < _DataGridView.Rows.Count - 1
+                _LastButton.Enabled = _DataGridView.SelectedRows(0).Index < _DataGridView.Rows.Count - 1
             Else
                 _FirstButton.Enabled = False
                 _PreviousButton.Enabled = False

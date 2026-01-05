@@ -6,14 +6,14 @@ Imports System.Windows.Forms
 ''' </summary>
 Public Class FluidResizer
     Private _TargetSize As Size
-    Private _Control As Control
-    Private _ResizeTimer As Timer
+    Private ReadOnly _Control As Control
+    Private ReadOnly _ResizeTimer As Timer
     Private _IsResizing As Boolean = False ' Flag para evitar conflito de redimensionamento
 
     Public Sub New(Control As Control)
         _Control = Control
         _ResizeTimer = New Timer With {.Interval = 1}
-        AddHandler _ResizeTimer.Tick, AddressOf _ResizeTimer_Tick
+        AddHandler _ResizeTimer.Tick, AddressOf ResizeTimer_Tick
     End Sub
 
     ''' <summary>
@@ -35,7 +35,7 @@ Public Class FluidResizer
         End If
     End Sub
 
-    Private Sub _ResizeTimer_Tick(sender As Object, e As EventArgs)
+    Private Sub ResizeTimer_Tick(sender As Object, e As EventArgs)
         Dim stepWidth As Integer = Math.Max(1, Math.Abs(_TargetSize.Width - _Control.Width) / 5)
         Dim stepHeight As Integer = Math.Max(1, Math.Abs(_TargetSize.Height - _Control.Height) / 5)
 

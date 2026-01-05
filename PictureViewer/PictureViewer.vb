@@ -275,72 +275,80 @@ Public Class PictureViewer
         RefreshControls()
     End Sub
     Private Sub InitializeComponents()
-        BtnFirst = New NoFocusCueButton
-        BtnFirst.Anchor = AnchorStyles.None
-        BtnFirst.BackgroundImageLayout = ImageLayout.Center
-        BtnFirst.BackColor = Color.Transparent
-        BtnFirst.FlatStyle = FlatStyle.Flat
+        BtnFirst = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnFirst.FlatAppearance.BorderSize = 0
         BtnFirst.TooltipText = "Primeiro"
         BtnFirst.UseVisualStyleBackColor = False
         BtnFirst.Image = My.Resources.NavFirst
-        BtnPrevious = New NoFocusCueButton
-        BtnPrevious.Anchor = AnchorStyles.None
-        BtnPrevious.BackgroundImageLayout = ImageLayout.Center
-        BtnPrevious.BackColor = Color.Transparent
-        BtnPrevious.FlatStyle = FlatStyle.Flat
+        BtnPrevious = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnPrevious.FlatAppearance.BorderSize = 0
         BtnPrevious.TooltipText = "Anterior"
         BtnPrevious.UseVisualStyleBackColor = False
         BtnPrevious.Image = My.Resources.NavPrevious
-        BtnNext = New NoFocusCueButton
-        BtnNext.Anchor = AnchorStyles.None
-        BtnNext.BackgroundImageLayout = ImageLayout.Center
-        BtnNext.BackColor = Color.Transparent
-        BtnNext.FlatStyle = FlatStyle.Flat
+        BtnNext = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnNext.FlatAppearance.BorderSize = 0
         BtnNext.TooltipText = "Próximo"
         BtnNext.UseVisualStyleBackColor = False
         BtnNext.Image = My.Resources.NavNext
-        BtnLast = New NoFocusCueButton
-        BtnLast.Anchor = AnchorStyles.None
-        BtnLast.BackgroundImageLayout = ImageLayout.Center
-        BtnLast.BackColor = Color.Transparent
-        BtnLast.FlatStyle = FlatStyle.Flat
+        BtnLast = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnLast.FlatAppearance.BorderSize = 0
         BtnLast.TooltipText = "Último"
         BtnLast.UseVisualStyleBackColor = False
         BtnLast.Image = My.Resources.NavLast
-        BtnSave = New NoFocusCueButton
-        BtnSave.Anchor = AnchorStyles.None
-        BtnSave.BackgroundImageLayout = ImageLayout.Center
-        BtnSave.BackColor = Color.Transparent
-        BtnSave.FlatStyle = FlatStyle.Flat
+        BtnSave = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnSave.FlatAppearance.BorderSize = 0
         BtnSave.TooltipText = "Salvar"
         BtnSave.UseVisualStyleBackColor = False
         BtnSave.Image = My.Resources.ImageSave
-        BtnRemove = New NoFocusCueButton
-        BtnRemove.Anchor = AnchorStyles.None
-        BtnRemove.BackgroundImageLayout = ImageLayout.Center
-        BtnRemove.BackColor = Color.Transparent
-        BtnRemove.FlatStyle = FlatStyle.Flat
+        BtnRemove = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnRemove.FlatAppearance.BorderSize = 0
         BtnRemove.TooltipText = "Remover"
         BtnRemove.UseVisualStyleBackColor = False
         BtnRemove.Image = My.Resources.ImageDelete
-        BtnInclude = New NoFocusCueButton
-        BtnInclude.Anchor = AnchorStyles.None
-        BtnInclude.BackgroundImageLayout = ImageLayout.Center
-        BtnInclude.BackColor = Color.Transparent
-        BtnInclude.FlatStyle = FlatStyle.Flat
+        BtnInclude = New NoFocusCueButton With {
+            .Anchor = AnchorStyles.None,
+            .BackgroundImageLayout = ImageLayout.Center,
+            .BackColor = Color.Transparent,
+            .FlatStyle = FlatStyle.Flat
+        }
         BtnInclude.FlatAppearance.BorderSize = 0
         BtnInclude.TooltipText = "Incluir"
         BtnInclude.UseVisualStyleBackColor = False
         BtnInclude.Image = My.Resources.ImageInclude
-        TlpControls = New TableLayoutPanel
-        TlpControls.BackColor = Color.White
-        TlpControls.ColumnCount = 9
+        TlpControls = New TableLayoutPanel With {
+            .BackColor = Color.White,
+            .ColumnCount = 9
+        }
         TlpControls.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50.0!))
         TlpControls.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 30.0!))
         TlpControls.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 30.0!))
@@ -361,14 +369,16 @@ Public Class PictureViewer
         TlpControls.RowCount = 1
         TlpControls.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0!))
         TlpControls.Height = 28
-        PbxPicture = New PictureBox
-        PbxPicture.BackColor = Color.White
-        PbxPicture.Dock = DockStyle.Fill
-        PbxPicture.SizeMode = PictureBoxSizeMode.Zoom
-        LblCounter = New Label
-        LblCounter.BackColor = Color.White
-        LblCounter.Dock = DockStyle.Bottom
-        LblCounter.TextAlign = ContentAlignment.MiddleCenter
+        PbxPicture = New PictureBox With {
+            .BackColor = Color.White,
+            .Dock = DockStyle.Fill,
+            .SizeMode = PictureBoxSizeMode.Zoom
+        }
+        LblCounter = New Label With {
+            .BackColor = Color.White,
+            .Dock = DockStyle.Bottom,
+            .TextAlign = ContentAlignment.MiddleCenter
+        }
         Padding = New Padding(1)
         Controls.Add(TlpControls)
         Controls.Add(LblCounter)

@@ -70,7 +70,7 @@ Public Class AnimatedBox
 
     Private _FrameIndex As Integer
     Private _LastFrameTime As Double
-    Private _Frames As List(Of AnimationFrameInfo)
+    Private ReadOnly _Frames As List(Of AnimationFrameInfo)
     Private ReadOnly _Watch As Stopwatch
     Private ReadOnly _frameTimer As Timer
 

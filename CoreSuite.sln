@@ -143,6 +143,9 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PictureViewer", "PictureVie
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QueriedBox", "QueriedBox\QueriedBox.vbproj", "{61E8F2C4-1722-40A1-B4CB-A17797C6E126}"
+	ProjectSection(ProjectDependencies) = postProject
+		{389D24DE-863A-4694-AE30-827E53E0A441} = {389D24DE-863A-4694-AE30-827E53E0A441}
+	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RichTextButton", "RichTextButton\RichTextButton.vbproj", "{4EA0B897-735A-4A48-BCB8-5414D1AE9678}"
 	ProjectSection(ProjectDependencies) = postProject

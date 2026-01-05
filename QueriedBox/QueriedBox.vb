@@ -1369,7 +1369,7 @@ Public Class QueriedBox
     End Class
     Class OperatorFilterCollection
         Inherits StringConverter
-        Private Shared _OperatorList As New List(Of String) From {
+        Private Shared ReadOnly _OperatorList As New List(Of String) From {
                 "=",
                 "<>",
                 ">",
@@ -1557,7 +1557,7 @@ Public Class QueriedBox
     End Class
     Class RelationFilterCollection
         Inherits StringConverter
-        Private Shared _JoinList As New List(Of String) From {
+        Private Shared ReadOnly _JoinList As New List(Of String) From {
             "LEFT",
             "RIGHT",
             "INNER",
@@ -1575,9 +1575,9 @@ Public Class QueriedBox
     End Class
     Private Class QueriedTextBoxControlDesignerActionList
         Inherits DesignerActionList
-        Private Control As QueriedBox
-        Private Designer As ControlDesigner
-        Private ActionList As DesignerActionList
+        Private ReadOnly Control As QueriedBox
+        Private ReadOnly Designer As ControlDesigner
+        Private ReadOnly ActionList As DesignerActionList
         Public Sub New(ByVal Designer As ControlDesigner, ByVal ActionList As DesignerActionList)
             MyBase.New(Designer.Component)
             Me.Designer = Designer
@@ -1701,7 +1701,7 @@ Public Class QueriedBox
     Private Class FormDropDownResults
         Inherits Form
         Public Textbox As Control
-        Private _QueriedBox As QueriedBox
+        Private ReadOnly _QueriedBox As QueriedBox
         Public Sub New(ByVal SearchBox As QueriedBox)
             SuspendLayout()
             _QueriedBox = SearchBox
@@ -1816,7 +1816,7 @@ Public Class QueriedBox
         Private Const WM_NCLBUTTONDOWN As Integer = &HA1
         Private Const WM_NCRBUTTONDOWN As Integer = &HA4
         Private Const WM_NCMBUTTONDOWN As Integer = &HA7
-        Private TextBox As Control = Nothing
+        Private ReadOnly TextBox As Control = Nothing
         Public Property Popup As Form = Nothing
         Public Sub New(ByVal popupW As Form, ByVal textbox As Control)
             Popup = popupW

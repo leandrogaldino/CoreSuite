@@ -34,7 +34,7 @@ Public Class SplitButton
         Split(Color.Gainsboro)
     End Sub
     Protected Overrides Sub OnClick(e As EventArgs)
-        If Position(IsDropDown) Then
+        If Position() Then
             If ButtonMenuStrip IsNot Nothing Then ButtonMenuStrip.Show(Me, 0, Height)
         Else
             MyBase.OnClick(e)
@@ -52,7 +52,7 @@ Public Class SplitButton
         MyBase.OnMouseLeave(e)
         Split(Color.Gainsboro)
     End Sub
-    Private Function Position(isdropdown As Boolean) As Boolean
+    Private Function Position() As Boolean
         Dim Pos As Boolean = False
         Dim X As Integer = PointToClient(MousePosition).X
         Dim y As Integer = PointToClient(MousePosition).Y

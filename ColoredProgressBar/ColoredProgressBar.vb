@@ -98,29 +98,23 @@ Public Class ColoredProgressBar
             Else
                 _Value = value
             End If
-
-            ' Calculate rectangles to update only the changed portion
-            Dim newValueRect As Rectangle = ClientRectangle
-            Dim oldValueRect As Rectangle = ClientRectangle
-            Dim percent As Single
-
-            percent = (_Value - _Minimum) / (_Maximum - _Minimum)
-            newValueRect.Width = CInt(ClientRectangle.Width * percent)
-
-            percent = (oldValue - _Minimum) / (_Maximum - _Minimum)
-            oldValueRect.Width = CInt(ClientRectangle.Width * percent)
-
-            Dim updateRect As Rectangle = New Rectangle()
-            If newValueRect.Width > oldValueRect.Width Then
-                updateRect.X = oldValueRect.Width
-                updateRect.Width = newValueRect.Width - oldValueRect.Width
+            Dim NewValueRect As Rectangle = ClientRectangle
+            Dim OldValueRect As Rectangle = ClientRectangle
+            Dim Percent As Single
+            Percent = (_Value - _Minimum) / (_Maximum - _Minimum)
+            NewValueRect.Width = CInt(ClientRectangle.Width * Percent)
+            Percent = (oldValue - _Minimum) / (_Maximum - _Minimum)
+            OldValueRect.Width = CInt(ClientRectangle.Width * Percent)
+            Dim UpdateRect As New Rectangle()
+            If NewValueRect.Width > OldValueRect.Width Then
+                UpdateRect.X = OldValueRect.Width
+                UpdateRect.Width = NewValueRect.Width - OldValueRect.Width
             Else
-                updateRect.X = newValueRect.Width
-                updateRect.Width = oldValueRect.Width - newValueRect.Width
+                UpdateRect.X = NewValueRect.Width
+                UpdateRect.Width = OldValueRect.Width - NewValueRect.Width
             End If
-            updateRect.Height = Me.Height
-
-            Invalidate(updateRect)
+            UpdateRect.Height = Me.Height
+            Invalidate(UpdateRect)
         End Set
     End Property
 
@@ -129,14 +123,12 @@ Public Class ColoredProgressBar
     ''' </summary>
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
-        Dim rect As Rectangle = ClientRectangle
-        Dim brush As LinearGradientBrush = New LinearGradientBrush(rect, ProgressTopColor, ProgressBottomColor, LinearGradientMode.Vertical)
-
-        Dim percent As Single = (_Value - _Minimum) / (_Maximum - _Minimum)
-        rect.Width = CInt(rect.Width * percent)
-
-        g.FillRectangle(brush, rect)
-        brush.Dispose()
+        Dim Rect As Rectangle = ClientRectangle
+        Dim Brush As New LinearGradientBrush(Rect, ProgressTopColor, ProgressBottomColor, LinearGradientMode.Vertical)
+        Dim Percent As Single = (_Value - _Minimum) / (_Maximum - _Minimum)
+        Rect.Width = CInt(Rect.Width * Percent)
+        g.FillRectangle(Brush, Rect)
+        Brush.Dispose()
     End Sub
 
     ''' <summary>

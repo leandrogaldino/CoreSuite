@@ -5,8 +5,7 @@ Public Class Connectivity
     Public Event ConnectivityChanged(sender As Object, e As ConnectivityEventArgs)
     Public Event Connected(sender As Object, e As EventArgs)
     Public Event Disconnected(sender As Object, e As EventArgs)
-
-    Private _Addresses() As String = {
+    Private ReadOnly _Addresses() As String = {
         "https://www.google.com/",
         "https://www.microsoft.com/",
         "https://www.facebook.com/",

@@ -284,14 +284,14 @@ Public Class PercentageBox
         If m.Msg = 133 AndAlso Focused AndAlso BorderStyle = PercentageBoxBorderStyles.Custom Then
             dc = GetWindowDC(Handle)
             Using g As Graphics = Graphics.FromHdc(dc)
-                Using p As Pen = New Pen(BorderColorFocused)
+                Using p As New Pen(BorderColorFocused)
                     g.DrawRectangle(p, 0, 0, Width - 1, Height - 1)
                 End Using
             End Using
         ElseIf m.Msg = 133 AndAlso Not Focused AndAlso BorderStyle = PercentageBoxBorderStyles.Custom Then
             dc = GetWindowDC(Handle)
             Using g As Graphics = Graphics.FromHdc(dc)
-                Using p As Pen = New Pen(BorderColorDefault)
+                Using p As New Pen(BorderColorDefault)
                     g.DrawRectangle(p, 0, 0, Width - 1, Height - 1)
                 End Using
             End Using
@@ -325,9 +325,9 @@ Public Class PercentageBox
 #Region "INTERNAL CLASSES"
     Private Class PercentageBoxControlDesignerActionList
         Inherits DesignerActionList
-        Private Control As PercentageBox
-        Private Designer As ControlDesigner
-        Private ActionList As DesignerActionList
+        Private ReadOnly Control As PercentageBox
+        Private ReadOnly Designer As ControlDesigner
+        Private ReadOnly ActionList As DesignerActionList
         Public Sub New(ByVal Designer As ControlDesigner, ByVal ActionList As DesignerActionList)
             MyBase.New(Designer.Component)
             Me.Designer = Designer

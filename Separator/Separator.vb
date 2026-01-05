@@ -7,14 +7,15 @@ Public Class Separator
     End Sub
 
     Private Sub InitializeComponent()
-        LblSeparator = New Label
-        LblSeparator.Text = Nothing
-        LblSeparator.AutoSize = False
-        LblSeparator.BorderStyle = BorderStyle.Fixed3D
-        LblSeparator.Location = New Point(0, 9)
-        LblSeparator.Size = New Size(100, 2)
-        LblSeparator.Anchor = AnchorStyles.Left Or AnchorStyles.Right
-        LblSeparator.BackColor = Color.Red
+        LblSeparator = New Label With {
+            .Text = Nothing,
+            .AutoSize = False,
+            .BorderStyle = BorderStyle.Fixed3D,
+            .Location = New Point(0, 9),
+            .Size = New Size(100, 2),
+            .Anchor = AnchorStyles.Left Or AnchorStyles.Right,
+            .BackColor = Color.Red
+        }
         Padding = New Padding(0)
         Margin = New Padding(0)
         Size = New Size(100, 18)

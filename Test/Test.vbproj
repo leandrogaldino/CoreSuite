@@ -106,9 +106,6 @@
     <Reference Include="CoreSuite.Extensions">
       <HintPath>..\Extensions\bin\Debug\CoreSuite.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="CoreSuite.FileHelper">
-      <HintPath>..\FileHelper\bin\Debug\CoreSuite.FileHelper.dll</HintPath>
-    </Reference>
     <Reference Include="CoreSuite.FileManager">
       <HintPath>..\FileManager\bin\Debug\CoreSuite.FileManager.dll</HintPath>
     </Reference>

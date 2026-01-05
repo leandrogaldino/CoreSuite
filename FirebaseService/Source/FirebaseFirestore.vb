@@ -130,8 +130,9 @@ Public Class FirebaseFirestore
                 Dim Resposnse = Await _Client.Http.SendAsync(Request)
                 Dim JsonRaw = Await Resposnse.Content.ReadAsStringAsync()
                 If Resposnse.IsSuccessStatusCode Then
-                    Dim Jss As New JavaScriptSerializer()
-                    Jss.MaxJsonLength = Int32.MaxValue
+                    Dim Jss As New JavaScriptSerializer With {
+                        .MaxJsonLength = Int32.MaxValue
+                    }
                     Dim Results = Jss.Deserialize(Of List(Of Dictionary(Of String, Object)))(JsonRaw)
                     If Results IsNot Nothing Then
                         For Each Item In Results
@@ -286,8 +287,9 @@ Public Class FirebaseFirestore
     Private Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
         Dim Resultado As New Dictionary(Of String, Object)
         Try
-            Dim Jss As New Web.Script.Serialization.JavaScriptSerializer()
-            Jss.MaxJsonLength = Int32.MaxValue
+            Dim Jss As New Web.Script.Serialization.JavaScriptSerializer With {
+                .MaxJsonLength = Int32.MaxValue
+            }
             Dim Root = Jss.Deserialize(Of Dictionary(Of String, Object))(JsonRaw)
             If Root IsNot Nothing Then
                 If Root.ContainsKey("name") Then

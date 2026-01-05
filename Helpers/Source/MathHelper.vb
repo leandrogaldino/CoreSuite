@@ -38,8 +38,8 @@ Public Class MathHelper
     ''' </returns>
     Public Shared Function EvaluateExpression(input As String) As Double
         Dim Expr As String = "(" & input.Replace(" ", Nothing) & ")"
-        Dim Ops As Stack(Of String) = New Stack(Of String)()
-        Dim Vals As Stack(Of Double) = New Stack(Of Double)()
+        Dim Ops As New Stack(Of String)()
+        Dim Vals As New Stack(Of Double)()
         For i As Integer = 0 To Expr.Length - 1
             Dim s As String = Expr.Substring(i, 1)
             If s.Equals("(") Then

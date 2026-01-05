@@ -185,7 +185,7 @@ Public Class BrazilianFormatHelper
                 Next
                 Sum = Number(0) * 5 + Number(1) * 4 + Number(2) * 3 + Number(3) * 2 + Number(4) * 9 + Number(5) * 8 + Number(6) * 7 +
                        Number(7) * 6 + Number(8) * 5 + Number(9) * 4 + Number(10) * 3 + Number(11) * 2
-                Sum = Sum - (11 * (Int(Sum / 11)))
+                Sum -= (11 * (Int(Sum / 11)))
                 If Sum = 0 Or Sum = 1 Then
                     Result1 = 0
                 Else
@@ -194,7 +194,7 @@ Public Class BrazilianFormatHelper
                 If Result1 = Number(12) Then
                     Sum = Number(0) * 6 + Number(1) * 5 + Number(2) * 4 + Number(3) * 3 + Number(4) * 2 + Number(5) * 9 + Number(6) * 8 +
                                  Number(7) * 7 + Number(8) * 6 + Number(9) * 5 + Number(10) * 4 + Number(11) * 3 + Number(12) * 2
-                    Sum = Sum - (11 * (Int(Sum / 11)))
+                    Sum -= (11 * (Int(Sum / 11)))
                     If Sum = 0 Or Sum = 1 Then
                         Result2 = 0
                     Else
@@ -242,7 +242,7 @@ Public Class BrazilianFormatHelper
             For x = 0 To 1
                 N1 = 0
                 For i = 0 To 8 + x
-                    N1 = N1 + Val(FormatedDocument.Substring(i, 1)) * (10 + x - i)
+                    N1 += Val(FormatedDocument.Substring(i, 1)) * (10 + x - i)
                 Next
                 N2 = 11 - (N1 - (Int(N1 / 11) * 11))
                 If N2 = 10 Or N2 = 11 Then N2 = 0

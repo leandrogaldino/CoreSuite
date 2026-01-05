@@ -9,9 +9,10 @@ Public Class Cryptography
         If Not String.IsNullOrEmpty(Text) Then
             Dim CipherText As Byte()
             Dim EncryptKey As New Rfc2898DeriveBytes(Key, Salt)
-            Dim Algorithm = New RijndaelManaged()
-            Algorithm.Key = EncryptKey.GetBytes(16)
-            Algorithm.IV = EncryptKey.GetBytes(16)
+            Dim Algorithm = New RijndaelManaged With {
+                .Key = EncryptKey.GetBytes(16),
+                .IV = EncryptKey.GetBytes(16)
+            }
             Dim SourceBytes() As Byte = New UnicodeEncoding().GetBytes(Text)
             Using StreamSource = New MemoryStream(SourceBytes)
                 Using StreamDestination As New MemoryStream()
@@ -32,9 +33,10 @@ Public Class Cryptography
         If Not String.IsNullOrEmpty(Text) Then
             Dim CipherText As Byte()
             Dim EncryptKey As New Rfc2898DeriveBytes(Key, Salt)
-            Dim Algorithm = New RijndaelManaged()
-            Algorithm.Key = EncryptKey.GetBytes(16)
-            Algorithm.IV = EncryptKey.GetBytes(16)
+            Dim Algorithm = New RijndaelManaged With {
+                .Key = EncryptKey.GetBytes(16),
+                .IV = EncryptKey.GetBytes(16)
+            }
             Dim SourceBytes() As Byte = New UnicodeEncoding().GetBytes(Text)
             Using StreamSource = New MemoryStream(SourceBytes)
                 Using StreamDestination As New MemoryStream()
@@ -54,9 +56,10 @@ Public Class Cryptography
     Public Shared Async Function DecryptAsync(Text As String, Key As String) As Task(Of String)
         If Not String.IsNullOrEmpty(Text) Then
             Dim DecryptKey As New Rfc2898DeriveBytes(Key, Salt)
-            Dim Algorithm = New RijndaelManaged()
-            Algorithm.Key = DecryptKey.GetBytes(16)
-            Algorithm.IV = DecryptKey.GetBytes(16)
+            Dim Algorithm = New RijndaelManaged With {
+                .Key = DecryptKey.GetBytes(16),
+                .IV = DecryptKey.GetBytes(16)
+            }
             Using StreamSource = New MemoryStream(Convert.FromBase64String(Text))
                 Using StreamDestination As New MemoryStream()
                     Using Crypto As New CryptoStream(StreamSource, Algorithm.CreateDecryptor(), CryptoStreamMode.Read)
@@ -74,9 +77,10 @@ Public Class Cryptography
     Public Shared Function Decrypt(Text As String, Key As String) As String
         If Not String.IsNullOrEmpty(Text) Then
             Dim DecryptKey As New Rfc2898DeriveBytes(Key, Salt)
-            Dim Algorithm = New RijndaelManaged()
-            Algorithm.Key = DecryptKey.GetBytes(16)
-            Algorithm.IV = DecryptKey.GetBytes(16)
+            Dim Algorithm = New RijndaelManaged With {
+                .Key = DecryptKey.GetBytes(16),
+                .IV = DecryptKey.GetBytes(16)
+            }
             Using StreamSource = New MemoryStream(Convert.FromBase64String(Text))
                 Using StreamDestination As New MemoryStream()
                     Using Crypto As New CryptoStream(StreamSource, Algorithm.CreateDecryptor(), CryptoStreamMode.Read)

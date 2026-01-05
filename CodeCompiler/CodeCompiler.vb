@@ -9,7 +9,7 @@ Public Class CodeCompiler
     Private _StrCode As String
     Private _Code As String
     Private _File As FileInfo
-    Private _Path As String
+    Private ReadOnly _Path As String
     Private _CompilerHelper As CompilerHelper
     Private _DisposedValue As Boolean
 
@@ -54,8 +54,6 @@ Public Class CodeCompiler
     ''' <returns></returns>
     Public Function Compile() As Object
 
-        'Variavel que irá retornar o objeto do código a ser compilado (se houver um)
-        Dim Result As Object = ""
 
         'Instanciando o compilador em na linguagem informada no CompilarHelper.
         _CodeCompiler = CodeDomProvider.CreateProvider(GetLanguageString(_CompilerHelper.Language))
@@ -98,10 +96,11 @@ Public Class CodeCompiler
 
         'Retorna um erro caso a classe especificada no CompilerHelper não exista no código.
         If objTheClass Is Nothing Then
-            Throw New Exception(String.Format("A classe {0} não foi encontrada no código.{1}{2},{3}",
-                                              _CompilerHelper.ClassName, vbCrLf, _CompileResults.Errors(0).Line.ToString, _CompileResults.Errors(0).ErrorText))
+            Throw New Exception(String.Format("A classe {0} não foi encontrada no código.{1}{2},{3}", _CompilerHelper.ClassName, vbCrLf, _CompileResults.Errors(0).Line.ToString, _CompileResults.Errors(0).ErrorText))
         End If
 
+        'Variavel que irá retornar o objeto do código a ser compilado (se houver um)
+        Dim Result As Object
         'Executa o código, e atribui o retorno dele (se houver) a variavel Result.
         Try
             Result = objTheClass.GetType.InvokeMember(_CompilerHelper.MethodName, BindingFlags.InvokeMethod, Nothing, objTheClass, _CompilerHelper.Parameters)

@@ -52,8 +52,9 @@ Public Class DateBox
     Public Sub New()
         MyBase.Mask = "00/00/0000"
         MinimumSize = New Size(100, 0)
-        Button = New PictureBox
-        Button.Size = New Size(25, ClientSize.Height + 2)
+        Button = New PictureBox With {
+            .Size = New Size(25, ClientSize.Height + 2)
+        }
         Button.Location = New Point(ClientSize.Width - Button.Width + 1, -1)
         Button.Cursor = Cursors.[Default]
         Button.BackgroundImage = My.Resources.Calendar

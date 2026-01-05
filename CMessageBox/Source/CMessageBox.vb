@@ -174,49 +174,53 @@ Public Class CMessageBox
         Return ShowMessage()
     End Function
     Private Shared Sub InitializeForm()
-        Form = New Form
-        Form.FormBorderStyle = FormBorderStyle.FixedSingle
-        Form.BackColor = MessageBackColor
-        Form.Font = MessageFont
-        Form.MaximizeBox = False
-        Form.MinimizeBox = False
-        Form.MinimumSize = New Size(350, 243)
-        Form.Size = New Size(350, 243)
-        Form.Padding = New Padding(0, 12, 0, 0)
-        Form.ShowIcon = False
-        Form.ShowInTaskbar = False
-        Form.KeyPreview = True
-        Form.TopMost = True
+        Form = New Form With {
+            .FormBorderStyle = FormBorderStyle.FixedSingle,
+            .BackColor = MessageBackColor,
+            .Font = MessageFont,
+            .MaximizeBox = False,
+            .MinimizeBox = False,
+            .MinimumSize = New Size(350, 243),
+            .Size = New Size(350, 243),
+            .Padding = New Padding(0, 12, 0, 0),
+            .ShowIcon = False,
+            .ShowInTaskbar = False,
+            .KeyPreview = True,
+            .TopMost = True
+        }
         AddHandler Form.FormClosed, AddressOf DeleteTempErrorFile
     End Sub
     Private Shared Sub DeleteTempErrorFile()
         If File.Exists(_ErrorFileName) Then File.Delete(_ErrorFileName)
     End Sub
     Private Shared Sub InitializeImage()
-        PnImage = New Panel
-        PnImage.Size = New Size(310, 42)
-        PnImage.Location = New Point(15, 1)
-        PnImage.BackgroundImage = GetImage(_BoxType)
-        PnImage.BackgroundImageLayout = ImageLayout.Zoom
+        PnImage = New Panel With {
+            .Size = New Size(310, 42),
+            .Location = New Point(15, 1),
+            .BackgroundImage = GetImage(_BoxType),
+            .BackgroundImageLayout = ImageLayout.Zoom
+        }
         Form.Controls.Add(PnImage)
     End Sub
     Private Shared Sub InitializeLabels()
-        LblMessage = New Label
-        LblMessage.Text = _Message
-        LblMessage.Font = MessageFont
-        LblMessage.ForeColor = MessageForeColor
-        LblMessage.AutoSize = True
-        LblMessage.MaximumSize = New Size(MaximumWidth, 0)
-        LblMessage.BackColor = Color.Transparent
+        LblMessage = New Label With {
+            .Text = _Message,
+            .Font = MessageFont,
+            .ForeColor = MessageForeColor,
+            .AutoSize = True,
+            .MaximumSize = New Size(MaximumWidth, 0),
+            .BackColor = Color.Transparent
+        }
         If _Title <> Nothing Then
-            LblTitle = New Label
-            LblTitle.Text = _Title
-            LblTitle.Font = TitleFont
-            LblTitle.ForeColor = TitleForeColor
-            LblTitle.AutoSize = True
-            LblTitle.MaximumSize = New Size(MaximumWidth, 0)
-            LblTitle.Location = New Point(15, 55)
-            LblTitle.BackColor = Color.Transparent
+            LblTitle = New Label With {
+                .Text = _Title,
+                .Font = TitleFont,
+                .ForeColor = TitleForeColor,
+                .AutoSize = True,
+                .MaximumSize = New Size(MaximumWidth, 0),
+                .Location = New Point(15, 55),
+                .BackColor = Color.Transparent
+            }
             LblMessage.Location = New Point(12, 97)
             Form.Controls.Add(LblTitle)
         Else
@@ -227,66 +231,74 @@ Public Class CMessageBox
         Form.Controls.Add(LblMessage)
     End Sub
     Private Shared Sub InitializeButtons()
-        Dim LeftButtonLocation As Point = New Point(85, 9)
-        Dim MiddleButtonLocation As Point = New Point(166, 9)
-        Dim RightButtonLocation As Point = New Point(247, 9)
-        PnButtons = New Panel
-        PnButtons.BackColor = PanelButtonsBackColor
-        PnButtons.Dock = DockStyle.Bottom
-        PnButtons.Height = 50
+        Dim LeftButtonLocation As New Point(85, 9)
+        Dim MiddleButtonLocation As New Point(166, 9)
+        Dim RightButtonLocation As New Point(247, 9)
+        PnButtons = New Panel With {
+            .BackColor = PanelButtonsBackColor,
+            .Dock = DockStyle.Bottom,
+            .Height = 50
+        }
         Form.Controls.Add(PnButtons)
-        BtnAbort = New Button
-        BtnAbort.DialogResult = DialogResult.Abort
-        BtnAbort.Size = New Size(75, 30)
-        BtnAbort.TabIndex = 2
-        BtnAbort.Text = "Abortar"
-        BtnAbort.UseVisualStyleBackColor = True
-        BtnAbort.Parent = PnButtons
-        BtnAbort.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnRetry = New Button
-        BtnRetry.DialogResult = DialogResult.Retry
-        BtnRetry.Size = New Size(75, 30)
-        BtnRetry.TabIndex = 0
-        BtnRetry.Text = "Repetir"
-        BtnRetry.UseVisualStyleBackColor = True
-        BtnRetry.Parent = PnButtons
-        BtnRetry.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnIgnore = New Button
-        BtnIgnore.DialogResult = DialogResult.Ignore
-        BtnIgnore.Size = New Size(75, 30)
-        BtnIgnore.Text = "Ignorar"
-        BtnIgnore.TabIndex = 1
-        BtnIgnore.UseVisualStyleBackColor = True
-        BtnIgnore.Parent = PnButtons
-        BtnIgnore.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnOK = New Button
-        BtnOK.DialogResult = DialogResult.OK
-        BtnOK.Size = New Size(75, 30)
-        BtnOK.Text = "OK"
-        BtnOK.TabIndex = 0
-        BtnOK.UseVisualStyleBackColor = True
-        BtnOK.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnCancel = New Button
-        BtnCancel.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnCancel.DialogResult = DialogResult.Cancel
-        BtnCancel.Size = New Size(75, 30)
-        BtnCancel.Text = "Cancelar"
-        BtnCancel.TabIndex = 1
-        BtnCancel.UseVisualStyleBackColor = True
-        BtnYes = New Button
-        BtnYes.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnYes.DialogResult = DialogResult.Yes
-        BtnYes.Size = New Size(75, 30)
-        BtnYes.TabIndex = 0
-        BtnYes.Text = "Sim"
-        BtnYes.UseVisualStyleBackColor = True
-        BtnNo = New Button
-        BtnNo.Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
-        BtnNo.DialogResult = DialogResult.No
-        BtnNo.Size = New Size(75, 30)
-        BtnNo.Text = "Não"
-        BtnNo.TabIndex = 1
-        BtnNo.UseVisualStyleBackColor = True
+        BtnAbort = New Button With {
+            .DialogResult = DialogResult.Abort,
+            .Size = New Size(75, 30),
+            .TabIndex = 2,
+            .Text = "Abortar",
+            .UseVisualStyleBackColor = True,
+            .Parent = PnButtons,
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
+        }
+        BtnRetry = New Button With {
+            .DialogResult = DialogResult.Retry,
+            .Size = New Size(75, 30),
+            .TabIndex = 0,
+            .Text = "Repetir",
+            .UseVisualStyleBackColor = True,
+            .Parent = PnButtons,
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
+        }
+        BtnIgnore = New Button With {
+            .DialogResult = DialogResult.Ignore,
+            .Size = New Size(75, 30),
+            .Text = "Ignorar",
+            .TabIndex = 1,
+            .UseVisualStyleBackColor = True,
+            .Parent = PnButtons,
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
+        }
+        BtnOK = New Button With {
+            .DialogResult = DialogResult.OK,
+            .Size = New Size(75, 30),
+            .Text = "OK",
+            .TabIndex = 0,
+            .UseVisualStyleBackColor = True,
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom
+        }
+        BtnCancel = New Button With {
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom,
+            .DialogResult = DialogResult.Cancel,
+            .Size = New Size(75, 30),
+            .Text = "Cancelar",
+            .TabIndex = 1,
+            .UseVisualStyleBackColor = True
+        }
+        BtnYes = New Button With {
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom,
+            .DialogResult = DialogResult.Yes,
+            .Size = New Size(75, 30),
+            .TabIndex = 0,
+            .Text = "Sim",
+            .UseVisualStyleBackColor = True
+        }
+        BtnNo = New Button With {
+            .Anchor = AnchorStyles.Right Or AnchorStyles.Bottom,
+            .DialogResult = DialogResult.No,
+            .Size = New Size(75, 30),
+            .Text = "Não",
+            .TabIndex = 1,
+            .UseVisualStyleBackColor = True
+        }
         Select Case _Buttons
             Case Is = CMessageBoxButtons.AbortRetryIgnore
                 BtnAbort.Location = LeftButtonLocation
@@ -356,59 +368,69 @@ Public Class CMessageBox
     Private Shared Sub InitializeExceptionHandler()
         If _BoxType = CMessageBoxType.Error Then
             LblMessage.Cursor = Cursors.Hand
-            UcExceptionDialog = New UserControl
-            UcExceptionDialog.BackColor = Color.White
-            UcExceptionDialog.Font = New Font("Microsoft Sans Serif", 9.75, FontStyle.Regular)
-            UcExceptionDialog.Margin = New Padding(4, 4, 4, 4)
-            UcExceptionDialog.Size = New Size(700, 400)
-            TcException = New TabControl
-            TcException.Dock = DockStyle.Fill
-            TpExceptionDetail = New TabPage
-            TpExceptionDetail.Text = "Detalhes"
-            TpExceptionDetail.UseVisualStyleBackColor = True
-            TpExceptionSupport = New TabPage
-            TpExceptionSupport.Text = "Suporte"
-            TpExceptionSupport.UseVisualStyleBackColor = True
-            WbDetailException = New WebBrowser
-            WbDetailException.Dock = DockStyle.Fill
-            WbDetailException.Url = New Uri(SaveXmlError(_ErrorFileName))
-            LblExceptionSteps = New Label
-            LblExceptionSteps.AutoSize = False
-            LblExceptionSteps.Dock = DockStyle.Top
-            LblExceptionSteps.Location = New Point(3, 58)
-            LblExceptionSteps.Text = "Escreva aqui em detalhes, os passos que levaram a esse erro"
-            LblExceptionSteps.TextAlign = ContentAlignment.MiddleCenter
-            LblExceptionSteps.ForeColor = Color.FromArgb(40, 40, 40)
-            TxtExceptionSteps = New TextBox
-            TxtExceptionSteps.Location = New Point(6, 77)
-            TxtExceptionSteps.Dock = DockStyle.Fill
-            TxtExceptionSteps.Multiline = True
-            TxtExceptionSteps.Size = New Size(283, 142)
-            TxtExceptionSteps.TabIndex = 2
-            PnExceptionButtons = New Panel
-            PnExceptionButtons.BackColor = Color.WhiteSmoke
-            PnExceptionButtons.Dock = DockStyle.Bottom
-            PnExceptionButtons.Height = 38
-            PnExceptionButtons.Margin = New Padding(4, 4, 4, 4)
+            UcExceptionDialog = New UserControl With {
+                .BackColor = Color.White,
+                .Font = New Font("Microsoft Sans Serif", 9.75, FontStyle.Regular),
+                .Margin = New Padding(4, 4, 4, 4),
+                .Size = New Size(700, 400)
+            }
+            TcException = New TabControl With {
+                .Dock = DockStyle.Fill
+            }
+            TpExceptionDetail = New TabPage With {
+                .Text = "Detalhes",
+                .UseVisualStyleBackColor = True
+            }
+            TpExceptionSupport = New TabPage With {
+                .Text = "Suporte",
+                .UseVisualStyleBackColor = True
+            }
+            WbDetailException = New WebBrowser With {
+                .Dock = DockStyle.Fill,
+                .Url = New Uri(SaveXmlError(_ErrorFileName))
+            }
+            LblExceptionSteps = New Label With {
+                .AutoSize = False,
+                .Dock = DockStyle.Top,
+                .Location = New Point(3, 58),
+                .Text = "Escreva aqui em detalhes, os passos que levaram a esse erro",
+                .TextAlign = ContentAlignment.MiddleCenter,
+                .ForeColor = Color.FromArgb(40, 40, 40)
+            }
+            TxtExceptionSteps = New TextBox With {
+                .Location = New Point(6, 77),
+                .Dock = DockStyle.Fill,
+                .Multiline = True,
+                .Size = New Size(283, 142),
+                .TabIndex = 2
+            }
+            PnExceptionButtons = New Panel With {
+                .BackColor = Color.WhiteSmoke,
+                .Dock = DockStyle.Bottom,
+                .Height = 38,
+                .Margin = New Padding(4, 4, 4, 4)
+            }
             If ShowSaveErrorButton Then
-                BtnSaveException = New Button
-                BtnSaveException.DialogResult = DialogResult.Abort
-                BtnSaveException.Size = New Size(75, 30)
-                BtnSaveException.Left = UcExceptionDialog.Width - 85 * 2
-                BtnSaveException.Top = 4
-                BtnSaveException.Text = "Salvar"
-                BtnSaveException.UseVisualStyleBackColor = True
-                BtnSaveException.TabIndex = 3
+                BtnSaveException = New Button With {
+                    .DialogResult = DialogResult.Abort,
+                    .Size = New Size(75, 30),
+                    .Left = UcExceptionDialog.Width - 85 * 2,
+                    .Top = 4,
+                    .Text = "Salvar",
+                    .UseVisualStyleBackColor = True,
+                    .TabIndex = 3
+                }
             End If
             If ShowEmailErrorButton Then
-                BtnSendEmailException = New Button
-                BtnSendEmailException.DialogResult = DialogResult.Abort
-                BtnSendEmailException.Size = New Size(75, 30)
-                BtnSendEmailException.Left = UcExceptionDialog.Width - 85
-                BtnSendEmailException.Top = 4
-                BtnSendEmailException.Text = "E-Mail"
-                BtnSendEmailException.UseVisualStyleBackColor = True
-                BtnSendEmailException.TabIndex = 4
+                BtnSendEmailException = New Button With {
+                    .DialogResult = DialogResult.Abort,
+                    .Size = New Size(75, 30),
+                    .Left = UcExceptionDialog.Width - 85,
+                    .Top = 4,
+                    .Text = "E-Mail",
+                    .UseVisualStyleBackColor = True,
+                    .TabIndex = 4
+                }
             Else
                 If BtnSaveException IsNot Nothing Then
                     BtnSaveException.Location = New Point(218, 4)
@@ -419,9 +441,10 @@ Public Class CMessageBox
             TcException.TabPages.AddRange({TpExceptionDetail, TpExceptionSupport})
             PnExceptionButtons.Controls.AddRange({BtnSaveException, BtnSendEmailException})
             UcExceptionDialog.Controls.AddRange({TcException, PnExceptionButtons})
-            CcContainer = New ControlContainer
-            CcContainer.DropDownControl = UcExceptionDialog
-            CcContainer.HostControl = LblMessage
+            CcContainer = New ControlContainer With {
+                .DropDownControl = UcExceptionDialog,
+                .HostControl = LblMessage
+            }
             TxtExceptionSteps.BringToFront()
         End If
     End Sub
