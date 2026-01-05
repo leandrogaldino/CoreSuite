@@ -117,6 +117,9 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ColorPicker", "ColorPicker\ColorPicker.vbproj", "{9526A607-7684-4A0B-BD57-B379A7661D46}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ControlSlider", "ControlSlider\ControlSlider.vbproj", "{56E65443-AC66-480A-9FCF-1D4A69657EED}"
+	ProjectSection(ProjectDependencies) = postProject
+		{389D24DE-863A-4694-AE30-827E53E0A441} = {389D24DE-863A-4694-AE30-827E53E0A441}
+	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DataGridViewClipboart", "DataGridViewClipboart\DataGridViewClipboart.vbproj", "{98EF6383-788F-48AB-B9DA-B6D615C71EBA}"
 EndProject
