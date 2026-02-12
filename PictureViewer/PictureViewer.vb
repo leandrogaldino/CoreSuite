@@ -10,11 +10,8 @@ Imports CoreSuite.Helpers
 ''' </summary>
 Public Class PictureViewer
     Inherits Panel
-
     Public Event PictureAdded(Path As String)
-
     Public Event PictureRemoved(Path As String)
-
     Friend WithEvents TlpControls As TableLayoutPanel
     Friend WithEvents PbxPicture As PictureBox
     Friend WithEvents LblCounter As Label
@@ -31,12 +28,6 @@ Public Class PictureViewer
     Private _MaximumPictures As Integer? = Nothing
     Private _ShowCounterBar As Boolean
     Private ReadOnly _Pictures As List(Of String)
-
-    ''' <summary>
-    ''' Obtém ou define o diretório temporário onde as imagens serão armazenadas.
-    ''' Por padrão, utiliza o diretório temporário do sistema.
-    ''' </summary>
-    Public Property TempDirectory As String = Path.GetTempPath()
 
     ''' <summary>
     ''' Obtém ou define o número máximo de imagens que podem ser carregadas no controle.
@@ -422,14 +413,11 @@ Public Class PictureViewer
     ''' </summary>
     ''' <param name="Path">Caminho do arquivo de imagem.</param>
     Public Sub AddPicture(Path As String)
-        Dim DestFileName As String
         If File.Exists(Path) Then
-            DestFileName = IO.Path.Combine(TempDirectory, TextHelper.GetRandomFileName(IO.Path.GetExtension(Path)))
-            File.Copy(Path, DestFileName, True)
             If Not (MaximumPictures.HasValue AndAlso _Pictures.Count = MaximumPictures) Then
-                _Pictures.Add(DestFileName)
-                RaiseEvent PictureAdded(DestFileName)
-                SelectedPicture = DestFileName
+                _Pictures.Add(Path)
+                RaiseEvent PictureAdded(Path)
+                SelectedPicture = Path
             End If
             ShowSelectedPicture()
             RefreshControls()
@@ -442,15 +430,11 @@ Public Class PictureViewer
     ''' </summary>
     ''' <param name="Paths">Coleção de caminhos de arquivos de imagem.</param>
     Public Sub AddPictures(Paths As IEnumerable(Of String), Optional SelectedIndex As Integer? = Nothing)
-        Dim DestFileName As String
         For Each Path In Paths.Reverse()
             If Not (MaximumPictures.HasValue AndAlso _Pictures.Count = MaximumPictures) Then
                 If File.Exists(Path) Then
-                    DestFileName = IO.Path.Combine(TempDirectory, TextHelper.GetRandomFileName(IO.Path.GetExtension(Path)))
-                    File.Copy(Path, DestFileName, True)
-
-                    _Pictures.Insert(0, DestFileName)
-                    RaiseEvent PictureAdded(DestFileName)
+                    _Pictures.Insert(0, Path)
+                    RaiseEvent PictureAdded(Path)
                 End If
             End If
         Next Path
@@ -617,14 +601,6 @@ Public Class PictureViewer
                     PbxPicture.Image.Dispose()
                     PbxPicture.Image = Nothing
                 End If
-                For Each Picture In _Pictures.ToList()
-                    If File.Exists(Picture) Then
-                        Try
-                            File.Delete(Picture)
-                        Catch
-                        End Try
-                    End If
-                Next
                 _Pictures.Clear()
                 For Each Button As NoFocusCueButton In {BtnFirst, BtnPrevious, BtnNext, BtnLast, BtnSave, BtnRemove, BtnInclude}
                     If Button IsNot Nothing AndAlso Button.Image IsNot Nothing Then
