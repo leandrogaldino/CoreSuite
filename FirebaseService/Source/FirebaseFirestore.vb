@@ -263,80 +263,214 @@ Public Class FirebaseFirestore
     End Function
 
     Private Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
+
         Dim Builder As New StringBuilder()
         Builder.Append("{""fields"": {")
-        Dim Entries As New List(Of String)()
+
+        Dim Entries As New List(Of String)
+
         For Each Kvp In Dictionary
+
             If Kvp.Key = DocumentIDFieldName Then Continue For
-            Dim ValuePart As String = ""
-            If TypeOf Kvp.Value Is String Then
-                ValuePart = "{""stringValue"": """ & Kvp.Value.ToString() & """}"
-            ElseIf TypeOf Kvp.Value Is Integer OrElse TypeOf Kvp.Value Is Long Then
-                ValuePart = "{""integerValue"": " & Kvp.Value.ToString() & "}"
-            ElseIf TypeOf Kvp.Value Is Boolean Then
-                ValuePart = "{""booleanValue"": " & Kvp.Value.ToString().ToLower() & "}"
-            ElseIf TypeOf Kvp.Value Is Double OrElse TypeOf Kvp.Value Is Decimal Then
-                Dim doubleVal As Double = Convert.ToDouble(Kvp.Value)
-                ValuePart = "{""doubleValue"": " & doubleVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & "}"
-            ElseIf TypeOf Kvp.Value Is DateTime Then
-                Dim [Date] As DateTime = DirectCast(Kvp.Value, DateTime)
-                Dim TimestampIso = [Date].ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-                ValuePart = "{""timestampValue"": """ & TimestampIso & """}"
+
+            Dim valueJson = FirestoreValueToJson(Kvp.Value)
+
+            If valueJson IsNot Nothing Then
+                Entries.Add($"""{Kvp.Key}"": {valueJson}")
             End If
-            If Not String.IsNullOrEmpty(ValuePart) Then
-                Entries.Add($"""{Kvp.Key}"": {ValuePart}")
-            End If
+
         Next
+
         Builder.Append(String.Join(",", Entries))
         Builder.Append("}}")
+
         Return Builder.ToString()
+
+    End Function
+
+    Private Function FirestoreValueToJson(Value As Object) As String
+
+        If Value Is Nothing Then
+            Return "{""nullValue"": null}"
+        End If
+
+        If TypeOf Value Is String Then
+            Return "{""stringValue"": """ & EscapeJson(Value.ToString()) & """}"
+        End If
+
+        If TypeOf Value Is Boolean Then
+            Return "{""booleanValue"": " & Value.ToString().ToLower() & "}"
+        End If
+
+        If TypeOf Value Is Integer OrElse TypeOf Value Is Long Then
+            Return "{""integerValue"": """ & Value.ToString() & """}"
+        End If
+
+        If TypeOf Value Is Double OrElse TypeOf Value Is Decimal OrElse TypeOf Value Is Single Then
+            Dim doubleVal As Double = Convert.ToDouble(Value)
+            Return "{""doubleValue"": " & doubleVal.ToString(Globalization.CultureInfo.InvariantCulture) & "}"
+        End If
+
+        If TypeOf Value Is DateTime Then
+            Dim dt As DateTime = DirectCast(Value, DateTime)
+            Dim iso = dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            Return "{""timestampValue"": """ & iso & """}"
+        End If
+
+        ' MAP (Dictionary)
+        If TypeOf Value Is Dictionary(Of String, Object) Then
+
+            Dim dict = DirectCast(Value, Dictionary(Of String, Object))
+            Dim entries As New List(Of String)
+
+            For Each kvp In dict
+                Dim innerJson = FirestoreValueToJson(kvp.Value)
+                entries.Add($"""{kvp.Key}"": {innerJson}")
+            Next
+
+            Return "{""mapValue"": {""fields"": {" & String.Join(",", entries) & "}}}"
+
+        End If
+
+        ' ARRAY
+        If TypeOf Value Is IEnumerable AndAlso Not TypeOf Value Is String Then
+
+            Dim values As New List(Of String)
+
+            For Each item In DirectCast(Value, IEnumerable)
+                values.Add(FirestoreValueToJson(item))
+            Next
+
+            Return "{""arrayValue"": {""values"": [" & String.Join(",", values) & "]}}"
+
+        End If
+
+        ' fallback
+        Return "{""stringValue"": """ & EscapeJson(Value.ToString()) & """}"
+
+    End Function
+
+    Private Function EscapeJson(value As String) As String
+        Return value.Replace("\", "\\").Replace("""", "\""")
     End Function
 
     Private Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
+
         Dim Resultado As New Dictionary(Of String, Object)
+
         Try
+
             Dim Jss As New Web.Script.Serialization.JavaScriptSerializer With {
-                .MaxJsonLength = Int32.MaxValue
-            }
+            .MaxJsonLength = Int32.MaxValue
+        }
+
             Dim Root = Jss.Deserialize(Of Dictionary(Of String, Object))(JsonRaw)
+
             If Root IsNot Nothing Then
+
                 If Root.ContainsKey("name") Then
                     Dim FullPath As String = Root("name").ToString()
                     Dim DocumentID As String = FullPath.Split("/"c).Last()
                     Resultado.Add(DocumentIDFieldName, DocumentID)
                 End If
+
                 If Root.ContainsKey("fields") Then
+
                     Dim Fields = DirectCast(Root("fields"), Dictionary(Of String, Object))
+
                     For Each Field In Fields
+
                         If Field.Key = DocumentIDFieldName Then Continue For
+
                         Dim TypeAndValue = DirectCast(Field.Value, Dictionary(Of String, Object))
-                        For Each Kvp In TypeAndValue
-                            Dim RealValue As Object = Kvp.Value
-                            Select Case Kvp.Key
-                                Case "integerValue"
-                                    Resultado.Add(Field.Key, Convert.ToInt64(RealValue))
-                                Case "doubleValue"
-                                    Resultado.Add(Field.Key, Convert.ToDouble(RealValue, System.Globalization.CultureInfo.InvariantCulture))
-                                Case "booleanValue"
-                                    Resultado.Add(Field.Key, Convert.ToBoolean(RealValue))
-                                Case "stringValue"
-                                    Resultado.Add(Field.Key, Convert.ToString(RealValue))
-                                Case "timestampValue"
-                                    Resultado.Add(Field.Key, Convert.ToDateTime(RealValue))
-                                Case Else
-                                    Resultado.Add(Field.Key, RealValue.ToString())
-                            End Select
-                            Exit For
-                        Next
+
+                        Resultado(Field.Key) = ParseFirestoreValue(TypeAndValue)
+
                     Next
+
                 End If
+
             End If
+
         Catch ex As Exception
             Throw New Exception($"Erro ao converter JSON do Firestore para Dictionary.{Environment.NewLine}JSON: {JsonRaw}", ex)
         End Try
+
         Return Resultado
+
     End Function
 
+    Private Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
+
+        For Each kvp In ValueObj
+
+            Select Case kvp.Key
+
+                Case "integerValue"
+                    Return Convert.ToInt64(kvp.Value)
+
+                Case "doubleValue"
+                    Return Convert.ToDouble(kvp.Value, Globalization.CultureInfo.InvariantCulture)
+
+                Case "booleanValue"
+                    Return Convert.ToBoolean(kvp.Value)
+
+                Case "stringValue"
+                    Return Convert.ToString(kvp.Value)
+
+                Case "timestampValue"
+                    Return Convert.ToDateTime(kvp.Value)
+
+                Case "nullValue"
+                    Return Nothing
+
+                Case "arrayValue"
+
+                    Dim result As New List(Of Object)
+
+                    Dim arrayObj = TryCast(kvp.Value, Dictionary(Of String, Object))
+
+                    If arrayObj IsNot Nothing AndAlso arrayObj.ContainsKey("values") Then
+
+                        Dim values = TryCast(arrayObj("values"), IEnumerable)
+
+                        If values IsNot Nothing Then
+                            For Each item In values
+                                Dim itemDict = DirectCast(item, Dictionary(Of String, Object))
+                                result.Add(ParseFirestoreValue(itemDict))
+                            Next
+                        End If
+
+                    End If
+
+                    Return result
+
+                Case "mapValue"
+
+                    Dim result As New Dictionary(Of String, Object)
+
+                    Dim mapObj = DirectCast(kvp.Value, Dictionary(Of String, Object))
+
+                    If mapObj.ContainsKey("fields") Then
+
+                        Dim fields = DirectCast(mapObj("fields"), Dictionary(Of String, Object))
+
+                        For Each field In fields
+                            Dim fieldValue = DirectCast(field.Value, Dictionary(Of String, Object))
+                            result(field.Key) = ParseFirestoreValue(fieldValue)
+                        Next
+
+                    End If
+
+                    Return result
+
+            End Select
+
+        Next
+
+        Return Nothing
+
+    End Function
     Private Function GetOperatorString([Operator] As FirestoreOperator) As String
         Select Case [Operator]
             Case FirestoreOperator.Equal : Return "EQUAL"
