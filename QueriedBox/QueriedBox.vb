@@ -701,9 +701,9 @@ Public Class QueriedBox
                     FullValue &= Prefix & MainValue & Suffix
                 End If
                 For Each o As OtherField In OtherFields
+                    OtherValue = TableResults.Rows(0).Item(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).ToString
+                    _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                     If o.Freeze Then
-                        OtherValue = TableResults.Rows(0).Item(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).ToString
-                        _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                         If Not String.IsNullOrEmpty(OtherValue) Then
                             FullValue &= o.Prefix & OtherValue & o.Suffix
                         End If
@@ -1013,9 +1013,9 @@ Public Class QueriedBox
                     FullValue &= Prefix & MainValue & Suffix
                 End If
                 For Each o As OtherField In OtherFields
+                    OtherValue = DropDownResultsForm.DgvResults.SelectedRows(0).Cells(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).Value.ToString
+                    _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                     If o.Freeze Then
-                        OtherValue = DropDownResultsForm.DgvResults.SelectedRows(0).Cells(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).Value.ToString
-                        _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                         If Not String.IsNullOrEmpty(OtherValue) Then
                             FullValue &= o.Prefix & OtherValue & o.Suffix
                         End If
