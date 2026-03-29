@@ -5,9 +5,7 @@ Public Class Form1
         Dim Remote As New FirebaseService("", "", "")
         Await Remote.Auth.LoginAsync("josias@manager.com", "123456")
         Dim Docs = Await Remote.Firestore.GetAllDocumentsAsync("evaluations")
-
         Dim Local As New MySqlService("localhost", "manager", "root", "123456")
-
         Dim EvaluationID As Long
         For Each Doc In Docs
 
@@ -21,8 +19,6 @@ Public Class Form1
             Else
                 EvaluationID = 0
             End If
-
-
             Dim info As New Dictionary(Of String, Object) From {
                 {"hasreplacedproducts", False},
                 {"importedby", If(EvaluationID > 0, "LUIZ", Nothing)},
@@ -33,23 +29,11 @@ Public Class Form1
                 {"requestprocessed", True},
                 {"visitscheduleid", Nothing}
             }
-
-
             Doc.Add("info", info)
-
-
-
             'If Doc("id") = "4a0393b63-3ee7-4219-ac1b-cd74b35eb55f_23032026_125339214" Then Continue For
-
             'ProcessRequests(Doc)
             'ProcessEvaluations(Doc)
-
             Await Remote.Firestore.SaveDocumentAsync("evaluations", Doc("id"), Doc)
-
         Next Doc
-
-
     End Sub
-
-
 End Class
