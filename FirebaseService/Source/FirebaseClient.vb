@@ -5,6 +5,7 @@ Public Class FirebaseClient
     Friend Property ApiKey As String
     Friend Property ProjectID As String
     Friend Property StorageBucket As String
+    Friend Property Auth As FirebaseAuth
     Friend Property Token As String
     Friend ReadOnly Http As HttpClient
 
@@ -24,5 +25,4 @@ Public Class FirebaseClient
         End If
         Return Request
     End Function
-
 End Class

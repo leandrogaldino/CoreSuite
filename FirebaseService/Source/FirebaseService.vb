@@ -82,6 +82,7 @@ Public Class FirebaseService
     Public Sub New(ApiKey As String, ProjectID As String, StorageBucket As String)
         _Client = New FirebaseClient(ApiKey, ProjectID, StorageBucket)
         _Auth = New FirebaseAuth(Client)
+        _Client.Auth = _Auth
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub
@@ -105,6 +106,7 @@ Public Class FirebaseService
     Public Sub Initialize(ApiKey As String, ProjectID As String, StorageBucket As String)
         _Client = New FirebaseClient(ApiKey, ProjectID, StorageBucket)
         _Auth = New FirebaseAuth(Client)
+        _Client.Auth = _Auth
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub

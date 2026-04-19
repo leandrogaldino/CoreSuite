@@ -214,7 +214,7 @@ Public Class FileMerger
             Dim iv = ReadHeader(fs)
 
             Using br As New BinaryReader(fs, Encoding.UTF8, True)
-                Dim backupDate = DateTime.FromBinary(br.ReadInt64())
+                Dim backupDate = DateTime.FromBinary(br.ReadInt64()).ToLocalTime()
                 Dim totalFiles = br.ReadInt32()
                 Dim totalSize = br.ReadInt64()
 

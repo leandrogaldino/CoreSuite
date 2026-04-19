@@ -21,6 +21,7 @@ Public Class FirebaseFirestore
     ''' <returns>A dictionary containing collection identifiers.</returns>
     Public Async Function GetCollectionsAsync(Optional DocumentPath = Nothing) As Task(Of Dictionary(Of String, Object))
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents/{DocumentPath}:listCollectionIds"
             Using Request = _Client.CreateRequest(HttpMethod.Get, Url)
                 Dim Response = Await _Client.Http.SendAsync(Request)
@@ -46,6 +47,7 @@ Public Class FirebaseFirestore
     ''' <returns>Document data as a dictionary.</returns>
     Public Async Function GetDocumentAsync(Collection As String, DocumentID As String) As Task(Of Dictionary(Of String, Object))
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents/{Collection}/{DocumentID}"
             Using Request = _Client.CreateRequest(HttpMethod.Get, Url)
                 Dim Response = Await _Client.Http.SendAsync(Request)
@@ -70,6 +72,7 @@ Public Class FirebaseFirestore
     ''' <returns>A list of documents represented as dictionaries.</returns>
     Public Async Function GetAllDocumentsAsync(Collection As String) As Task(Of List(Of Dictionary(Of String, Object)))
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents/{Collection}"
             Dim ResultList As New List(Of Dictionary(Of String, Object))
             Using Request = _Client.CreateRequest(HttpMethod.Get, Url)
@@ -105,6 +108,7 @@ Public Class FirebaseFirestore
     ''' <returns>Matching documents.</returns>
     Public Async Function QueryCompositeAsync(Collection As String, Filters As List(Of FirestoreFilter)) As Task(Of List(Of Dictionary(Of String, Object)))
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents:runQuery"
             Dim JsonFilterList As New List(Of String)
             For Each FirestoreFilter In Filters
@@ -166,6 +170,7 @@ Public Class FirebaseFirestore
     ''' <returns>The document identifier.</returns>
     Public Async Function SaveDocumentAsync(Collection As String, DocumentID As String, Fields As Dictionary(Of String, Object)) As Task(Of String)
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim IsAutoId As Boolean = String.IsNullOrEmpty(DocumentID)
             Dim Url As String
             Dim Method As HttpMethod
@@ -206,6 +211,7 @@ Public Class FirebaseFirestore
     ''' <returns>True if deletion was successful.</returns>
     Public Async Function DeleteDocumentAsync(Collection As String, DocumentID As String) As Task(Of Boolean)
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents/{Collection}/{DocumentID}"
             Using Request = _Client.CreateRequest(HttpMethod.Delete, url)
                 Dim Response = Await _Client.Http.SendAsync(Request)
@@ -231,6 +237,7 @@ Public Class FirebaseFirestore
     ''' <returns>True if the document exists.</returns>
     Public Async Function DocumentExistsAsync(Collection As String, DocumentID As String) As Task(Of Boolean)
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Url = $"https://firestore.googleapis.com/v1/projects/{_Client.ProjectID}/databases/(default)/documents/{Collection}/{DocumentID}"
             Using Request = _Client.CreateRequest(HttpMethod.Get, Url)
                 Dim Response = Await _Client.Http.SendAsync(Request)
