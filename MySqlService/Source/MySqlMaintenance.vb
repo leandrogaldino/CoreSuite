@@ -102,7 +102,6 @@ Public Class MySqlMaintenance
             Using Cmd As New MySqlCommand(Nothing, Connection)
                 Using Bkp As New MySqlBackup(Cmd)
                     Bkp.ImportInfo.IntervalForProgressReport = 1
-
                     AddHandler Bkp.ImportProgressChanged, Sub(sender, e)
                                                               Dim TotalBytes As Long = New FileInfo(FilePath).Length
                                                               Dim CurrentBytes As Long = e.CurrentBytes
@@ -186,6 +185,9 @@ Public Class MySqlMaintenance
                                                     End Sub
 
                     Using Stream As New FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, True)
+                        Bkp.ExportInfo.ExportProcedures = False
+                        Bkp.ExportInfo.ExportFunctions = True
+                        Bkp.ExportInfo.ExportTriggers = True
                         Bkp.ExportToStream(Stream)
                         Await Stream.FlushAsync()
                     End Using
