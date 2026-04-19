@@ -40,6 +40,7 @@ Public Class FirebaseStorage
     ''' <returns>A download token for the uploaded file.</returns>
     Public Async Function UploadFile(LocalPath As String, RemotePath As String) As Task(Of String)
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Bucket = _Client.StorageBucket.Replace("gs://", "").TrimEnd("/"c)
             Dim EncodedPath = Uri.EscapeDataString(RemotePath.TrimStart("/"c))
             Dim Url = $"https://firebasestorage.googleapis.com/v0/b/{Bucket}/o" & $"?uploadType=media&name={EncodedPath}"
@@ -59,10 +60,10 @@ Public Class FirebaseStorage
                 Return TextHelper.ExtractJsonValue(Json, "downloadTokens")
             Else
                 Dim [Error] = Await Response.Content.ReadAsStringAsync()
-                Throw New Exception($"Erro no Storage: {[Error]}")
+                Throw New Exception($"Storage error: {[Error]}")
             End If
         Catch ex As Exception
-            Throw New Exception($"Falha no Upload: {ex.Message}")
+            Throw New Exception($"Upload failed: {ex.Message}")
         End Try
     End Function
 
@@ -73,6 +74,7 @@ Public Class FirebaseStorage
     ''' <param name="LocalPath">Local file destination.</param>
     Public Async Function DownloadFile(RemotePath As String, LocalPath As String) As Task
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Bucket = _Client.StorageBucket.Replace("gs://", "").TrimEnd("/"c)
             Dim EncodedPath = Uri.EscapeDataString(RemotePath.TrimStart("/"c))
             Dim Url = $"https://firebasestorage.googleapis.com/v0/b/{Bucket}/o/{EncodedPath}?alt=media"
@@ -81,7 +83,7 @@ Public Class FirebaseStorage
             Dim Response = Await _Client.Http.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead)
             If Not Response.IsSuccessStatusCode Then
                 Dim [Error] = Await Response.Content.ReadAsStringAsync()
-                Throw New Exception($"Erro no download: {[Error]}")
+                Throw New Exception($"Download error: {[Error]}")
             End If
             Dim TotalBytes As Long = If(Response.Content.Headers.ContentLength, -1)
             Dim Downloaded As Long = 0
@@ -102,7 +104,7 @@ Public Class FirebaseStorage
             End Using
             RaiseEvent DownloadProgressChanged(100)
         Catch ex As Exception
-            Throw New Exception($"Falha no Download: {ex.Message}")
+            Throw New Exception($"Download failed: {ex.Message}")
         End Try
     End Function
 
@@ -113,6 +115,7 @@ Public Class FirebaseStorage
     ''' <returns>True if deletion was successful.</returns>
     Public Async Function DeleteFileAsync(RemotePath As String) As Task(Of Boolean)
         Try
+            Await _Client.Auth.EnsureValidTokenAsync()
             Dim Bucket = _Client.StorageBucket.Replace("gs://", "").TrimEnd("/"c)
             Dim EncodedPath = Uri.EscapeDataString(RemotePath.TrimStart("/c"))
             Dim Url = $"https://firebasestorage.googleapis.com/v0/b/{Bucket}/o/{EncodedPath}"
@@ -125,17 +128,16 @@ Public Class FirebaseStorage
                 Return False
             Else
                 Dim [Error] = Await Response.Content.ReadAsStringAsync()
-                Throw New Exception("Erro ao deletar arquivo no Storage: " & [Error])
+                Throw New Exception("Error deleting file from Storage: " & [Error])
             End If
         Catch ex As HttpRequestException
-            Throw New Exception("Erro de rede ao deletar arquivo do Storage.", ex)
+            Throw New Exception("Network error while deleting file from Storage.", ex)
         Catch ex As TaskCanceledException
-            Throw New Exception("Timeout ao tentar deletar arquivo do Storage.")
+            Throw New Exception("Timeout while attempting to delete file from Storage.")
         Catch ex As Exception
             Throw
         End Try
     End Function
-
     Private Class ProgressableStreamContent
         Inherits HttpContent
         Private ReadOnly _Stream As Stream
@@ -148,7 +150,6 @@ Public Class FirebaseStorage
             _Progress = Progress
             Headers.ContentLength = Stream.Length
         End Sub
-
         Protected Overrides Async Function SerializeToStreamAsync(TargetStream As Stream, Context As TransportContext) As Task
             Dim Buffer(_BufferSize - 1) As Byte
             Dim Uploaded As Long = 0
@@ -164,12 +165,9 @@ Public Class FirebaseStorage
                 Loop
             End Using
         End Function
-
         Protected Overrides Function TryComputeLength(ByRef Length As Long) As Boolean
             Length = _Stream.Length
             Return True
         End Function
-
     End Class
-
 End Class

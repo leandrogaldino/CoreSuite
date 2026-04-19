@@ -136,5 +136,4 @@ Public Class MySqlService
         _Request = New MySqlRequest(Client)
         _Maintenance = New MySqlMaintenance(Client)
     End Sub
-
 End Class

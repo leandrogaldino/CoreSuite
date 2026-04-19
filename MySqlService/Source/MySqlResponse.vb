@@ -91,5 +91,4 @@ Public Class MySqlResponse
         Next Dict
         Return Table
     End Function
-
 End Class

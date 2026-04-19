@@ -66,15 +66,12 @@ Public Class PaginatedList(Of T)
         End If
         _PageSize = PageSize
     End Sub
-
     Protected Overrides Sub InsertItem(index As Integer, item As T)
         MyBase.InsertItem(index, item)
     End Sub
-
     Protected Overrides Sub ClearItems()
         MyBase.ClearItems()
     End Sub
-
     ''' <summary>
     ''' Gets the index of the page where the specified item is located.
     ''' </summary>
@@ -88,15 +85,12 @@ Public Class PaginatedList(Of T)
         Next
         Return -1
     End Function
-
     Protected Overrides Sub RemoveItem(index As Integer)
         MyBase.RemoveItem(index)
     End Sub
-
     Protected Overrides Sub SetItem(index As Integer, item As T)
         MyBase.SetItem(index, item)
     End Sub
-
     Private Function GetPaginatedList(OriginalList As List(Of T), PageSize As Integer) As List(Of List(Of T))
         Dim paginatedList As New List(Of List(Of T))()
         Dim pageCount As Integer = Math.Ceiling(OriginalList.Count / PageSize)
@@ -107,5 +101,4 @@ Public Class PaginatedList(Of T)
         Next
         Return paginatedList
     End Function
-
 End Class

@@ -8,7 +8,6 @@ Public Class FirebaseClient
     Friend Property Auth As FirebaseAuth
     Friend Property Token As String
     Friend ReadOnly Http As HttpClient
-
     Friend Sub New(Api As String, ProjectID As String, Bucket As String)
         ApiKey = Api
         Me.ProjectID = ProjectID
@@ -17,7 +16,6 @@ Public Class FirebaseClient
             .Timeout = TimeSpan.FromSeconds(30)
         }
     End Sub
-
     Friend Function CreateRequest(Method As HttpMethod, Url As String) As HttpRequestMessage
         Dim Request As New HttpRequestMessage(Method, Url)
         If Not String.IsNullOrEmpty(Token) Then

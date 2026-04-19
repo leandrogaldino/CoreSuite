@@ -36,10 +36,8 @@ Public Class InternetHelper
                     End Using
                 End Using
             Catch ex As Exception
-                ' continua tentando o próximo endereço
             End Try
-        Next
-
+        Next Address
         Return False
     End Function
 
@@ -60,12 +58,9 @@ Public Class InternetHelper
                         Return True
                     End If
                 Catch ex As Exception
-                    ' continua tentando o próximo endereço
                 End Try
-            Next
+            Next Address
         End Using
-
         Return False
     End Function
-
 End Class

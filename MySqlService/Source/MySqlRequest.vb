@@ -22,45 +22,36 @@ Public Class MySqlRequest
     Public Function ExecuteProcedure(ProcedureName As String, Optional Params As Dictionary(Of String, Object) = Nothing, Optional Connection As DbConnection = Nothing) As MySqlResponse
         Dim Data As List(Of Dictionary(Of String, Object)) = Nothing
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
-
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
             Connection.Open()
         ElseIf Connection.State <> ConnectionState.Open Then
             Connection.Open()
         End If
-
         Try
             Using Command As DbCommand = Connection.CreateCommand()
                 Command.CommandText = ProcedureName
                 Command.CommandType = CommandType.StoredProcedure
-
                 If Params IsNot Nothing Then
                     For Each Arg In Params
                         Dim Param = Command.CreateParameter()
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
-
                 Data = New List(Of Dictionary(Of String, Object))()
-
                 Using Reader As DbDataReader = Command.ExecuteReader()
                     While Reader.Read()
                         Dim Item As New Dictionary(Of String, Object)
-
                         For i = 0 To Reader.FieldCount - 1
                             Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                        Next
-
+                        Next i
                         Data.Add(Item)
                     End While
                 End Using
             End Using
-
             Return New MySqlResponse(Data, 0, Nothing)
-
         Catch
             Throw
         Finally
@@ -97,17 +88,15 @@ Public Class MySqlRequest
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
                 Data = New List(Of Dictionary(Of String, Object))()
                 Using Reader As DbDataReader = Await Command.ExecuteReaderAsync()
                     While Await Reader.ReadAsync()
                         Dim Item As New Dictionary(Of String, Object)
-
                         For i = 0 To Reader.FieldCount - 1
                             Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                        Next
-
+                        Next i
                         Data.Add(Item)
                     End While
                 End Using
@@ -152,7 +141,7 @@ Public Class MySqlRequest
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
                 If IsSelect Then
                     Data = New List(Of Dictionary(Of String, Object))()
@@ -161,7 +150,7 @@ Public Class MySqlRequest
                             Dim Item As New Dictionary(Of String, Object)
                             For i = 0 To Reader.FieldCount - 1
                                 Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                            Next
+                            Next i
                             Data.Add(Item)
                         End While
                     End Using
@@ -209,7 +198,7 @@ Public Class MySqlRequest
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
                 If IsSelect Then
                     Data = New List(Of Dictionary(Of String, Object))()
@@ -218,7 +207,7 @@ Public Class MySqlRequest
                             Dim Item As New Dictionary(Of String, Object)
                             For i = 0 To Reader.FieldCount - 1
                                 Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                            Next
+                            Next i
                             Data.Add(Item)
                         End While
                     End Using
@@ -248,38 +237,30 @@ Public Class MySqlRequest
     Public Function ExecuteDelete(Table As String, Optional Where As String = Nothing, Optional QueryArgs As Dictionary(Of String, Object) = Nothing, Optional Connection As DbConnection = Nothing) As MySqlResponse
         Dim AffectedRows As Integer
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
-
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
             Connection.Open()
         ElseIf Connection.State <> ConnectionState.Open Then
             Connection.Open()
         End If
-
         Try
             Dim Query As String = $"DELETE FROM {Table}"
-
             If Not String.IsNullOrWhiteSpace(Where) Then
                 Query &= $" WHERE {Where}"
             End If
-
             Using Command As DbCommand = Connection.CreateCommand()
                 Command.CommandText = Query
-
                 If QueryArgs IsNot Nothing Then
                     For Each Arg In QueryArgs
                         Dim Param = Command.CreateParameter()
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
-
                 AffectedRows = Command.ExecuteNonQuery()
             End Using
-
             Return New MySqlResponse(Nothing, AffectedRows, Nothing)
-
         Catch
             Throw
         Finally
@@ -320,7 +301,7 @@ Public Class MySqlRequest
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
                 AffectedRows = Await Command.ExecuteNonQueryAsync()
             End Using
@@ -359,39 +340,31 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-                ' Monta SET com parâmetros
                 Dim SetClauses As New List(Of String)
-                For Each kvp In Values
-                    Dim paramName As String = $"@upd_{kvp.Key}"
-                    SetClauses.Add($"{kvp.Key} = {paramName}")
-                    Dim param = Command.CreateParameter()
-                    param.ParameterName = paramName
-                    param.Value = If(kvp.Value, DBNull.Value)
-                    Command.Parameters.Add(param)
-                Next
+                For Each Kvp In Values
+                    Dim ParamName As String = $"@upd_{Kvp.Key}"
+                    SetClauses.Add($"{Kvp.Key} = {ParamName}")
+                    Dim Param = Command.CreateParameter()
+                    Param.ParameterName = ParamName
+                    Param.Value = If(Kvp.Value, DBNull.Value)
+                    Command.Parameters.Add(Param)
+                Next Kvp
                 Dim Query As String = $"UPDATE {Table} SET {String.Join(", ", SetClauses)}"
-                ' WHERE opcional
                 If Not String.IsNullOrWhiteSpace(Where) Then
                     Query &= $" WHERE {Where}"
                 End If
-
                 Command.CommandText = Query
-
-                ' Parâmetros adicionais (WHERE)
                 If QueryArgs IsNot Nothing Then
                     For Each Arg In QueryArgs
-                        Dim param = Command.CreateParameter()
-                        param.ParameterName = Arg.Key
-                        param.Value = If(Arg.Value, DBNull.Value)
-                        Command.Parameters.Add(param)
-                    Next
+                        Dim Param = Command.CreateParameter()
+                        Param.ParameterName = Arg.Key
+                        Param.Value = If(Arg.Value, DBNull.Value)
+                        Command.Parameters.Add(Param)
+                    Next Arg
                 End If
-
                 AffectedRows = Command.ExecuteNonQuery()
             End Using
-
             Return New MySqlResponse(Nothing, AffectedRows)
-
         Catch
             Throw
         Finally
@@ -426,31 +399,27 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-                ' Monta SET com parâmetros
                 Dim SetClauses As New List(Of String)
-                For Each kvp In Values
-                    Dim paramName As String = $"@upd_{kvp.Key}"
-                    SetClauses.Add($"{kvp.Key} = {paramName}")
-
-                    Dim param = Command.CreateParameter()
-                    param.ParameterName = paramName
-                    param.Value = If(kvp.Value, DBNull.Value)
-                    Command.Parameters.Add(param)
-                Next
+                For Each Kvp In Values
+                    Dim ParamName As String = $"@upd_{Kvp.Key}"
+                    SetClauses.Add($"{Kvp.Key} = {ParamName}")
+                    Dim Param = Command.CreateParameter()
+                    Param.ParameterName = ParamName
+                    Param.Value = If(Kvp.Value, DBNull.Value)
+                    Command.Parameters.Add(Param)
+                Next Kvp
                 Dim Query As String = $"UPDATE {Table} SET {String.Join(", ", SetClauses)}"
-                ' WHERE opcional
                 If Not String.IsNullOrWhiteSpace(Where) Then
                     Query &= $" WHERE {Where}"
                 End If
                 Command.CommandText = Query
-                ' Parâmetros adicionais (WHERE)
                 If QueryArgs IsNot Nothing Then
                     For Each Arg In QueryArgs
-                        Dim param = Command.CreateParameter()
-                        param.ParameterName = Arg.Key
-                        param.Value = If(Arg.Value, DBNull.Value)
-                        Command.Parameters.Add(param)
-                    Next
+                        Dim Param = Command.CreateParameter()
+                        Param.ParameterName = Arg.Key
+                        Param.Value = If(Arg.Value, DBNull.Value)
+                        Command.Parameters.Add(Param)
+                    Next Arg
                 End If
                 AffectedRows = Await Command.ExecuteNonQueryAsync()
             End Using
@@ -475,66 +444,46 @@ Public Class MySqlRequest
     ''' A task returning a <see cref="MySqlResponse"/> containing the number of affected rows
     ''' and the last inserted ID.
     ''' </returns>
-    Public Function ExecuteInsert(Table As String,
-                              Values As Dictionary(Of String, Object),
-                              Optional QueryArgs As Dictionary(Of String, Object) = Nothing,
-                              Optional Connection As DbConnection = Nothing) As MySqlResponse
-
+    Public Function ExecuteInsert(Table As String, Values As Dictionary(Of String, Object), Optional QueryArgs As Dictionary(Of String, Object) = Nothing, Optional Connection As DbConnection = Nothing) As MySqlResponse
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-
         Dim AffectedRows As Integer
         Dim LastInsertedRow As Integer
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
-
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
             Connection.Open()
         ElseIf Connection.State <> ConnectionState.Open Then
             Connection.Open()
         End If
-
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-
-                ' Monta colunas e parâmetros
                 Dim Columns As String = String.Join(", ", Values.Keys)
                 Dim ParamNames As New List(Of String)
-
-                For Each kvp In Values
-                    Dim paramName As String = $"@ins_{kvp.Key}"
-                    ParamNames.Add(paramName)
-
-                    Dim param = Command.CreateParameter()
-                    param.ParameterName = paramName
-                    param.Value = If(kvp.Value, DBNull.Value)
-                    Command.Parameters.Add(param)
-                Next
-
+                For Each Kvp In Values
+                    Dim ParamName As String = $"@ins_{Kvp.Key}"
+                    ParamNames.Add(ParamName)
+                    Dim Param As DbParameter = Command.CreateParameter()
+                    Param.ParameterName = ParamName
+                    Param.Value = If(Kvp.Value, DBNull.Value)
+                    Command.Parameters.Add(Param)
+                Next Kvp
                 Dim Query As String = $"INSERT INTO {Table} ({Columns}) VALUES ({String.Join(", ", ParamNames)})"
                 Command.CommandText = Query
-
-                ' Parâmetros extras (se houver)
                 If QueryArgs IsNot Nothing Then
                     For Each Arg In QueryArgs
                         Dim param = Command.CreateParameter()
                         param.ParameterName = Arg.Key
                         param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(param)
-                    Next
+                    Next Arg
                 End If
-
                 AffectedRows = Command.ExecuteNonQuery()
-
-                ' Recupera último ID inserido
                 Command.CommandText = "SELECT LAST_INSERT_ID();"
                 LastInsertedRow = Convert.ToInt32(Command.ExecuteScalar())
-
             End Using
-
             Return New MySqlResponse(Nothing, AffectedRows, LastInsertedRow)
-
         Catch
             Throw
         Finally
@@ -559,58 +508,42 @@ Public Class MySqlRequest
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-
         Dim AffectedRows As Integer
         Dim LastInsertedRow As Integer
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
-
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
             Await Connection.OpenAsync()
         ElseIf Connection.State <> ConnectionState.Open Then
             Await Connection.OpenAsync()
         End If
-
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-
-                ' Monta colunas e parâmetros
                 Dim Columns As String = String.Join(", ", Values.Keys)
                 Dim ParamNames As New List(Of String)
-
-                For Each kvp In Values
-                    Dim paramName As String = $"@ins_{kvp.Key}"
-                    ParamNames.Add(paramName)
-
-                    Dim param = Command.CreateParameter()
-                    param.ParameterName = paramName
-                    param.Value = If(kvp.Value, DBNull.Value)
-                    Command.Parameters.Add(param)
-                Next
-
+                For Each Kvp In Values
+                    Dim ParamName As String = $"@ins_{Kvp.Key}"
+                    ParamNames.Add(ParamName)
+                    Dim Param As DbParameter = Command.CreateParameter()
+                    Param.ParameterName = ParamName
+                    Param.Value = If(Kvp.Value, DBNull.Value)
+                    Command.Parameters.Add(Param)
+                Next Kvp
                 Dim Query As String = $"INSERT INTO {Table} ({Columns}) VALUES ({String.Join(", ", ParamNames)})"
                 Command.CommandText = Query
-
-                ' Parâmetros extras (se houver)
                 If QueryArgs IsNot Nothing Then
                     For Each Arg In QueryArgs
-                        Dim param = Command.CreateParameter()
-                        param.ParameterName = Arg.Key
-                        param.Value = If(Arg.Value, DBNull.Value)
-                        Command.Parameters.Add(param)
-                    Next
+                        Dim Param As DbParameter = Command.CreateParameter()
+                        Param.ParameterName = Arg.Key
+                        Param.Value = If(Arg.Value, DBNull.Value)
+                        Command.Parameters.Add(Param)
+                    Next Arg
                 End If
-
                 AffectedRows = Await Command.ExecuteNonQueryAsync()
-
-                ' Recupera último ID inserido
                 Command.CommandText = "SELECT LAST_INSERT_ID();"
                 LastInsertedRow = Convert.ToInt32(Await Command.ExecuteScalarAsync())
-
             End Using
-
             Return New MySqlResponse(Nothing, AffectedRows, LastInsertedRow)
-
         Catch
             Throw
         Finally
@@ -633,14 +566,12 @@ Public Class MySqlRequest
     Public Function ExecuteSelect(Table As String, Optional Options As MySqlSelectOptions = Nothing) As MySqlResponse
         Dim OwnsConnection As Boolean = (Options.Connection Is Nothing)
         Dim Data As New List(Of Dictionary(Of String, Object))
-
         If OwnsConnection Then
             Options.Connection = _Client.CreateDatabaseConnection()
             Options.Connection.Open()
         ElseIf Options.Connection.State <> ConnectionState.Open Then
             Options.Connection.Open()
         End If
-
         Try
             Dim Query As String = "SELECT "
             If Options.Columns IsNot Nothing AndAlso Options.Columns.Count > 0 Then
@@ -648,46 +579,36 @@ Public Class MySqlRequest
             Else
                 Query &= "*"
             End If
-
             Query &= $" FROM {Table} "
-
             If Not String.IsNullOrEmpty(Options.Where) Then
                 Query &= $"WHERE {Options.Where} "
             End If
-
             If Not String.IsNullOrEmpty(Options.OrderBy) Then
                 Query &= $"ORDER BY {Options.OrderBy} "
             End If
-
             If Options.Limit IsNot Nothing Then
                 Query &= $"LIMIT {Options.Limit.Value} "
             End If
-
             Using Command As DbCommand = Options.Connection.CreateCommand()
                 Command.CommandText = Query
-
                 If Options.QueryArgs IsNot Nothing AndAlso Options.QueryArgs.Count > 0 Then
                     For Each Arg In Options.QueryArgs
-                        Dim Param = Command.CreateParameter()
+                        Dim Param As DbParameter = Command.CreateParameter()
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
-
                 Using Reader As DbDataReader = Command.ExecuteReader()
                     While Reader.Read()
                         Dim Item As New Dictionary(Of String, Object)
-
                         For i = 0 To Reader.FieldCount - 1
                             Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                        Next
-
+                        Next i
                         Data.Add(Item)
                     End While
                 End Using
             End Using
-
             Return New MySqlResponse(Data)
         Catch
             Throw
@@ -742,16 +663,14 @@ Public Class MySqlRequest
                         Param.ParameterName = Arg.Key
                         Param.Value = If(Arg.Value, DBNull.Value)
                         Command.Parameters.Add(Param)
-                    Next
+                    Next Arg
                 End If
                 Using Reader As DbDataReader = Await Command.ExecuteReaderAsync()
                     While Await Reader.ReadAsync()
                         Dim Item As New Dictionary(Of String, Object)
-
                         For i = 0 To Reader.FieldCount - 1
                             Item.Add(Reader.GetName(i), Reader.GetValue(i))
-                        Next
-
+                        Next i
                         Data.Add(Item)
                     End While
                 End Using
@@ -765,5 +684,4 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
 End Class

@@ -4,20 +4,16 @@
 ''' and retrieving instances by type.
 ''' </summary>
 Public Class Locator
-
     Private Enum RegistrationType
         Singleton
         Factory
     End Enum
-
     Private Class Registration
         Public Property Type As RegistrationType
         Public Property Instance As Object
         Public Property Factory As Func(Of Object)
     End Class
-
     Private Shared ReadOnly _Registrations As New Dictionary(Of (Type, String), Registration)
-
     ''' <summary>
     ''' Registers an instance as a singleton for the specified type.
     ''' </summary>
@@ -31,7 +27,6 @@ Public Class Locator
             .Instance = Instance
         }
     End Sub
-
     ''' <summary>
     ''' Registers a service via a factory, creating a new instance each time it is requested.
     ''' </summary>
@@ -45,7 +40,6 @@ Public Class Locator
             .Factory = Function() Factory()
         }
     End Sub
-
     ''' <summary>
     ''' Retrieves a registered instance of the specified type.
     ''' </summary>
@@ -68,5 +62,4 @@ Public Class Locator
             Throw New Exception($"Service of type {InstanceType.Name} {If(Not String.IsNullOrEmpty(Key), $"with key {Key} ", String.Empty)} is not registered.")
         End If
     End Function
-
 End Class

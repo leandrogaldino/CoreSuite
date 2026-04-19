@@ -30,7 +30,7 @@ Public Class EnumHelper
                 Return Field.GetValue(Nothing)
             End If
         Next
-        Throw New Exception("Nenhum elemento encontrado com essa descrição.")
+        Throw New Exception("No elements found with this description.")
     End Function
 
     ''' <summary>
@@ -53,7 +53,7 @@ Public Class EnumHelper
     Public Shared Function GetEnumItems(Of T As Structure)(Optional Predicate As Func(Of FieldInfo, Boolean) = Nothing) As IEnumerable(Of T)
         Dim EnumItems As New List(Of T)()
         If Not GetType(T).IsEnum Then
-            Throw New ArgumentException("O tipo T deve ser um Enum.")
+            Throw New ArgumentException("Type **T** must be an Enum.")
         End If
         If Predicate Is Nothing Then
             Predicate = Function(f) True

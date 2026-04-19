@@ -33,7 +33,7 @@ Public Class FirebaseFirestore
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
@@ -59,7 +59,7 @@ Public Class FirebaseFirestore
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
@@ -90,11 +90,11 @@ Public Class FirebaseFirestore
                     End If
                     Return ResultList
                 Else
-                    Throw New Exception($"Erro ao listar coleção: {JsonRaw}")
+                    Throw New Exception($"Error listing collection: {JsonRaw}")
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
@@ -153,7 +153,7 @@ Public Class FirebaseFirestore
                     End If
                     Return ResultList
                 Else
-                    Throw New Exception($"Erro na Query: {JsonRaw}")
+                    Throw New Exception($"Error in query: {JsonRaw}")
                 End If
             End Using
         Catch ex As Exception
@@ -196,7 +196,7 @@ Public Class FirebaseFirestore
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
@@ -219,11 +219,11 @@ Public Class FirebaseFirestore
                     Return True
                 Else
                     Dim ErrorJson As String = Await Response.Content.ReadAsStringAsync()
-                    Throw New Exception($"Erro ao deletar documento: {ErrorJson}")
+                    Throw New Exception($"Error deleting document: {ErrorJson}")
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
@@ -247,282 +247,182 @@ Public Class FirebaseFirestore
                     Return False
                 Else
                     Dim [Error] = Await Response.Content.ReadAsStringAsync()
-                    Throw New Exception($"Erro ao verificar existência: {[Error]}")
+                    Throw New Exception($"Error checking existence: {[Error]}")
                 End If
             End Using
         Catch ex As HttpRequestException
-            Throw New Exception("Falha de rede ao conectar com Firebase.", ex)
+            Throw New Exception("Network failure while connecting to Firebase.", ex)
         Catch ex As Exception
             Throw
         End Try
     End Function
-
     Private Function FormatFirestoreValue(Value As Object) As String
-
         If Value Is Nothing Then
             Return """nullValue"": null"
         End If
-
         If TypeOf Value Is String Then
             Return """stringValue"": """ & EscapeJson(Value.ToString()) & """"
         End If
-
         If TypeOf Value Is Boolean Then
             Return """booleanValue"": " & Value.ToString().ToLower()
         End If
-
         If TypeOf Value Is Integer OrElse TypeOf Value Is Long Then
             Return """integerValue"": """ & Value.ToString() & """"
         End If
-
         If TypeOf Value Is Double OrElse TypeOf Value Is Decimal OrElse TypeOf Value Is Single Then
             Dim doubleVal As Double = Convert.ToDouble(Value)
             Return """doubleValue"": " & doubleVal.ToString(Globalization.CultureInfo.InvariantCulture)
         End If
-
         If TypeOf Value Is DateTime Then
-            Dim dt As DateTime = DirectCast(Value, DateTime)
-            Dim iso = dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            Return """timestampValue"": """ & iso & """"
+            Dim Dt As DateTime = DirectCast(Value, DateTime)
+            Dim Iso = Dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            Return """timestampValue"": """ & Iso & """"
         End If
-
         If TypeOf Value Is Dictionary(Of String, Object) Then
-
-            Dim dict = DirectCast(Value, Dictionary(Of String, Object))
-            Dim entries As New List(Of String)
-
-            For Each kvp In dict
-                entries.Add($"""{kvp.Key}"": {{ {FormatFirestoreValue(kvp.Value)} }}")
-            Next
-
-            Return """mapValue"": { ""fields"": { " & String.Join(",", entries) & " } }"
-
+            Dim Dict = DirectCast(Value, Dictionary(Of String, Object))
+            Dim Entries As New List(Of String)
+            For Each Kvp In Dict
+                Entries.Add($"""{Kvp.Key}"": {{ {FormatFirestoreValue(Kvp.Value)} }}")
+            Next Kvp
+            Return """mapValue"": { ""fields"": { " & String.Join(",", Entries) & " } }"
         End If
-
-        If TypeOf Value Is IEnumerable AndAlso Not TypeOf Value Is String Then
-
-            Dim values As New List(Of String)
-
-            For Each item In DirectCast(Value, IEnumerable)
-                values.Add("{ " & FormatFirestoreValue(item) & " }")
-            Next
-
-            Return """arrayValue"": { ""values"": [" & String.Join(",", values) & "] }"
-
+        If TypeOf Value Is IEnumerable AndAlso TypeOf Value IsNot String Then
+            Dim Values As New List(Of String)
+            For Each Item In DirectCast(Value, IEnumerable)
+                Values.Add("{ " & FormatFirestoreValue(Item) & " }")
+            Next Item
+            Return """arrayValue"": { ""values"": [" & String.Join(",", Values) & "] }"
         End If
-
         Return """stringValue"": """ & EscapeJson(Value.ToString()) & """"
-
     End Function
-
     Private Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
-
         Dim Builder As New StringBuilder()
         Builder.Append("{""fields"": {")
-
         Dim Entries As New List(Of String)
-
         For Each Kvp In Dictionary
-
             If Kvp.Key = DocumentIDFieldName Then Continue For
-
             Dim valueJson = FirestoreValueToJson(Kvp.Value)
-
             If valueJson IsNot Nothing Then
                 Entries.Add($"""{Kvp.Key}"": {valueJson}")
             End If
-
         Next
-
         Builder.Append(String.Join(",", Entries))
         Builder.Append("}}")
-
         Return Builder.ToString()
-
     End Function
 
     Private Function FirestoreValueToJson(Value As Object) As String
-
         If Value Is Nothing Then
             Return "{""nullValue"": null}"
         End If
-
         If TypeOf Value Is String Then
             Return "{""stringValue"": """ & EscapeJson(Value.ToString()) & """}"
         End If
-
         If TypeOf Value Is Boolean Then
             Return "{""booleanValue"": " & Value.ToString().ToLower() & "}"
         End If
-
         If TypeOf Value Is Integer OrElse TypeOf Value Is Long Then
             Return "{""integerValue"": """ & Value.ToString() & """}"
         End If
-
         If TypeOf Value Is Double OrElse TypeOf Value Is Decimal OrElse TypeOf Value Is Single Then
             Dim doubleVal As Double = Convert.ToDouble(Value)
             Return "{""doubleValue"": " & doubleVal.ToString(Globalization.CultureInfo.InvariantCulture) & "}"
         End If
-
         If TypeOf Value Is DateTime Then
-            Dim dt As DateTime = DirectCast(Value, DateTime)
-            Dim iso = dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-            Return "{""timestampValue"": """ & iso & """}"
+            Dim Dt As DateTime = DirectCast(Value, DateTime)
+            Dim Iso = Dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            Return "{""timestampValue"": """ & Iso & """}"
         End If
-
-        ' MAP (Dictionary)
         If TypeOf Value Is Dictionary(Of String, Object) Then
-
-            Dim dict = DirectCast(Value, Dictionary(Of String, Object))
-            Dim entries As New List(Of String)
-
-            For Each kvp In dict
-                Dim innerJson = FirestoreValueToJson(kvp.Value)
-                entries.Add($"""{kvp.Key}"": {innerJson}")
+            Dim Dict = DirectCast(Value, Dictionary(Of String, Object))
+            Dim Entries As New List(Of String)
+            For Each Kvp In Dict
+                Dim InnerJson = FirestoreValueToJson(Kvp.Value)
+                Entries.Add($"""{Kvp.Key}"": {InnerJson}")
             Next
-
-            Return "{""mapValue"": {""fields"": {" & String.Join(",", entries) & "}}}"
-
+            Return "{""mapValue"": {""fields"": {" & String.Join(",", Entries) & "}}}"
         End If
-
-        ' ARRAY
-        If TypeOf Value Is IEnumerable AndAlso Not TypeOf Value Is String Then
-
-            Dim values As New List(Of String)
-
-            For Each item In DirectCast(Value, IEnumerable)
-                values.Add(FirestoreValueToJson(item))
+        If TypeOf Value Is IEnumerable AndAlso TypeOf Value IsNot String Then
+            Dim Values As New List(Of String)
+            For Each Item In DirectCast(Value, IEnumerable)
+                Values.Add(FirestoreValueToJson(Item))
             Next
-
-            Return "{""arrayValue"": {""values"": [" & String.Join(",", values) & "]}}"
-
+            Return "{""arrayValue"": {""values"": [" & String.Join(",", Values) & "]}}"
         End If
-
-        ' fallback
         Return "{""stringValue"": """ & EscapeJson(Value.ToString()) & """}"
-
     End Function
-
     Private Function EscapeJson(value As String) As String
         Return value.Replace("\", "\\").Replace("""", "\""")
     End Function
-
     Private Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
-
         Dim Resultado As New Dictionary(Of String, Object)
-
         Try
-
-            Dim Jss As New Web.Script.Serialization.JavaScriptSerializer With {
-            .MaxJsonLength = Int32.MaxValue
-        }
-
+            Dim Jss As New JavaScriptSerializer With {
+                .MaxJsonLength = Int32.MaxValue
+            }
             Dim Root = Jss.Deserialize(Of Dictionary(Of String, Object))(JsonRaw)
-
             If Root IsNot Nothing Then
-
                 If Root.ContainsKey("name") Then
                     Dim FullPath As String = Root("name").ToString()
                     Dim DocumentID As String = FullPath.Split("/"c).Last()
                     Resultado.Add(DocumentIDFieldName, DocumentID)
                 End If
-
                 If Root.ContainsKey("fields") Then
-
                     Dim Fields = DirectCast(Root("fields"), Dictionary(Of String, Object))
-
                     For Each Field In Fields
-
                         If Field.Key = DocumentIDFieldName Then Continue For
-
                         Dim TypeAndValue = DirectCast(Field.Value, Dictionary(Of String, Object))
-
                         Resultado(Field.Key) = ParseFirestoreValue(TypeAndValue)
-
                     Next
-
                 End If
-
             End If
-
         Catch ex As Exception
-            Throw New Exception($"Erro ao converter JSON do Firestore para Dictionary.{Environment.NewLine}JSON: {JsonRaw}", ex)
+            Throw New Exception($"Error converting Firestore JSON to Dictionary.{Environment.NewLine}JSON: {JsonRaw}", ex)
         End Try
-
         Return Resultado
-
     End Function
-
     Private Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
-
         For Each kvp In ValueObj
-
             Select Case kvp.Key
-
                 Case "integerValue"
                     Return Convert.ToInt64(kvp.Value)
-
                 Case "doubleValue"
                     Return Convert.ToDouble(kvp.Value, Globalization.CultureInfo.InvariantCulture)
-
                 Case "booleanValue"
                     Return Convert.ToBoolean(kvp.Value)
-
                 Case "stringValue"
                     Return Convert.ToString(kvp.Value)
-
                 Case "timestampValue"
                     Return Convert.ToDateTime(kvp.Value)
-
                 Case "nullValue"
                     Return Nothing
-
                 Case "arrayValue"
-
                     Dim result As New List(Of Object)
-
                     Dim arrayObj = TryCast(kvp.Value, Dictionary(Of String, Object))
-
                     If arrayObj IsNot Nothing AndAlso arrayObj.ContainsKey("values") Then
-
                         Dim values = TryCast(arrayObj("values"), IEnumerable)
-
                         If values IsNot Nothing Then
                             For Each item In values
                                 Dim itemDict = DirectCast(item, Dictionary(Of String, Object))
                                 result.Add(ParseFirestoreValue(itemDict))
                             Next
                         End If
-
                     End If
-
                     Return result
-
                 Case "mapValue"
-
                     Dim result As New Dictionary(Of String, Object)
-
                     Dim mapObj = DirectCast(kvp.Value, Dictionary(Of String, Object))
-
                     If mapObj.ContainsKey("fields") Then
-
                         Dim fields = DirectCast(mapObj("fields"), Dictionary(Of String, Object))
-
                         For Each field In fields
                             Dim fieldValue = DirectCast(field.Value, Dictionary(Of String, Object))
                             result(field.Key) = ParseFirestoreValue(fieldValue)
                         Next
-
                     End If
-
                     Return result
-
             End Select
-
         Next
-
         Return Nothing
-
     End Function
     Private Function GetOperatorString([Operator] As FirestoreOperator) As String
         Select Case [Operator]

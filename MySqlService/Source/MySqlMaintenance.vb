@@ -5,17 +5,12 @@ Imports System.Text.RegularExpressions
 Imports MySql.Data.MySqlClient
 
 Public Class MySqlMaintenance
-
     Public Event BackupProgressChanged As EventHandler(Of ProgressChangedEventArgs)
-
     Public Event RestoreProgressChanged As EventHandler(Of ProgressChangedEventArgs)
-
     Private ReadOnly _Client As MySqlClient
-
     Friend Sub New(Client As MySqlClient)
         _Client = Client
     End Sub
-
     ''' <summary>
     ''' Creates a database on the MySQL server according to the data provided to <see cref="MySqlClient"/>.
     ''' </summary>
@@ -26,10 +21,10 @@ Public Class MySqlMaintenance
     ''' <returns>A task representing the asynchronous operation.</returns>
     Public Async Function ExecuteCreateDatabaseAsync(Optional IfNotExists As Boolean = True, Optional Charset As String = "utf8mb4", Optional Collation As String = "utf8mb4_unicode_ci", Optional Connection As DbConnection = Nothing) As Task
         If String.IsNullOrWhiteSpace(_Client.Database) Then
-            Throw New ArgumentException("DatabaseName inválido.", NameOf(_Client.Database))
+            Throw New ArgumentException("Invalid database name.", NameOf(_Client.Database))
         End If
         If Not Regex.IsMatch(_Client.Database, "^[a-zA-Z0-9_]+$") Then
-            Throw New ArgumentException("DatabaseName contém caracteres inválidos.")
+            Throw New ArgumentException("Database name contains invalid characters.", NameOf(_Client.Database))
         End If
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
@@ -84,12 +79,11 @@ Public Class MySqlMaintenance
 
     Private Overloads Async Function ExecuteRestoreAsync(FilePath As String, Optional Connection As DbConnection = Nothing, Optional Progress As IProgress(Of Integer) = Nothing) As Task
         If String.IsNullOrWhiteSpace(FilePath) Then
-            Throw New ArgumentException("FilePath inválido.", NameOf(FilePath))
+            Throw New ArgumentException("Invalid file path.", NameOf(FilePath))
         End If
         If Not File.Exists(FilePath) Then
-            Throw New FileNotFoundException("Arquivo de backup não encontrado.", FilePath)
+            Throw New FileNotFoundException("Backup file not found.", FilePath)
         End If
-
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
@@ -97,7 +91,6 @@ Public Class MySqlMaintenance
         ElseIf Connection.State <> ConnectionState.Open Then
             Await Connection.OpenAsync()
         End If
-
         Try
             Using Cmd As New MySqlCommand(Nothing, Connection)
                 Using Bkp As New MySqlBackup(Cmd)
@@ -199,5 +192,4 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
-
 End Class
