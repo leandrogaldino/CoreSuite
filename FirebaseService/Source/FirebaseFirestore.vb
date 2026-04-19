@@ -251,15 +251,61 @@ Public Class FirebaseFirestore
     End Function
 
     Private Function FormatFirestoreValue(Value As Object) As String
+
+        If Value Is Nothing Then
+            Return """nullValue"": null"
+        End If
+
+        If TypeOf Value Is String Then
+            Return """stringValue"": """ & EscapeJson(Value.ToString()) & """"
+        End If
+
         If TypeOf Value Is Boolean Then
             Return """booleanValue"": " & Value.ToString().ToLower()
-        ElseIf TypeOf Value Is DateTime Then
-            Return """timestampValue"": """ & DirectCast(Value, DateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ") & """"
-        ElseIf IsNumeric(Value) Then
-            Return """doubleValue"": " & Convert.ToDouble(Value).ToString(Globalization.CultureInfo.InvariantCulture)
-        Else
-            Return """stringValue"": """ & Value.ToString() & """"
         End If
+
+        If TypeOf Value Is Integer OrElse TypeOf Value Is Long Then
+            Return """integerValue"": """ & Value.ToString() & """"
+        End If
+
+        If TypeOf Value Is Double OrElse TypeOf Value Is Decimal OrElse TypeOf Value Is Single Then
+            Dim doubleVal As Double = Convert.ToDouble(Value)
+            Return """doubleValue"": " & doubleVal.ToString(Globalization.CultureInfo.InvariantCulture)
+        End If
+
+        If TypeOf Value Is DateTime Then
+            Dim dt As DateTime = DirectCast(Value, DateTime)
+            Dim iso = dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+            Return """timestampValue"": """ & iso & """"
+        End If
+
+        If TypeOf Value Is Dictionary(Of String, Object) Then
+
+            Dim dict = DirectCast(Value, Dictionary(Of String, Object))
+            Dim entries As New List(Of String)
+
+            For Each kvp In dict
+                entries.Add($"""{kvp.Key}"": {{ {FormatFirestoreValue(kvp.Value)} }}")
+            Next
+
+            Return """mapValue"": { ""fields"": { " & String.Join(",", entries) & " } }"
+
+        End If
+
+        If TypeOf Value Is IEnumerable AndAlso Not TypeOf Value Is String Then
+
+            Dim values As New List(Of String)
+
+            For Each item In DirectCast(Value, IEnumerable)
+                values.Add("{ " & FormatFirestoreValue(item) & " }")
+            Next
+
+            Return """arrayValue"": { ""values"": [" & String.Join(",", values) & "] }"
+
+        End If
+
+        Return """stringValue"": """ & EscapeJson(Value.ToString()) & """"
+
     End Function
 
     Private Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
