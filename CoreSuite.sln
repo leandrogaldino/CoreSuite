@@ -165,6 +165,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TimeBox", "TimeBox\TimeBox.
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ToggleButton", "ToggleButton\ToggleButton.vbproj", "{6DCBE5A0-EADA-424F-8C6F-3E916AF250AA}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FileStateManager", "FileStateManager\FileStateManager.vbproj", "{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -323,6 +325,10 @@ Global
 		{6DCBE5A0-EADA-424F-8C6F-3E916AF250AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DCBE5A0-EADA-424F-8C6F-3E916AF250AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DCBE5A0-EADA-424F-8C6F-3E916AF250AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -365,6 +371,7 @@ Global
 		{11AEBCB1-BC37-476E-993D-D4FD50D8E249} = {449F1DDD-0D88-4E63-B9B1-D3214BBA4E5C}
 		{33B30BBF-49E5-4FDD-BD2E-AD82662FE9B1} = {D60DA386-54B6-458C-81A7-194DEE108E08}
 		{6DCBE5A0-EADA-424F-8C6F-3E916AF250AA} = {D60DA386-54B6-458C-81A7-194DEE108E08}
+		{64E69FB5-9AC5-4E28-BE80-3CFBF8F9CC23} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9D22103-398C-42E5-8401-284AD9ECDDC3}

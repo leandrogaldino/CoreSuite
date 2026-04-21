@@ -330,7 +330,7 @@ Public Class MySqlRequest
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-        Dim AffectedRows As Integer
+        Dim AffectedRows As Integer = 0
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
@@ -340,16 +340,18 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
+                Dim SafeTable As String = $"`{Table}`"
                 Dim SetClauses As New List(Of String)
                 For Each Kvp In Values
+                    Dim SafeColumn As String = $"`{Kvp.Key}`"
                     Dim ParamName As String = $"@upd_{Kvp.Key}"
-                    SetClauses.Add($"{Kvp.Key} = {ParamName}")
+                    SetClauses.Add($"{SafeColumn} = {ParamName}")
                     Dim Param = Command.CreateParameter()
                     Param.ParameterName = ParamName
                     Param.Value = If(Kvp.Value, DBNull.Value)
                     Command.Parameters.Add(Param)
                 Next Kvp
-                Dim Query As String = $"UPDATE {Table} SET {String.Join(", ", SetClauses)}"
+                Dim Query As String = $"UPDATE {SafeTable} SET {String.Join(", ", SetClauses)}"
                 If Not String.IsNullOrWhiteSpace(Where) Then
                     Query &= $" WHERE {Where}"
                 End If
@@ -389,7 +391,7 @@ Public Class MySqlRequest
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-        Dim AffectedRows As Integer
+        Dim AffectedRows As Integer = 0
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
@@ -399,16 +401,18 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
+                Dim SafeTable As String = $"`{Table}`"
                 Dim SetClauses As New List(Of String)
                 For Each Kvp In Values
+                    Dim SafeColumn As String = $"`{Kvp.Key}`"
                     Dim ParamName As String = $"@upd_{Kvp.Key}"
-                    SetClauses.Add($"{Kvp.Key} = {ParamName}")
+                    SetClauses.Add($"{SafeColumn} = {ParamName}")
                     Dim Param = Command.CreateParameter()
                     Param.ParameterName = ParamName
                     Param.Value = If(Kvp.Value, DBNull.Value)
                     Command.Parameters.Add(Param)
                 Next Kvp
-                Dim Query As String = $"UPDATE {Table} SET {String.Join(", ", SetClauses)}"
+                Dim Query As String = $"UPDATE {SafeTable} SET {String.Join(", ", SetClauses)}"
                 If Not String.IsNullOrWhiteSpace(Where) Then
                     Query &= $" WHERE {Where}"
                 End If
@@ -438,18 +442,17 @@ Public Class MySqlRequest
     ''' </summary>
     ''' <param name="Table">Table name.</param>
     ''' <param name="Values">Dictionary containing columns and values to be inserted.</param>
-    ''' <param name="QueryArgs">Optional query parameters.</param>
     ''' <param name="Connection">Optional connection.</param>
     ''' <returns>
     ''' A task returning a <see cref="MySqlResponse"/> containing the number of affected rows
     ''' and the last inserted ID.
     ''' </returns>
-    Public Function ExecuteInsert(Table As String, Values As Dictionary(Of String, Object), Optional QueryArgs As Dictionary(Of String, Object) = Nothing, Optional Connection As DbConnection = Nothing) As MySqlResponse
+    Public Function ExecuteInsert(Table As String, Values As Dictionary(Of String, Object), Optional Connection As DbConnection = Nothing) As MySqlResponse
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-        Dim AffectedRows As Integer
-        Dim LastInsertedRow As Integer
+        Dim AffectedRows As Integer = 0
+        Dim LastInsertedRow As Integer = 0
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
@@ -459,7 +462,8 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-                Dim Columns As String = String.Join(", ", Values.Keys)
+                Dim SafeTable As String = $"`{Table}`"
+                Dim SafeColumns As String = String.Join(", ", Values.Keys.Select(Function(k) $"`{k}`"))
                 Dim ParamNames As New List(Of String)
                 For Each Kvp In Values
                     Dim ParamName As String = $"@ins_{Kvp.Key}"
@@ -469,19 +473,13 @@ Public Class MySqlRequest
                     Param.Value = If(Kvp.Value, DBNull.Value)
                     Command.Parameters.Add(Param)
                 Next Kvp
-                Dim Query As String = $"INSERT INTO {Table} ({Columns}) VALUES ({String.Join(", ", ParamNames)})"
-                Command.CommandText = Query
-                If QueryArgs IsNot Nothing Then
-                    For Each Arg In QueryArgs
-                        Dim param = Command.CreateParameter()
-                        param.ParameterName = Arg.Key
-                        param.Value = If(Arg.Value, DBNull.Value)
-                        Command.Parameters.Add(param)
-                    Next Arg
-                End If
+                Command.CommandText = $"INSERT INTO {SafeTable} ({SafeColumns}) VALUES ({String.Join(", ", ParamNames)})"
                 AffectedRows = Command.ExecuteNonQuery()
                 Command.CommandText = "SELECT LAST_INSERT_ID();"
-                LastInsertedRow = Convert.ToInt32(Command.ExecuteScalar())
+                Dim Result = Command.ExecuteScalar()
+                If Result IsNot Nothing AndAlso Not IsDBNull(Result) Then
+                    LastInsertedRow = Convert.ToInt32(Result)
+                End If
             End Using
             Return New MySqlResponse(Nothing, AffectedRows, LastInsertedRow)
         Catch
@@ -498,18 +496,17 @@ Public Class MySqlRequest
     ''' </summary>
     ''' <param name="Table">Table name.</param>
     ''' <param name="Values">Dictionary containing columns and values to be inserted.</param>
-    ''' <param name="QueryArgs">Optional query parameters.</param>
     ''' <param name="Connection">Optional connection.</param>
     ''' <returns>
     ''' A task returning a <see cref="MySqlResponse"/> containing the number of affected rows
     ''' and the last inserted ID.
     ''' </returns>
-    Public Async Function ExecuteInsertAsync(Table As String, Values As Dictionary(Of String, Object), Optional QueryArgs As Dictionary(Of String, Object) = Nothing, Optional Connection As DbConnection = Nothing) As Task(Of MySqlResponse)
+    Public Async Function ExecuteInsertAsync(Table As String, Values As Dictionary(Of String, Object), Optional Connection As DbConnection = Nothing) As Task(Of MySqlResponse)
         If Values Is Nothing OrElse Values.Count = 0 Then
             Throw New ArgumentException("Values cannot be empty.", NameOf(Values))
         End If
-        Dim AffectedRows As Integer
-        Dim LastInsertedRow As Integer
+        Dim AffectedRows As Integer = 0
+        Dim LastInsertedRow As Integer = 0
         Dim OwnsConnection As Boolean = (Connection Is Nothing)
         If OwnsConnection Then
             Connection = _Client.CreateDatabaseConnection()
@@ -519,7 +516,8 @@ Public Class MySqlRequest
         End If
         Try
             Using Command As DbCommand = Connection.CreateCommand()
-                Dim Columns As String = String.Join(", ", Values.Keys)
+                Dim SafeTable As String = $"`{Table}`"
+                Dim SafeColumns As String = String.Join(", ", Values.Keys.Select(Function(k) $"`{k}`"))
                 Dim ParamNames As New List(Of String)
                 For Each Kvp In Values
                     Dim ParamName As String = $"@ins_{Kvp.Key}"
@@ -529,19 +527,13 @@ Public Class MySqlRequest
                     Param.Value = If(Kvp.Value, DBNull.Value)
                     Command.Parameters.Add(Param)
                 Next Kvp
-                Dim Query As String = $"INSERT INTO {Table} ({Columns}) VALUES ({String.Join(", ", ParamNames)})"
-                Command.CommandText = Query
-                If QueryArgs IsNot Nothing Then
-                    For Each Arg In QueryArgs
-                        Dim Param As DbParameter = Command.CreateParameter()
-                        Param.ParameterName = Arg.Key
-                        Param.Value = If(Arg.Value, DBNull.Value)
-                        Command.Parameters.Add(Param)
-                    Next Arg
-                End If
+                Command.CommandText = $"INSERT INTO {SafeTable} ({SafeColumns}) VALUES ({String.Join(", ", ParamNames)})"
                 AffectedRows = Await Command.ExecuteNonQueryAsync()
                 Command.CommandText = "SELECT LAST_INSERT_ID();"
-                LastInsertedRow = Convert.ToInt32(Await Command.ExecuteScalarAsync())
+                Dim Result = Await Command.ExecuteScalarAsync()
+                If Result IsNot Nothing AndAlso Not IsDBNull(Result) Then
+                    LastInsertedRow = Convert.ToInt32(Result)
+                End If
             End Using
             Return New MySqlResponse(Nothing, AffectedRows, LastInsertedRow)
         Catch
