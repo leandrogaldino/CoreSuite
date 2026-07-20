@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CoreSuite.Extensions</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+</Project>

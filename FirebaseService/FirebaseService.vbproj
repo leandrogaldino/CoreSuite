@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CoreSuite.Services</RootNamespace>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>CoreSuite..$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Helpers\Helpers.vbproj" />
+  </ItemGroup>
+
+</Project>
