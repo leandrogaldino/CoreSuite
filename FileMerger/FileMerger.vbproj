@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>CoreSuite.FileMerger</RootNamespace>
+    <RootNamespace>CoreSuite</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>

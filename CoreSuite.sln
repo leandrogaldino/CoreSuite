@@ -59,6 +59,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CMessageBox", "CMessageBox\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NoFocusCueButton", "NoFocusCueButton\NoFocusCueButton.vbproj", "{B90E6DC1-3433-4236-867A-DF00F5083E06}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ControlContainer", "ControlContainer\ControlContainer.vbproj", "{10581B5C-C6EF-4953-A909-D3CC1491086B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{B90E6DC1-3433-4236-867A-DF00F5083E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B90E6DC1-3433-4236-867A-DF00F5083E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B90E6DC1-3433-4236-867A-DF00F5083E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

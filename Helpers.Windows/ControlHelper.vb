@@ -27,7 +27,7 @@ Public Class ControlHelper
             Stack.Push(Child)
         Next
 
-        While Stack.Any()
+        While Stack.Count <> 0
             Dim [next] = Stack.Pop()
             Yield [next]
             For Each child As Control In [next].Controls

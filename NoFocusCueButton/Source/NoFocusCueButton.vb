@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms
-Public Class NoFocusCueButton
+﻿Public Class NoFocusCueButton
     Inherits Button
     Protected Overrides ReadOnly Property ShowFocusCues As Boolean
         Get

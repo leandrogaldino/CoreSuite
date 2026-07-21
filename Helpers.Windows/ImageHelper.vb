@@ -1,5 +1,5 @@
-﻿Imports System.Drawing
-Imports CoreSuite.Helpers.Windows.My.Resources
+﻿Imports CoreSuite.My.Resources
+
 
 ''' <summary>
 ''' Provides helper methods for common image operations such as cloning,

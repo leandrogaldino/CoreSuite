@@ -1,6 +1,5 @@
 ﻿Imports System.ComponentModel
 Imports System.Runtime.CompilerServices
-Imports System.Windows.Forms
 
 Namespace Extensions
     Public Module DataGridViewExtensions

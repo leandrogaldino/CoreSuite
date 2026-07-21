@@ -24,13 +24,14 @@ Partial Class FrmMessageBox
     Private Sub InitializeComponent()
         TlpContainer = New TableLayoutPanel()
         TlpTopBar = New TableLayoutPanel()
-        BtnClose = New NoFocusCueButton.NoFocusCueButton()
+        BtnClose = New NoFocusCueButton()
         TlpBottomBar = New TableLayoutPanel()
         TlpBody = New TableLayoutPanel()
-        LblTitle = New Label()
         PbxIcon = New PictureBox()
+        LblTitle = New Label()
         PnMessage = New Panel()
         LblMessage = New Label()
+        CcException = New ControlContainer()
         TlpContainer.SuspendLayout()
         TlpTopBar.SuspendLayout()
         TlpBody.SuspendLayout()
@@ -107,40 +108,40 @@ Partial Class FrmMessageBox
         TlpBody.ColumnCount = 2
         TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 125F))
         TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
-        TlpBody.Controls.Add(LblTitle, 1, 0)
-        TlpBody.Controls.Add(PbxIcon, 0, 0)
+        TlpBody.Controls.Add(PbxIcon, 0, 1)
+        TlpBody.Controls.Add(LblTitle, 0, 0)
         TlpBody.Controls.Add(PnMessage, 1, 1)
         TlpBody.Dock = DockStyle.Fill
         TlpBody.Location = New Point(3, 43)
         TlpBody.Name = "TlpBody"
         TlpBody.RowCount = 2
-        TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 19.7969589F))
-        TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 80.20304F))
-        TlpBody.RowStyles.Add(New RowStyle(SizeType.Absolute, 20F))
+        TlpBody.RowStyles.Add(New RowStyle(SizeType.Absolute, 30F))
+        TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
         TlpBody.Size = New Size(461, 162)
         TlpBody.TabIndex = 2
-        ' 
-        ' LblTitle
-        ' 
-        LblTitle.Dock = DockStyle.Fill
-        LblTitle.Font = New Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblTitle.Location = New Point(128, 3)
-        LblTitle.Margin = New Padding(3)
-        LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(330, 26)
-        LblTitle.TabIndex = 0
-        LblTitle.Text = "Title"
-        LblTitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' PbxIcon
         ' 
         PbxIcon.Dock = DockStyle.Fill
-        PbxIcon.Location = New Point(3, 3)
+        PbxIcon.Location = New Point(3, 33)
         PbxIcon.Name = "PbxIcon"
-        TlpBody.SetRowSpan(PbxIcon, 2)
-        PbxIcon.Size = New Size(119, 156)
-        PbxIcon.TabIndex = 2
+        PbxIcon.Size = New Size(119, 126)
+        PbxIcon.SizeMode = PictureBoxSizeMode.CenterImage
+        PbxIcon.TabIndex = 5
         PbxIcon.TabStop = False
+        ' 
+        ' LblTitle
+        ' 
+        TlpBody.SetColumnSpan(LblTitle, 2)
+        LblTitle.Dock = DockStyle.Fill
+        LblTitle.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblTitle.Location = New Point(3, 3)
+        LblTitle.Margin = New Padding(3)
+        LblTitle.Name = "LblTitle"
+        LblTitle.Size = New Size(455, 24)
+        LblTitle.TabIndex = 4
+        LblTitle.Text = "Title"
+        LblTitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' PnMessage
         ' 
@@ -148,15 +149,16 @@ Partial Class FrmMessageBox
         PnMessage.Controls.Add(LblMessage)
         PnMessage.Dock = DockStyle.Fill
         PnMessage.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        PnMessage.Location = New Point(128, 35)
+        PnMessage.Location = New Point(128, 33)
         PnMessage.Name = "PnMessage"
         PnMessage.Padding = New Padding(5)
-        PnMessage.Size = New Size(330, 124)
+        PnMessage.Size = New Size(330, 126)
         PnMessage.TabIndex = 3
         ' 
         ' LblMessage
         ' 
         LblMessage.AutoSize = True
+        LblMessage.BackColor = Color.Transparent
         LblMessage.Location = New Point(5, 5)
         LblMessage.Name = "LblMessage"
         LblMessage.Size = New Size(37, 17)
@@ -164,10 +166,16 @@ Partial Class FrmMessageBox
         LblMessage.Text = "Body"
         LblMessage.TextAlign = ContentAlignment.MiddleLeft
         ' 
+        ' CcException
+        ' 
+        CcException.DropDownBorderColor = SystemColors.HotTrack
+        CcException.DropDownControl = Nothing
+        CcException.DropDownEnabled = True
+        CcException.HostControl = BtnClose
+        ' 
         ' FrmMessageBox
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
-        AutoScaleMode = AutoScaleMode.Font
+        AutoScaleMode = AutoScaleMode.None
         BackColor = Color.White
         ClientSize = New Size(467, 258)
         ControlBox = False
@@ -188,10 +196,11 @@ Partial Class FrmMessageBox
     Friend WithEvents TlpContainer As TableLayoutPanel
     Friend WithEvents TlpTopBar As TableLayoutPanel
     Friend WithEvents TlpBottomBar As TableLayoutPanel
-    Friend WithEvents BtnClose As NoFocusCueButton.NoFocusCueButton
+    Friend WithEvents BtnClose As NoFocusCueButton
     Friend WithEvents TlpBody As TableLayoutPanel
-    Friend WithEvents LblTitle As Label
-    Friend WithEvents PbxIcon As PictureBox
     Friend WithEvents PnMessage As Panel
     Friend WithEvents LblMessage As Label
+    Friend WithEvents PbxIcon As PictureBox
+    Friend WithEvents LblTitle As Label
+    Friend WithEvents CcException As ControlContainer
 End Class

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>CoreSuite.AsyncLoader</RootNamespace>
+    <RootNamespace>CoreSuite</RootNamespace>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>FileStateManager</RootNamespace>
+    <RootNamespace>CoreSuite</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
