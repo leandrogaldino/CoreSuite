@@ -15,8 +15,32 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnimatedBox\AnimatedBox.vbproj" />
+    <ProjectReference Include="..\AsyncLoader\AsyncLoader.vbproj" />
+    <ProjectReference Include="..\Attributes\Attributes.vbproj" />
+    <ProjectReference Include="..\CentralizedComboBox\CentralizedComboBox.vbproj" />
     <ProjectReference Include="..\CMessageBox\CMessageBox.vbproj" />
+    <ProjectReference Include="..\ColoredProgressBar\ColoredProgressBar.vbproj" />
+    <ProjectReference Include="..\ColorPicker\ColorPicker.vbproj" />
     <ProjectReference Include="..\Connectivity\Connectivity.vbproj" />
+    <ProjectReference Include="..\ControlContainer\ControlContainer.vbproj" />
+    <ProjectReference Include="..\ControlSlider\ControlSlider.vbproj" />
+    <ProjectReference Include="..\CToolStripRender\CToolStripRender.vbproj" />
+    <ProjectReference Include="..\CUITypeEditor\CUITypeEditor.vbproj" />
+    <ProjectReference Include="..\DataGridViewContentCopy\DataGridViewContentCopy.vbproj" />
+    <ProjectReference Include="..\DataGridViewLayout\DataGridViewLayout.vbproj" />
+    <ProjectReference Include="..\Extensions.Windows\Extensions.Windows.vbproj" />
+    <ProjectReference Include="..\Extensions\Extensions.vbproj" />
+    <ProjectReference Include="..\FileMerger\FileMerger.vbproj" />
+    <ProjectReference Include="..\FileStateManager\FileStateManager.vbproj" />
+    <ProjectReference Include="..\FirebaseService\FirebaseService.vbproj" />
+    <ProjectReference Include="..\FluidResizer\FluidResizer.vbproj" />
+    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj" />
+    <ProjectReference Include="..\Helpers\Helpers.vbproj" />
+    <ProjectReference Include="..\Locator\Locator.vbproj" />
+    <ProjectReference Include="..\MySqlService\MySqlService.vbproj" />
+    <ProjectReference Include="..\NoFocusCueButton\NoFocusCueButton.vbproj" />
+    <ProjectReference Include="..\ToolStripCheckBox\ToolStripCheckBox.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

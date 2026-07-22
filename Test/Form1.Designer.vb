@@ -23,6 +23,7 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         ControlContainer1 = New CoreSuite.ControlContainer()
+        ControlSlider1 = New CoreSuite.ControlSlider()
         SuspendLayout()
         ' 
         ' ControlContainer1
@@ -31,6 +32,11 @@ Partial Class Form1
         ControlContainer1.DropDownControl = Nothing
         ControlContainer1.DropDownEnabled = True
         ControlContainer1.HostControl = Nothing
+        ' 
+        ' ControlSlider1
+        ' 
+        ControlSlider1.Child = Me
+        ControlSlider1.Parent = Me
         ' 
         ' Form1
         ' 
@@ -43,5 +49,6 @@ Partial Class Form1
     End Sub
 
     Friend WithEvents ControlContainer1 As CoreSuite.ControlContainer
+    Friend WithEvents ControlSlider1 As CoreSuite.ControlSlider
 
 End Class

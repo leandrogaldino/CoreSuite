@@ -1,12 +1,9 @@
-ColorPicker
-ControlSlider
-DataGridViewContentCopy
+QueriedBox
 DataGridViewNavigator
 DateBox
 DecimalBox
 PercentageBox
 PictureViewer
-QueriedBox
 RichTextButton
 Separator
 SplitButton
