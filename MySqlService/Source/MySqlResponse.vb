@@ -7,13 +7,18 @@ Public Class MySqlResponse
     Private ReadOnly _Data As List(Of Dictionary(Of String, Object))
     Private ReadOnly _AffectedRows As Long
     Private ReadOnly _LastInsertedID As Long
-
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="MySqlResponse"/> class with the
+    ''' specified data, affected row count, and last inserted ID.
+    ''' </summary>
+    ''' <param name="Data">The data returned by the operation, if any.</param>
+    ''' <param name="AffectedRows">The number of rows affected by the operation.</param>
+    ''' <param name="LastInsertedID">The ID of the last row inserted by an INSERT operation.</param>
     Friend Sub New(Optional Data As List(Of Dictionary(Of String, Object)) = Nothing, Optional AffectedRows As Long = 0, Optional LastInsertedID As Long = 0)
         _Data = Data
         _AffectedRows = AffectedRows
         _LastInsertedID = LastInsertedID
     End Sub
-
     ''' <summary>
     ''' Gets the ID of the last row inserted by an INSERT operation.
     ''' </summary>
@@ -22,7 +27,6 @@ Public Class MySqlResponse
             Return _LastInsertedID
         End Get
     End Property
-
     ''' <summary>
     ''' Gets the number of rows affected by the operation
     ''' (INSERT, UPDATE, or DELETE).
@@ -32,7 +36,6 @@ Public Class MySqlResponse
             Return _AffectedRows
         End Get
     End Property
-
     ''' <summary>
     ''' Indicates whether the operation returned any data.
     ''' </summary>
@@ -45,7 +48,6 @@ Public Class MySqlResponse
             End If
         End Get
     End Property
-
     ''' <summary>
     ''' Gets the returned data as a list of dictionaries (column/value).
     ''' </summary>

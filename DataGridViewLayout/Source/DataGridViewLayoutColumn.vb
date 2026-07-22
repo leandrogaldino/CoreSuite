@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms
-''' <summary>
+﻿''' <summary>
 ''' Represents a single column configuration within a DataGridView layout system.
 ''' </summary>
 ''' <remarks>

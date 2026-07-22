@@ -1,24 +1,19 @@
 ﻿Imports System.ComponentModel
-Imports System.Drawing
 Imports System.Drawing.Drawing2D
-
 ''' <summary>
 ''' A custom progress bar that fills with a gradient color based on the <see cref="Value"/>.
 ''' </summary>
 Public Class ColoredProgressBar
     Inherits UserControl
-
     Private _Minimum As Integer = 0
     Private _Maximum As Integer = 100
     Private _Value As Integer = 0
     Private _ProgressTopColor As Color = Color.ForestGreen
     Private _ProgressBottomColor As Color = Color.ForestGreen
-
     Public Sub New()
         Size = New Size(150, 24)
         BackColor = Color.WhiteSmoke
     End Sub
-
     ''' <summary>
     ''' Gets or sets the minimum value of the progress bar.
     ''' </summary>
@@ -35,7 +30,6 @@ Public Class ColoredProgressBar
             Invalidate()
         End Set
     End Property
-
     ''' <summary>
     ''' Gets or sets the maximum value of the progress bar.
     ''' </summary>
@@ -51,7 +45,6 @@ Public Class ColoredProgressBar
             Invalidate()
         End Set
     End Property
-
     ''' <summary>
     ''' Gets or sets the top color of the gradient fill.
     ''' </summary>
@@ -65,7 +58,6 @@ Public Class ColoredProgressBar
             Invalidate()
         End Set
     End Property
-
     ''' <summary>
     ''' Gets or sets the bottom color of the gradient fill.
     ''' </summary>
@@ -79,7 +71,6 @@ Public Class ColoredProgressBar
             Invalidate()
         End Set
     End Property
-
     ''' <summary>
     ''' Gets or sets the current value of the progress bar.
     ''' </summary>
@@ -116,7 +107,6 @@ Public Class ColoredProgressBar
             Invalidate(UpdateRect)
         End Set
     End Property
-
     ''' <summary>
     ''' Paints the progress bar with the gradient fill according to the current <see cref="Value"/>.
     ''' </summary>
@@ -129,7 +119,6 @@ Public Class ColoredProgressBar
         g.FillRectangle(Brush, Rect)
         Brush.Dispose()
     End Sub
-
     ''' <summary>
     ''' Refreshes the control when resized.
     ''' </summary>
@@ -137,5 +126,4 @@ Public Class ColoredProgressBar
         MyBase.OnResize(e)
         Invalidate()
     End Sub
-
 End Class

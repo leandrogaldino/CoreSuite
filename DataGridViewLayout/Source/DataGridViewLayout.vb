@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Forms
-
-''' <summary>
+﻿''' <summary>
 ''' Represents a full DataGridView layout configuration for a specific routine/version.
 ''' </summary>
 ''' <remarks>
@@ -11,34 +9,28 @@
 ''' It supports deep cloning for safe manipulation without affecting the original instance.
 ''' </remarks>
 Public Class DataGridViewLayout
-
     ''' <summary>
     ''' Gets the routine name associated with this layout configuration.
     ''' </summary>
     Public ReadOnly Property Routine As String
-
     ''' <summary>
     ''' Gets the version of the layout schema.
     ''' Used to determine whether a layout file is outdated.
     ''' </summary>
     Public ReadOnly Property Version As Integer
-
     ''' <summary>
     ''' Gets or sets the index of the column currently used for sorting.
     ''' A value of -1 indicates no sorting.
     ''' </summary>
     Public Property SortedColumn As Integer = -1
-
     ''' <summary>
     ''' Gets or sets the current sort direction applied to the grid.
     ''' </summary>
     Public Property SortDirection As SortOrder = SortOrder.None
-
     ''' <summary>
     ''' Gets the list of column configurations that define the layout structure.
     ''' </summary>
     Public Property Columns As New List(Of DataGridViewLayoutColumn)
-
     ''' <summary>
     ''' Initializes a new instance of the DataGridViewLayout class.
     ''' </summary>
@@ -48,7 +40,6 @@ Public Class DataGridViewLayout
         Me.Routine = Routine
         Me.Version = Version
     End Sub
-
     ''' <summary>
     ''' Creates a deep copy of the current layout instance.
     ''' </summary>
@@ -65,7 +56,6 @@ Public Class DataGridViewLayout
             .SortedColumn = Me.SortedColumn,
             .SortDirection = Me.SortDirection
         }
-
         For Each Column In Columns
             MyClone.Columns.Add(New DataGridViewLayoutColumn(Column.VisibleInContext) With {
                 .Width = Column.Width,
@@ -77,9 +67,7 @@ Public Class DataGridViewLayout
                 .HeaderAlignment = Column.HeaderAlignment,
                 .Format = Column.Format
             })
-        Next
-
+        Next Column
         Return MyClone
     End Function
-
 End Class

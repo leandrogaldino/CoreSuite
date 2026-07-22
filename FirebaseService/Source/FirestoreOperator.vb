@@ -1,36 +1,45 @@
 ﻿''' <summary>
-''' Defines supported Firestore query operators.
+''' Specifies the comparison operators available for building Firestore query filters.
 ''' </summary>
 Public Enum FirestoreOperator
-
-    ''' <summary>Equal comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are equal to the specified value.
+    ''' </summary>
     Equal
-
-    ''' <summary>Not equal comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are not equal to the specified value.
+    ''' </summary>
     NotEqual
-
-    ''' <summary>Less than comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are less than the specified value.
+    ''' </summary>
     LessThan
-
-    ''' <summary>Less than or equal comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are less than or equal to the specified value.
+    ''' </summary>
     LessThanOrEqual
-
-    ''' <summary>Greater than comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are greater than the specified value.
+    ''' </summary>
     GreaterThan
-
-    ''' <summary>Greater than or equal comparison.</summary>
+    ''' <summary>
+    ''' Matches values that are greater than or equal to the specified value.
+    ''' </summary>
     GreaterThanOrEqual
-
-    ''' <summary>Checks if an array contains a value.</summary>
+    ''' <summary>
+    ''' Matches array fields that contain the specified value.
+    ''' </summary>
     ArrayContains
-
-    ''' <summary>Checks if an array contains any value from a list.</summary>
+    ''' <summary>
+    ''' Matches array fields that contain any of the specified values.
+    ''' </summary>
     ArrayContainsAny
-
-    ''' <summary>Checks if a value exists within a list.</summary>
+    ''' <summary>
+    ''' Matches values that are present in the specified list of values.
+    ''' </summary>
     InList
-
-    ''' <summary>Checks if a value does not exist within a list.</summary>
+    ''' <summary>
+    ''' Matches values that are not present in the specified list of values.
+    ''' </summary>
     NotInList
-
 End Enum

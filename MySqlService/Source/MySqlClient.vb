@@ -7,26 +7,51 @@ Imports MySql.Data.MySqlClient
 ''' for MySQL servers and databases using MySqlConnector.
 ''' </summary>
 Public Class MySqlClient
+    ''' <summary>
+    ''' Gets or sets the MySQL server address.
+    ''' </summary>
     Friend Property Server As String
+    ''' <summary>
+    ''' Gets or sets the name of the database to connect to.
+    ''' </summary>
     Friend Property Database As String
+    ''' <summary>
+    ''' Gets or sets the username used to authenticate with the MySQL server.
+    ''' </summary>
     Friend Property User As String
+    ''' <summary>
+    ''' Gets or sets the password used to authenticate with the MySQL server.
+    ''' </summary>
     Friend Property Password As String
-
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="MySqlClient"/> class with the
+    ''' specified server, database, and credentials.
+    ''' </summary>
+    ''' <param name="Server">The MySQL server address.</param>
+    ''' <param name="Database">The name of the database to connect to.</param>
+    ''' <param name="User">The username used to authenticate with the server.</param>
+    ''' <param name="Password">The password used to authenticate with the server.</param>
     Friend Sub New(Server As String, Database As String, User As String, Password As String)
         Me.Server = Server
         Me.Database = Database
         Me.User = User
         Me.Password = Password
     End Sub
-
+    ''' <summary>
+    ''' Builds the connection string used to connect to the MySQL server
+    ''' without targeting a specific database.
+    ''' </summary>
+    ''' <returns>A connection string containing the server address and credentials.</returns>
     Friend Function GetServerConnectionString() As String
         Return String.Format("Server={0};Uid={1};Pwd={2};Pooling=True", Server, User, Password)
     End Function
-
+    ''' <summary>
+    ''' Builds the connection string used to connect to the configured MySQL database.
+    ''' </summary>
+    ''' <returns>A connection string containing the server address, database name, and credentials.</returns>
     Friend Function GetDatabaseConnectionString() As String
         Return String.Format("Server={0};Database={1};Uid={2};Pwd={3};Pooling=True", Server, Database, User, Password)
     End Function
-
     ''' <summary>
     ''' Creates a new connection to the MySQL server without associating it with a specific database.
     ''' </summary>
@@ -59,7 +84,6 @@ Public Class MySqlClient
         Dim Connection As New MySqlConnection(GetServerConnectionString())
         Return Connection
     End Function
-
     ''' <summary>
     ''' Creates a new connection to the MySQL database configured as the default.
     ''' </summary>
@@ -93,5 +117,4 @@ Public Class MySqlClient
         Dim Connection As New MySqlConnection(GetDatabaseConnectionString())
         Return Connection
     End Function
-
 End Class

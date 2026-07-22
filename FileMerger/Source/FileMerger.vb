@@ -226,6 +226,13 @@ Public Class FileMerger
             Return False
         End Try
     End Function
+    ''' <summary>
+    ''' Attempts to read a length-prefixed (varint-encoded length) UTF-8 string from the stream.
+    ''' </summary>
+    ''' <param name="Reader">The binary reader used to read the string.</param>
+    ''' <param name="Stream">The underlying stream, used to validate available data.</param>
+    ''' <param name="Result">When this method returns, contains the string that was read, or <c>Nothing</c> if reading failed.</param>
+    ''' <returns><c>True</c> if the string was read successfully; otherwise, <c>False</c>.</returns>
     Private Shared Function TryReadString(Reader As BinaryReader, Stream As FileStream, ByRef Result As String) As Boolean
         Result = Nothing
         Dim Length As Integer = 0
@@ -304,12 +311,22 @@ Public Class FileMerger
         End Using
         Return Metadata
     End Function
+    ''' <summary>
+    ''' Derives a 256-bit AES encryption key from the specified password using PBKDF2.
+    ''' </summary>
+    ''' <param name="password">The password from which the key will be derived.</param>
+    ''' <returns>A 32-byte array representing the derived encryption key.</returns>
     Private Shared Function DeriveKey(password As String) As Byte()
         Dim Salt = Encoding.UTF8.GetBytes("fd529abe-3283-487e-b6fd-127d9868c658")
         Using pdb As New Rfc2898DeriveBytes(password, Salt, 100000, HashAlgorithmName.SHA256)
             Return pdb.GetBytes(32)
         End Using
     End Function
+    ''' <summary>
+    ''' Writes the file header, including the signature and encryption IV, to the specified stream.
+    ''' </summary>
+    ''' <param name="Stream">The stream to which the header will be written.</param>
+    ''' <param name="IV">The initialization vector used for encryption.</param>
     Private Shared Sub WriteHeader(Stream As FileStream, IV As Byte())
         Using Writer As New BinaryWriter(Stream, Encoding.UTF8, True)
             Writer.Write(HEADER_SIGNATURE)
@@ -317,6 +334,12 @@ Public Class FileMerger
             Writer.Write(IV)
         End Using
     End Sub
+    ''' <summary>
+    ''' Reads and validates the file header from the specified stream, returning the encryption IV.
+    ''' </summary>
+    ''' <param name="Stream">The stream from which the header will be read.</param>
+    ''' <returns>The initialization vector (IV) stored in the header.</returns>
+    ''' <exception cref="InvalidDataException">Thrown when the file signature does not match the expected header signature.</exception>
     Private Shared Function ReadHeader(Stream As FileStream) As Byte()
         Using Reader As New BinaryReader(Stream, Encoding.UTF8, True)
             Dim Signature As String = Reader.ReadString()
@@ -325,6 +348,12 @@ Public Class FileMerger
             Return Reader.ReadBytes(IVLength)
         End Using
     End Function
+    ''' <summary>
+    ''' Computes the relative path of a file with respect to a base directory path.
+    ''' </summary>
+    ''' <param name="BasePath">The base directory path.</param>
+    ''' <param name="FullPath">The full path of the file.</param>
+    ''' <returns>The relative path from <paramref name="BasePath"/> to <paramref name="FullPath"/>.</returns>
     Private Shared Function GetRelativePath(BasePath As String, FullPath As String) As String
         Dim BaseUri = New Uri(If(BasePath.EndsWith(Path.DirectorySeparatorChar), BasePath, BasePath & Path.DirectorySeparatorChar))
         Dim FullUri = New Uri(FullPath)

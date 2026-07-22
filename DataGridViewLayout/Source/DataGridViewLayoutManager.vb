@@ -122,63 +122,48 @@ Public Class DataGridViewLayoutManager
         Dim Button As ToolStripMenuItem
         Dim SelectedRow As Long = 0
         Dim FirstRow As Long = 0
-
         If DefaultLayout Is Nothing Then
             Throw New InvalidOperationException("DefaultLayout must be defined before calling Load().")
         End If
-
         _CmsColumns.Font = Font
-
         If Not File.Exists(LayoutDirectory & "\" & DefaultLayout.Routine & ".json") OrElse HasNewVersion() Then
             CreateJsonFile()
         End If
-
         _CurrentLayout = ReadJsonFile()
-
         For Each Column In _CurrentLayout.Columns
             Index = _CurrentLayout.Columns.IndexOf(Column)
-
             _DataGridView.Columns(Index).Visible = Column.VisibleInGrid
             _DataGridView.Columns(Index).DisplayIndex = Column.DisplayIndex
             _DataGridView.Columns(Index).HeaderText = Column.DisplayName
-
             If Column.WidthSizeMode = DataGridViewAutoSizeColumnMode.None Then
                 _DataGridView.Columns(Index).AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                 _DataGridView.Columns(Index).Width = Column.Width
             Else
                 _DataGridView.Columns(Index).AutoSizeMode = Column.WidthSizeMode
             End If
-
             _DataGridView.Columns(Index).DefaultCellStyle.Alignment = Column.CellAlignment
             _DataGridView.Columns(Index).HeaderCell.Style.Alignment = Column.HeaderAlignment
             _DataGridView.Columns(Index).DefaultCellStyle.Format = Column.Format
-        Next
-
+        Next Column
         If _DataGridView IsNot Nothing Then
             If _DataGridView.SelectedRows.Count = 1 Then
                 SelectedRow = _DataGridView.SelectedRows(0).Index
             End If
-
             FirstRow = _DataGridView.FirstDisplayedScrollingRowIndex
         End If
-
         If _CurrentLayout.SortDirection = SortOrder.Ascending Then
             _DataGridView.Sort(_DataGridView.Columns(_CurrentLayout.SortedColumn), 0)
         End If
-
         If _CurrentLayout.SortDirection = SortOrder.Descending Then
             _DataGridView.Sort(_DataGridView.Columns(_CurrentLayout.SortedColumn), 1)
         End If
-
         If _CurrentLayout.SortDirection = SortOrder.None Then ClearSort()
-
         If _DataGridView.Rows.Count > 0 Then
             If SelectedRow < _DataGridView.Rows.Count Then
                 _DataGridView.Rows(SelectedRow).Selected = True
             Else
                 _DataGridView.Rows(_DataGridView.Rows.Count - 1).Selected = True
             End If
-
             If FirstRow >= 0 Then
                 If _DataGridView.Rows.Count >= FirstRow Then
                     _DataGridView.FirstDisplayedScrollingRowIndex = FirstRow
@@ -187,9 +172,7 @@ Public Class DataGridViewLayoutManager
                 End If
             End If
         End If
-
         _CmsColumns.Items.Clear()
-
         Button = New ToolStripMenuItem With {
             .Name = "BtnRestoreGridLayout",
             .Text = "Restaurar Colunas"
@@ -203,25 +186,20 @@ Public Class DataGridViewLayoutManager
         }
         AddHandler Button.Click, AddressOf BtnRemoveSort_Click
         _CmsColumns.Items.Add(Button)
-
         _CmsColumns.Items.Add(New ToolStripSeparator)
-
         For Each Column In _DataGridView.Columns
             Dim LayoutColumn As DataGridViewLayoutColumn =
                 _CurrentLayout.Columns.FirstOrDefault(Function(c) c.DisplayName = Column.HeaderText)
-
             If LayoutColumn.VisibleInContext Then
                 Button = New ToolStripMenuItem With {
                     .CheckOnClick = True,
                     .Text = LayoutColumn.DisplayName,
                     .Checked = LayoutColumn.VisibleInGrid
                 }
-
                 AddHandler Button.CheckedChanged, AddressOf BtnColumn_CheckedChanged
                 _CmsColumns.Items.Add(Button)
             End If
-        Next
-
+        Next Column
         RaiseEvent Loaded(Me, EventArgs.Empty)
     End Sub
     ''' <summary>
@@ -233,7 +211,6 @@ Public Class DataGridViewLayoutManager
         If File.Exists(LayoutDirectory & "\" & DefaultLayout.Routine & ".json") Then
             For Each Column In _CurrentLayout.Columns
                 Index = _CurrentLayout.Columns.IndexOf(Column)
-
                 Column.VisibleInGrid = DataGridView.Columns(Index).Visible
                 Column.DisplayIndex = DataGridView.Columns(Index).DisplayIndex
                 Column.DisplayName = DataGridView.Columns(Index).HeaderText
@@ -242,17 +219,10 @@ Public Class DataGridViewLayoutManager
                 Column.CellAlignment = DataGridView.Columns(Index).DefaultCellStyle.Alignment
                 Column.HeaderAlignment = DataGridView.Columns(Index).HeaderCell.Style.Alignment
                 Column.Format = DataGridView.Columns(Index).DefaultCellStyle.Format
-            Next
-
-            _CurrentLayout.SortedColumn =
-                If(DataGridView.SortedColumn IsNot Nothing, DataGridView.SortedColumn.Index, -1)
-
-            _CurrentLayout.SortDirection =
-                If(DataGridView.SortOrder = SortOrder.Descending,
-                   SortOrder.Descending,
-                   SortOrder.Ascending)
+            Next Column
+            _CurrentLayout.SortedColumn = If(DataGridView.SortedColumn IsNot Nothing, DataGridView.SortedColumn.Index, -1)
+            _CurrentLayout.SortDirection = If(DataGridView.SortOrder = SortOrder.Descending, SortOrder.Descending, SortOrder.Ascending)
         End If
-
         SaveJsonFile()
     End Sub
     ''' <summary>
@@ -261,7 +231,6 @@ Public Class DataGridViewLayoutManager
     <DebuggerStepThrough>
     Private Sub DataGridView_MouseDown(sender As Object, e As MouseEventArgs)
         Dim Click As DataGridView.HitTestInfo = DataGridView.HitTest(e.X, e.Y)
-
         If Click.Type = DataGridViewHitTestType.ColumnHeader And e.Button = MouseButtons.Right Then
             _SaveLayout = False
             _LoadLayout = True
@@ -277,11 +246,9 @@ Public Class DataGridViewLayoutManager
     <DebuggerStepThrough>
     Private Sub DataGridView_MouseUp(sender As Object, e As MouseEventArgs)
         If _SaveLayout Then Save()
-
         If _LoadLayout Then
             _CmsColumns.Show(DataGridView.PointToScreen(_CmsPoint))
         End If
-
         _SaveLayout = False
         _LoadLayout = False
     End Sub
@@ -296,37 +263,29 @@ Public Class DataGridViewLayoutManager
 
     Private Sub BtnRestoreGridLayout_Click(sender As Object, e As EventArgs)
         _CmsColumns.Close()
-
         If File.Exists(LayoutDirectory & "\" & _CurrentLayout.Routine & ".json") Then
             CreateJsonFile()
             Load()
         End If
     End Sub
-
     Private Sub BtnRemoveSort_Click(sender As Object, e As EventArgs)
         _CmsColumns.Close()
-
         _CurrentLayout = ReadJsonFile()
         _CurrentLayout.SortedColumn = -1
         _CurrentLayout.SortDirection = SortOrder.None
-
         SaveJsonFile()
         Load()
     End Sub
-
     Private Sub BtnColumn_CheckedChanged(sender As Object, e As EventArgs)
         Dim Menu As ContextMenuStrip =
             CType(CType(sender, ToolStripMenuItem).GetCurrentParent, ContextMenuStrip)
-
-        If Menu.Items.OfType(Of ToolStripMenuItem).Count(Function(x) x.Checked) = 0 Then
+        If Not Menu.Items.OfType(Of ToolStripMenuItem).Any(Function(x) x.Checked) Then
             If _CurrentLayout.Columns.All(Function(x) x.VisibleInContext) Then
                 sender.checked = True
             End If
         End If
-
         DataGridView.Columns.Cast(Of DataGridViewColumn).
             Single(Function(x) x.HeaderText = sender.Text).Visible = sender.Checked
-
         Save()
     End Sub
     ''' <summary>
@@ -337,5 +296,4 @@ Public Class DataGridViewLayoutManager
         Dim Current = ReadJsonFile()
         Return DefaultLayout.Version > Current.Version
     End Function
-
 End Class

@@ -33,9 +33,7 @@ Public Class AttributeHelper
         If String.IsNullOrEmpty(MemberName) Then
             Throw New ArgumentNullException(NameOf(MemberName))
         End If
-        If Type Is Nothing Then
-            Throw New ArgumentNullException(NameOf(Type))
-        End If
+        ArgumentNullException.ThrowIfNull(Type)
         Dim Member = Type.GetMember(MemberName, BindingFlags.Public Or BindingFlags.Static).FirstOrDefault()
         If Member Is Nothing Then
             Throw New ArgumentException($"The member '{MemberName}' was not found in type '{Type.Name}'.")

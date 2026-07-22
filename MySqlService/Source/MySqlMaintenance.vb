@@ -4,11 +4,21 @@ Imports System.Data.Common
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports MySql.Data.MySqlClient
-
 Public Class MySqlMaintenance
-    Public Event BackupProgressChanged As EventHandler(Of ProgressChangedEventArgs)
-    Public Event RestoreProgressChanged As EventHandler(Of ProgressChangedEventArgs)
     Private ReadOnly _Client As MySqlClient
+    ''' <summary>
+    ''' Occurs when the progress of a backup operation changes.
+    ''' </summary>
+    Public Event BackupProgressChanged As EventHandler(Of ProgressChangedEventArgs)
+    ''' <summary>
+    ''' Occurs when the progress of a restore operation changes.
+    ''' </summary>
+    Public Event RestoreProgressChanged As EventHandler(Of ProgressChangedEventArgs)
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="MySqlMaintenance"/> class
+    ''' associated with the specified <see cref="MySqlClient"/>.
+    ''' </summary>
+    ''' <param name="Client">The client containing the connection information to use.</param>
     Friend Sub New(Client As MySqlClient)
         _Client = Client
     End Sub
@@ -48,7 +58,6 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Restores the database using only the backup file path.
     ''' </summary>
@@ -57,7 +66,6 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteRestoreAsync(FilePath As String) As Task
         Await ExecuteRestoreAsync(FilePath, Nothing, Nothing)
     End Function
-
     ''' <summary>
     ''' Restores the database using a file path and an existing connection.
     ''' </summary>
@@ -67,7 +75,6 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteRestoreAsync(FilePath As String, Connection As DbConnection) As Task
         Await ExecuteRestoreAsync(FilePath, Connection, Nothing)
     End Function
-
     ''' <summary>
     ''' Restores the database using a file path and progress reporting.
     ''' </summary>
@@ -77,7 +84,16 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteRestoreAsync(FilePath As String, Progress As IProgress(Of Integer)) As Task
         Await ExecuteRestoreAsync(FilePath, Nothing, Progress)
     End Function
-
+    ''' <summary>
+    ''' Restores the database from a backup file, using the specified connection
+    ''' and reporting progress if provided.
+    ''' </summary>
+    ''' <param name="FilePath">Path to the backup file to be restored.</param>
+    ''' <param name="Connection">Optional existing connection. If not provided, the class will create one.</param>
+    ''' <param name="Progress">Optional progress reported during restore (0 to 100).</param>
+    ''' <returns>An asynchronous task.</returns>
+    ''' <exception cref="ArgumentException">Thrown when <paramref name="FilePath"/> is null or whitespace.</exception>
+    ''' <exception cref="FileNotFoundException">Thrown when the specified backup file does not exist.</exception>
     Private Overloads Async Function ExecuteRestoreAsync(FilePath As String, Optional Connection As DbConnection = Nothing, Optional Progress As IProgress(Of Integer) = Nothing) As Task
         If String.IsNullOrWhiteSpace(FilePath) Then
             Throw New ArgumentException("Invalid file path.", NameOf(FilePath))
@@ -118,7 +134,6 @@ Public Class MySqlMaintenance
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Performs a backup using only the file path.
     ''' </summary>
@@ -127,7 +142,6 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteBackupAsync(FilePath As String) As Task
         Await ExecuteBackupAsync(FilePath, Nothing, Nothing)
     End Function
-
     ''' <summary>
     ''' Backup usando caminho do arquivo e conexão.
     ''' </summary>
@@ -137,7 +151,6 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteBackupAsync(FilePath As String, Connection As DbConnection) As Task
         Await ExecuteBackupAsync(FilePath, Connection, Nothing)
     End Function
-
     ''' <summary>
     ''' Performs a backup using a file path and progress reporting.
     ''' </summary>
@@ -147,7 +160,15 @@ Public Class MySqlMaintenance
     Public Overloads Async Function ExecuteBackupAsync(FilePath As String, Progress As IProgress(Of Integer)) As Task
         Await ExecuteBackupAsync(FilePath, Nothing, Progress)
     End Function
-
+    ''' <summary>
+    ''' Performs a database backup, using the specified connection and reporting
+    ''' progress if provided.
+    ''' </summary>
+    ''' <param name="FilePath">Path where the backup file will be saved.</param>
+    ''' <param name="Connection">Optional existing connection. If not provided, the class will create one.</param>
+    ''' <param name="Progress">Optional progress reported during backup (0 to 100).</param>
+    ''' <returns>An asynchronous task.</returns>
+    ''' <exception cref="ArgumentException">Thrown when <paramref name="FilePath"/> is null or whitespace.</exception>
     Private Overloads Async Function ExecuteBackupAsync(FilePath As String, Optional Connection As DbConnection = Nothing, Optional Progress As IProgress(Of Integer) = Nothing) As Task
         If String.IsNullOrWhiteSpace(FilePath) Then
             Throw New ArgumentException("FilePath inválido.", NameOf(FilePath))

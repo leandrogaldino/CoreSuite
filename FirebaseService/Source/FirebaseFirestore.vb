@@ -1,19 +1,15 @@
 ﻿Imports System.Net.Http
 Imports System.Text
 Imports System.Text.Json
-Imports CoreSuite.Helpers
-
 ''' <summary>
 ''' Provides access to Firebase Firestore database operations.
 ''' </summary>
 Public Class FirebaseFirestore
     Private ReadOnly _Client As FirebaseClient
     Private Const DocumentIDFieldName = "firestore_document_id"
-
     Friend Sub New(Client As FirebaseClient)
         _Client = Client
     End Sub
-
     ''' <summary>
     ''' Retrieves all sub-collections of a document or root collections.
     ''' </summary>
@@ -38,7 +34,6 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-
     ''' <summary>
     ''' Retrieves a document from a Firestore collection.
     ''' </summary>
@@ -64,7 +59,6 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-
     ''' <summary>
     ''' Retrieves all documents from a Firestore collection.
     ''' </summary>
@@ -97,7 +91,6 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-
     ''' <summary>
     ''' Executes a composite query using multiple filters.
     ''' </summary>
@@ -156,7 +149,6 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-
     ''' <summary>
     ''' Creates or updates a Firestore document.
     ''' </summary>
@@ -198,7 +190,6 @@ Public Class FirebaseFirestore
         End Try
         Return String.Empty
     End Function
-
     ''' <summary>
     ''' Deletes a document from a Firestore collection.
     ''' </summary>
@@ -224,7 +215,6 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-
     ''' <summary>
     ''' Determines whether a document exists in a collection.
     ''' </summary>
@@ -252,7 +242,13 @@ Public Class FirebaseFirestore
             Throw
         End Try
     End Function
-    Private Function FormatFirestoreValue(Value As Object) As String
+    ''' <summary>
+    ''' Converts a value into its Firestore-formatted JSON field representation,
+    ''' including the appropriate Firestore value type wrapper.
+    ''' </summary>
+    ''' <param name="Value">The value to format.</param>
+    ''' <returns>A JSON string fragment representing the value in Firestore's field format.</returns>
+    Private Shared Function FormatFirestoreValue(Value As Object) As String
         If Value Is Nothing Then
             Return """nullValue"": null"
         End If
@@ -291,7 +287,12 @@ Public Class FirebaseFirestore
         End If
         Return """stringValue"": """ & EscapeJson(Value.ToString()) & """"
     End Function
-    Private Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
+    ''' <summary>
+    ''' Converts a dictionary of field values into a complete Firestore document JSON payload.
+    ''' </summary>
+    ''' <param name="Dictionary">The dictionary containing the document fields and their values.</param>
+    ''' <returns>A JSON string representing the Firestore document payload.</returns>
+    Private Shared Function MapToFirestoreJson(Dictionary As Dictionary(Of String, Object)) As String
         Dim Builder As New StringBuilder()
         Builder.Append("{""fields"": {")
         Dim Entries As New List(Of String)
@@ -306,8 +307,12 @@ Public Class FirebaseFirestore
         Builder.Append("}}")
         Return Builder.ToString()
     End Function
-
-    Private Function FirestoreValueToJson(Value As Object) As String
+    ''' <summary>
+    ''' Converts a single value into its corresponding Firestore JSON value representation.
+    ''' </summary>
+    ''' <param name="Value">The value to convert.</param>
+    ''' <returns>A JSON string representing the value wrapped in its Firestore type.</returns>
+    Private Shared Function FirestoreValueToJson(Value As Object) As String
         If Value Is Nothing Then
             Return "{""nullValue"": null}"
         End If
@@ -347,10 +352,21 @@ Public Class FirebaseFirestore
         End If
         Return "{""stringValue"": """ & EscapeJson(Value.ToString()) & """}"
     End Function
-    Private Function EscapeJson(value As String) As String
+    ''' <summary>
+    ''' Escapes special characters in a string so it can be safely embedded in JSON.
+    ''' </summary>
+    ''' <param name="value">The string to escape.</param>
+    ''' <returns>The escaped string.</returns>
+    Private Shared Function EscapeJson(value As String) As String
         Return value.Replace("\", "\\").Replace("""", "\""")
     End Function
-    Private Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
+    ''' <summary>
+    ''' Converts a raw Firestore document JSON response into a dictionary of field names and values.
+    ''' </summary>
+    ''' <param name="JsonRaw">The raw JSON string returned by Firestore.</param>
+    ''' <returns>A dictionary representing the document's fields and their parsed values.</returns>
+    ''' <exception cref="Exception">Thrown when the JSON cannot be converted to a dictionary.</exception>
+    Private Shared Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
         Dim Resultado As New Dictionary(Of String, Object)
         Try
             Dim Root As JsonElement = JsonSerializer.Deserialize(Of JsonElement)(JsonRaw)
@@ -377,50 +393,63 @@ Public Class FirebaseFirestore
         End Try
         Return Resultado
     End Function
-    Private Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
-        For Each kvp In ValueObj
-            Select Case kvp.Key
+    ''' <summary>
+    ''' Parses a Firestore-typed value object into its corresponding native .NET value.
+    ''' </summary>
+    ''' <param name="ValueObj">A dictionary representing the Firestore value type and its raw value.</param>
+    ''' <returns>The parsed native value, which may be a primitive, list, dictionary, or <c>Nothing</c>.</returns>
+    Private Shared Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
+        For Each Kvp In ValueObj
+            Select Case Kvp.Key
                 Case "integerValue"
-                    Return Convert.ToInt64(kvp.Value)
+                    Return Convert.ToInt64(Kvp.Value)
                 Case "doubleValue"
-                    Return Convert.ToDouble(kvp.Value, Globalization.CultureInfo.InvariantCulture)
+                    Return Convert.ToDouble(Kvp.Value, Globalization.CultureInfo.InvariantCulture)
                 Case "booleanValue"
-                    Return Convert.ToBoolean(kvp.Value)
+                    Return Convert.ToBoolean(Kvp.Value)
                 Case "stringValue"
-                    Return Convert.ToString(kvp.Value)
+                    Return Convert.ToString(Kvp.Value)
                 Case "timestampValue"
-                    Return Convert.ToDateTime(kvp.Value)
+                    Return Convert.ToDateTime(Kvp.Value)
                 Case "nullValue"
                     Return Nothing
                 Case "arrayValue"
-                    Dim result As New List(Of Object)
-                    Dim arrayObj = TryCast(kvp.Value, Dictionary(Of String, Object))
-                    If arrayObj IsNot Nothing AndAlso arrayObj.ContainsKey("values") Then
-                        Dim values = TryCast(arrayObj("values"), IEnumerable)
+                    Dim Result As New List(Of Object)
+                    Dim ArrayObj = TryCast(Kvp.Value, Dictionary(Of String, Object))
+                    Dim Value As Object = Nothing
+                    If ArrayObj IsNot Nothing AndAlso ArrayObj.TryGetValue("values", Value) Then
+                        Dim values = TryCast(Value, IEnumerable)
                         If values IsNot Nothing Then
                             For Each item In values
                                 Dim itemDict = DirectCast(item, Dictionary(Of String, Object))
-                                result.Add(ParseFirestoreValue(itemDict))
-                            Next
+                                Result.Add(ParseFirestoreValue(itemDict))
+                            Next item
                         End If
                     End If
-                    Return result
+                    Return Result
                 Case "mapValue"
-                    Dim result As New Dictionary(Of String, Object)
-                    Dim mapObj = DirectCast(kvp.Value, Dictionary(Of String, Object))
-                    If mapObj.ContainsKey("fields") Then
-                        Dim fields = DirectCast(mapObj("fields"), Dictionary(Of String, Object))
-                        For Each field In fields
-                            Dim fieldValue = DirectCast(field.Value, Dictionary(Of String, Object))
-                            result(field.Key) = ParseFirestoreValue(fieldValue)
-                        Next
+                    Dim Result As New Dictionary(Of String, Object)
+                    Dim MapObj = DirectCast(Kvp.Value, Dictionary(Of String, Object))
+                    Dim value As Object = Nothing
+                    If MapObj.TryGetValue("fields", value) Then
+                        Dim Fields = DirectCast(value, Dictionary(Of String, Object))
+                        For Each Field In Fields
+                            Dim FieldValue = DirectCast(Field.Value, Dictionary(Of String, Object))
+                            Result(Field.Key) = ParseFirestoreValue(FieldValue)
+                        Next Field
                     End If
-                    Return result
+                    Return Result
             End Select
-        Next
+        Next Kvp
         Return Nothing
     End Function
-    Private Function GetOperatorString([Operator] As FirestoreOperator) As String
+    ''' <summary>
+    ''' Converts a <see cref="FirestoreOperator"/> enumeration value into its corresponding
+    ''' Firestore REST API operator string.
+    ''' </summary>
+    ''' <param name="Operator">The operator to convert.</param>
+    ''' <returns>The string representation of the operator as expected by the Firestore API.</returns>
+    Private Shared Function GetOperatorString([Operator] As FirestoreOperator) As String
         Select Case [Operator]
             Case FirestoreOperator.Equal : Return "EQUAL"
             Case FirestoreOperator.NotEqual : Return "NOT_EQUAL"
@@ -435,5 +464,4 @@ Public Class FirebaseFirestore
             Case Else : Return "EQUAL"
         End Select
     End Function
-
 End Class

@@ -2,8 +2,6 @@
 Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Http.Headers
-Imports CoreSuite.Helpers
-
 ''' <summary>
 ''' Provides access to Firebase Storage for file upload, download, and deletion.
 ''' </summary>
@@ -22,16 +20,13 @@ Public Class FirebaseStorage
     ''' Occurs when upload progress changes.
     ''' </summary>
     Public Event UploadProgressChanged(percentage As Double)
-
     ''' <summary>
     ''' Occurs when download progress changes.
     ''' </summary>
     Public Event DownloadProgressChanged(percentage As Double)
-
     Friend Sub New(Client As FirebaseClient)
         _Client = Client
     End Sub
-
     ''' <summary>
     ''' Uploads a local file to Firebase Storage.
     ''' </summary>
@@ -66,7 +61,6 @@ Public Class FirebaseStorage
             Throw New Exception($"Upload failed: {ex.Message}")
         End Try
     End Function
-
     ''' <summary>
     ''' Downloads a file from Firebase Storage.
     ''' </summary>
@@ -92,9 +86,9 @@ Public Class FirebaseStorage
                 RaiseEvent DownloadProgressChanged(0)
                 Dim BytesRead As Integer
                 Do
-                    BytesRead = Await httpStream.ReadAsync(Buffer, 0, Buffer.Length)
+                    BytesRead = Await httpStream.ReadAsync(Buffer)
                     If BytesRead = 0 Then Exit Do
-                    Await FileStream.WriteAsync(Buffer, 0, BytesRead)
+                    Await FileStream.WriteAsync(Buffer.AsMemory(0, BytesRead))
                     Downloaded += BytesRead
                     If TotalBytes > 0 Then
                         Dim Percent = CInt((Downloaded * 100L) / TotalBytes)
@@ -107,7 +101,6 @@ Public Class FirebaseStorage
             Throw New Exception($"Download failed: {ex.Message}")
         End Try
     End Function
-
     ''' <summary>
     ''' Deletes a file from Firebase Storage.
     ''' </summary>
@@ -138,18 +131,34 @@ Public Class FirebaseStorage
             Throw
         End Try
     End Function
+    ''' <summary>
+    ''' Provides an <see cref="HttpContent"/> implementation that reports upload progress
+    ''' while streaming a file's contents to an HTTP request.
+    ''' </summary>
     Private Class ProgressableStreamContent
         Inherits HttpContent
         Private ReadOnly _Stream As Stream
         Private ReadOnly _BufferSize As Integer
         Private ReadOnly _Progress As Action(Of Long, Long)
-
+        ''' <summary>
+        ''' Initializes a new instance of the <see cref="ProgressableStreamContent"/> class.
+        ''' </summary>
+        ''' <param name="Stream">The source stream whose content will be uploaded.</param>
+        ''' <param name="BufferSize">The size, in bytes, of the buffer used to read from the stream.</param>
+        ''' <param name="Progress">A callback invoked with the number of bytes uploaded and the total length whenever progress is made.</param>
         Public Sub New(Stream As Stream, BufferSize As Integer, Progress As Action(Of Long, Long))
             _Stream = Stream
             _BufferSize = BufferSize
             _Progress = Progress
             Headers.ContentLength = Stream.Length
         End Sub
+        ''' <summary>
+        ''' Asynchronously serializes the source stream's content to the target HTTP stream,
+        ''' reporting progress as data is written.
+        ''' </summary>
+        ''' <param name="TargetStream">The stream to which the content will be written.</param>
+        ''' <param name="Context">The transport context associated with the request.</param>
+        ''' <returns>A task representing the asynchronous serialization operation.</returns>
         Protected Overrides Async Function SerializeToStreamAsync(TargetStream As Stream, Context As TransportContext) As Task
             Dim Buffer(_BufferSize - 1) As Byte
             Dim Uploaded As Long = 0
@@ -157,14 +166,19 @@ Public Class FirebaseStorage
             Using _Stream
                 Dim BytesRead As Integer
                 Do
-                    BytesRead = Await _Stream.ReadAsync(Buffer, 0, Buffer.Length)
+                    BytesRead = Await _Stream.ReadAsync(Buffer)
                     If BytesRead = 0 Then Exit Do
-                    Await TargetStream.WriteAsync(Buffer, 0, BytesRead)
+                    Await TargetStream.WriteAsync(Buffer.AsMemory(0, BytesRead))
                     Uploaded += BytesRead
                     _Progress?.Invoke(Uploaded, Total)
                 Loop
             End Using
         End Function
+        ''' <summary>
+        ''' Attempts to compute the length of the content based on the source stream's length.
+        ''' </summary>
+        ''' <param name="Length">When this method returns, contains the length of the content in bytes.</param>
+        ''' <returns><c>True</c> if the length could be determined; otherwise, <c>False</c>.</returns>
         Protected Overrides Function TryComputeLength(ByRef Length As Long) As Boolean
             Length = _Stream.Length
             Return True

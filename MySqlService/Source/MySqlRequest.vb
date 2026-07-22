@@ -1,13 +1,16 @@
 ﻿Imports System.Data
 Imports System.Data.Common
-
 ''' <summary>
 ''' Class responsible for executing SQL commands, CRUD operations, and stored procedures
 ''' on a MySQL database using a <see cref="MySqlClient"/>.
 ''' </summary>
 Public Class MySqlRequest
     Private ReadOnly _Client As MySqlClient
-
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="MySqlRequest"/> class
+    ''' associated with the specified <see cref="MySqlClient"/>.
+    ''' </summary>
+    ''' <param name="Client">The client containing the connection information to use.</param>
     Friend Sub New(Client As MySqlClient)
         _Client = Client
     End Sub
@@ -111,7 +114,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes a generic SQL query (SELECT, INSERT, UPDATE, DELETE).
     ''' </summary>
@@ -168,7 +170,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes a generic SQL query (SELECT, INSERT, UPDATE, DELETE).
     ''' </summary>
@@ -315,7 +316,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes an UPDATE operation on a table.
     ''' </summary>
@@ -376,7 +376,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes an UPDATE operation on a table.
     ''' </summary>
@@ -437,7 +436,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes an INSERT operation on a table.
     ''' </summary>
@@ -491,7 +489,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes an INSERT operation on a table.
     ''' </summary>
@@ -545,7 +542,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes a SELECT operation on a table with advanced options.
     ''' </summary>
@@ -611,7 +607,6 @@ Public Class MySqlRequest
             End If
         End Try
     End Function
-
     ''' <summary>
     ''' Executes a SELECT operation on a table with advanced options.
     ''' </summary>

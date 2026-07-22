@@ -1,9 +1,4 @@
-﻿Imports System.Drawing
-Imports System.Drawing.Drawing2D
-Imports System.Windows.Forms
-Imports CoreSuite.Helpers
-Imports CoreSuite.Helpers.Windows
-
+﻿Imports System.Drawing.Drawing2D
 ''' <summary>
 ''' Provides an asynchronous loading overlay mechanism for WinForms,
 ''' allowing a child loader form to be displayed while blocking or covering
@@ -21,22 +16,18 @@ Public Class AsyncLoader
     Private _MinimizeBoxVisible As Boolean
     Private _BorderStyle As FormBorderStyle
     Private _ControlBox As Boolean
-
     ''' <summary>
     ''' Indicates whether the parent form should be visually covered.
     ''' </summary>
     Public Property CoverParent As Boolean
-
     ''' <summary>
     ''' Parent container form that will be blocked during loading.
     ''' </summary>
     Public Property Container As Form
-
     ''' <summary>
     ''' Loader form displayed on top of the parent container.
     ''' </summary>
     Public Property Loader As Form
-
     ''' <summary>
     ''' Gets or sets the background color of the overlay panel.
     ''' When <see cref="CoverParent"/> is enabled, the color cannot be transparent.
@@ -54,7 +45,6 @@ Public Class AsyncLoader
             _BackColor = value
         End Set
     End Property
-
     ''' <summary>
     ''' Gets or sets the border radius applied to the loader form.
     ''' </summary>
@@ -67,7 +57,6 @@ Public Class AsyncLoader
             If _BorderRadius < 0 Then _BorderRadius = 0
         End Set
     End Property
-
     ''' <summary>
     ''' Gets a value indicating whether the loader is active.
     ''' </summary>
@@ -76,7 +65,6 @@ Public Class AsyncLoader
             Return _IsRunning
         End Get
     End Property
-
     ''' <summary>
     ''' Initializes a new instance of the <see cref="AsyncLoader"/> class.
     ''' </summary>
@@ -92,7 +80,6 @@ Public Class AsyncLoader
         Me.BorderRadius = BorderRadius
         Me.BackColor = BackColor
     End Sub
-
     ''' <summary>
     ''' Starts the asynchronous loader process.
     ''' </summary>
@@ -137,7 +124,6 @@ Public Class AsyncLoader
         Await Task.Yield()
         If Delay > 0 Then Await Task.Delay(Delay)
     End Function
-
     ''' <summary>
     ''' Stops the loader and restores the parent form state.
     ''' </summary>
@@ -153,7 +139,6 @@ Public Class AsyncLoader
             _AutoClose = False
         End If
     End Function
-
     Private Sub OnChildFormLoad(sender As Object, e As EventArgs)
         If BorderRadius > 0 Then
             Dim path As New GraphicsPath()
@@ -165,13 +150,11 @@ Public Class AsyncLoader
             Loader.Region = New Region(path)
         End If
     End Sub
-
     Private Sub OnLoaderFormClosing(sender As Object, e As FormClosingEventArgs)
         If Not _AutoClose Then
             e.Cancel = True
         End If
     End Sub
-
     Private Sub DisableParentControls()
         If Container IsNot Nothing Then
             _MaximizeBoxVisible = Container.MaximizeBox
@@ -186,7 +169,6 @@ Public Class AsyncLoader
             End If
         End If
     End Sub
-
     Private Sub RestoreParentControls()
         If Container IsNot Nothing Then
             Container.MaximizeBox = _MaximizeBoxVisible
@@ -195,7 +177,6 @@ Public Class AsyncLoader
             Container.ControlBox = _ControlBox
         End If
     End Sub
-
     Private Sub CreateOverlayPanel(Parent As Form)
         If _OverlayPanel IsNot Nothing AndAlso Not _OverlayPanel.IsDisposed Then
             Parent.Controls.Remove(_OverlayPanel)
@@ -216,7 +197,6 @@ Public Class AsyncLoader
         Parent.Controls.SetChildIndex(_OverlayPanel, 0)
         _OverlayPanel.BringToFront()
     End Sub
-
     Private Sub AdjustChildFormSize()
         If Container IsNot Nothing AndAlso Loader IsNot Nothing Then
             Dim MaxWidth As Integer = Container.ClientSize.Width - 40
@@ -230,7 +210,6 @@ Public Class AsyncLoader
             Loader.MinimumSize = New Size(Loader.Width, Loader.Height)
         End If
     End Sub
-
     Private Sub UpdateChildFormPosition()
         If Container IsNot Nothing AndAlso Loader IsNot Nothing Then
             Loader.StartPosition = FormStartPosition.Manual
@@ -241,19 +220,16 @@ Public Class AsyncLoader
             End If
         End If
     End Sub
-
     Private Sub OnParentResize(sender As Object, e As EventArgs)
         If Loader IsNot Nothing AndAlso Loader.Visible Then
             UpdateChildFormPosition()
         End If
     End Sub
-
     Private Sub OnParentMove(sender As Object, e As EventArgs)
         If Loader IsNot Nothing AndAlso Loader.Visible Then
             UpdateChildFormPosition()
         End If
     End Sub
-
     Private Sub OnChildFormClosed(sender As Object, e As FormClosedEventArgs)
         If CoverParent Then
             If Container IsNot Nothing AndAlso _ControlsState IsNot Nothing Then
@@ -278,5 +254,4 @@ Public Class AsyncLoader
         RemoveHandler Container.Move, AddressOf OnParentMove
         RemoveHandler Loader.FormClosing, AddressOf OnLoaderFormClosing
     End Sub
-
 End Class

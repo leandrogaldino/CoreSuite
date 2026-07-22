@@ -22,7 +22,15 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        ControlContainer1 = New CoreSuite.ControlContainer()
         SuspendLayout()
+        ' 
+        ' ControlContainer1
+        ' 
+        ControlContainer1.DropDownBorderColor = SystemColors.HotTrack
+        ControlContainer1.DropDownControl = Nothing
+        ControlContainer1.DropDownEnabled = True
+        ControlContainer1.HostControl = Nothing
         ' 
         ' Form1
         ' 
@@ -33,5 +41,7 @@ Partial Class Form1
         Text = "Form1"
         ResumeLayout(False)
     End Sub
+
+    Friend WithEvents ControlContainer1 As CoreSuite.ControlContainer
 
 End Class

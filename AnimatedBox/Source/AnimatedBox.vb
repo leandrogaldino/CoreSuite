@@ -1,31 +1,5 @@
-﻿Imports System.Drawing
-Imports System.Drawing.Drawing2D
+﻿Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
-
-''' <summary>
-''' Defines how animation frames are scaled inside the <see cref="AnimatedBox"/> control.
-''' </summary>
-Public Enum AnimationScaleMode
-
-    ''' <summary>
-    ''' Draws the image using its original size, centered within the control.
-    ''' </summary>
-    Normal
-
-    ''' <summary>
-    ''' Stretches the image to completely fill the control,
-    ''' ignoring the original aspect ratio.
-    ''' </summary>
-    Fill
-
-    ''' <summary>
-    ''' Scales the image proportionally to fit inside the control
-    ''' while keeping its aspect ratio and centering it.
-    ''' </summary>
-    Centrer
-
-End Enum
-
 ''' <summary>
 ''' A WinForms control that renders frame-based animations using images or GIF files.
 ''' </summary>
@@ -39,47 +13,15 @@ End Enum
 ''' </remarks>
 Public Class AnimatedBox
     Inherits Panel
-
-    ''' <summary>
-    ''' Internal representation of a single animation frame.
-    ''' </summary>
-    Private Class AnimationFrameInfo
-
-        ''' <summary>
-        ''' Gets or sets the image associated with this frame.
-        ''' </summary>
-        Public Property Image As Image
-
-        ''' <summary>
-        ''' Gets or sets the delay (in seconds) before advancing to the next frame.
-        ''' </summary>
-        Public Property Delay As Double
-
-        ''' <summary>
-        ''' Initializes a new instance of the <see cref="AnimationFrameInfo"/> class.
-        ''' </summary>
-        ''' <param name="Image">The image to be displayed.</param>
-        ''' <param name="Delay">
-        ''' The frame delay in seconds. Default value is 0.03 (≈33 FPS).
-        ''' </param>
-        Public Sub New(Image As Image, Optional Delay As Double = 0.03)
-            Me.Image = Image
-            Me.Delay = Delay
-        End Sub
-
-    End Class
-
     Private _FrameIndex As Integer
     Private _LastFrameTime As Double
-    Private ReadOnly _Frames As List(Of AnimationFrameInfo)
+    Private ReadOnly _Frames As List(Of AnimationFrame)
     Private ReadOnly _Watch As Stopwatch
     Private ReadOnly _frameTimer As Timer
-
     ''' <summary>
     ''' Gets or sets the scaling behavior used when rendering animation frames.
     ''' </summary>
     Public Property ScaleMode As AnimationScaleMode
-
     ''' <summary>
     ''' Loads a sequence of images to be used as animation frames.
     ''' </summary>
@@ -89,10 +31,9 @@ Public Class AnimatedBox
     Public Sub LoadImages(Images As List(Of Image))
         _Frames.Clear()
         Images.ForEach(Sub(x)
-                           _Frames.Add(New AnimationFrameInfo(x))
+                           _Frames.Add(New AnimationFrame(x))
                        End Sub)
     End Sub
-
     ''' <summary>
     ''' Loads and extracts frames from a GIF image.
     ''' </summary>
@@ -101,15 +42,14 @@ Public Class AnimatedBox
         Dim Images As List(Of Image) = ExtractGifFrames(Gif)
         _Frames.Clear()
         Images.ForEach(Sub(x)
-                           _Frames.Add(New AnimationFrameInfo(x))
+                           _Frames.Add(New AnimationFrame(x))
                        End Sub)
     End Sub
-
     ''' <summary>
     ''' Initializes a new instance of the <see cref="AnimatedBox"/> control.
     ''' </summary>
     Public Sub New()
-        _Frames = New List(Of AnimationFrameInfo)()
+        _Frames = New List(Of AnimationFrame)()
         _Watch = New Stopwatch()
         ScaleMode = AnimationScaleMode.Centrer
         SetStyle(ControlStyles.UserPaint Or ControlStyles.SupportsTransparentBackColor Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer, True)
@@ -117,7 +57,6 @@ Public Class AnimatedBox
         _frameTimer = New Timer()
         AddHandler _frameTimer.Tick, AddressOf FrameTimer_Tick
     End Sub
-
     ''' <summary>
     ''' Handles frame advancement based on elapsed time and frame delay.
     ''' </summary>
@@ -131,7 +70,6 @@ Public Class AnimatedBox
             Invalidate()
         End If
     End Sub
-
     ''' <summary>
     ''' Starts the animation playback.
     ''' </summary>
@@ -142,7 +80,6 @@ Public Class AnimatedBox
         _frameTimer.Interval = 15
         _frameTimer.Start()
     End Sub
-
     ''' <summary>
     ''' Stops the animation playback.
     ''' </summary>
@@ -150,22 +87,17 @@ Public Class AnimatedBox
         _frameTimer.Stop()
         _Watch.Stop()
     End Sub
-
     ''' <summary>
     ''' Renders the current animation frame.
     ''' </summary>
     ''' <param name="e">Paint event data.</param>
     Protected Overrides Sub OnPaint(e As PaintEventArgs)
         MyBase.OnPaint(e)
-
         If _Frames.Count = 0 Then Return
-
         Dim Frame = _Frames(_FrameIndex)
-
         e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic
         e.Graphics.SmoothingMode = SmoothingMode.HighQuality
         e.Graphics.PixelOffsetMode = PixelOffsetMode.Half
-
         Select Case ScaleMode
             Case AnimationScaleMode.Normal
                 Dim x = (Width - Frame.Image.Width) \ 2
@@ -188,13 +120,12 @@ Public Class AnimatedBox
                 e.Graphics.DrawImage(Frame.Image, CSng(x), CSng(y), CSng(w), CSng(h))
         End Select
     End Sub
-
     ''' <summary>
     ''' Extracts individual frames from a GIF image.
     ''' </summary>
     ''' <param name="Gif">The source GIF image.</param>
     ''' <returns>A list containing all extracted frames.</returns>
-    Private Function ExtractGifFrames(Gif As Image) As List(Of Image)
+    Private Shared Function ExtractGifFrames(Gif As Image) As List(Of Image)
         Dim List As New List(Of Image)()
         Dim Dimension = New FrameDimension(Gif.FrameDimensionsList(0))
         Dim FrameCount = Gif.GetFrameCount(Dimension)
@@ -209,7 +140,6 @@ Public Class AnimatedBox
 
         Return List
     End Function
-
     ''' <summary>
     ''' Releases all resources used by the control.
     ''' </summary>
@@ -220,7 +150,6 @@ Public Class AnimatedBox
         If disposing Then
             _frameTimer.Stop()
             _Watch.Stop()
-
             If _Frames IsNot Nothing Then
                 For Each frame In _Frames
                     frame.Image?.Dispose()
@@ -231,5 +160,4 @@ Public Class AnimatedBox
 
         MyBase.Dispose(disposing)
     End Sub
-
 End Class

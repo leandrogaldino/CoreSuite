@@ -1,9 +1,10 @@
 ﻿Imports System.Runtime.CompilerServices
 Imports System.Text
-
 Namespace Extensions
     Public Module StringExtensions
-
+        Private ReadOnly ToCamelSeparator As Char() = New Char() {" "c, "_"c, "-"c}
+        Private ReadOnly RemoveExtraSpacesSeparator As Char() = New Char() {" "c}
+        Private ReadOnly WordSeparators As Char() = New Char() {" "c, ControlChars.Tab, ControlChars.Lf, ControlChars.Cr}
         ''' <summary>
         ''' Reverses the order of characters in a string.
         ''' </summary>
@@ -22,7 +23,6 @@ Namespace Extensions
             If String.IsNullOrEmpty(Text) Then Return String.Empty
             Return New String(Text.Reverse().ToArray())
         End Function
-
         ''' <summary>
         ''' Reverses the order of words in a string.
         ''' </summary>
@@ -42,7 +42,6 @@ Namespace Extensions
             If String.IsNullOrEmpty(Text) Then Return String.Empty
             Return String.Join(" ", Text.Split(" "c).Reverse())
         End Function
-
         ''' <summary>
         ''' Counts the number of words in a string.
         ''' </summary>
@@ -58,9 +57,8 @@ Namespace Extensions
         <Extension>
         Public Function CountWords(Text As String) As Integer
             If String.IsNullOrEmpty(Text) Then Return 0
-            Return Text.Split(New Char() {" "c, ControlChars.Tab, ControlChars.Lf, ControlChars.Cr}, StringSplitOptions.RemoveEmptyEntries).Length
+            Return Text.Split(WordSeparators, StringSplitOptions.RemoveEmptyEntries).Length
         End Function
-
         ''' <summary>
         ''' Removes all accents and diacritics from a string, returning an unaccented version.
         ''' </summary>
@@ -87,7 +85,6 @@ Namespace Extensions
             Next
             Return SbReturn.ToString()
         End Function
-
         ''' <summary>
         ''' Returns a new string with the first letter of each word capitalized
         ''' and the remaining letters in lowercase.
@@ -109,7 +106,6 @@ Namespace Extensions
               Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Text.ToLower()),
               Nothing)
         End Function
-
         ''' <summary>
         ''' Converts a string to CamelCase format.
         ''' Words are separated by spaces, underscores, or hyphens, with the first word lowercase
@@ -119,10 +115,9 @@ Namespace Extensions
         ''' <returns>A string converted to CamelCase format.</returns>
         <Extension>
         Public Function ToCamel(Text As String) As String
-            Dim words = Text.Split(New Char() {" "c, "_"c, "-"c}, StringSplitOptions.RemoveEmptyEntries)
-            Return String.Join("", words.Select(Function(w, i) If(i = 0, w.ToLower(), Char.ToUpper(w(0)) & w.Substring(1).ToLower())))
+            Dim Words = Text.Split(ToCamelSeparator, StringSplitOptions.RemoveEmptyEntries)
+            Return String.Join("", Words.Select(Function(w, i) If(i = 0, w.ToLower(), Char.ToUpper(w(0)) & w.Substring(1).ToLower())))
         End Function
-
         ''' <summary>
         ''' Replaces the first occurrence of a specific substring in a string
         ''' with another provided substring.
@@ -145,9 +140,8 @@ Namespace Extensions
             If pos < 0 Then
                 Return Text
             End If
-            Return Text.Substring(0, pos) & NewValue & Text.Substring(pos + OldValue.Length)
+            Return String.Concat(Text.AsSpan(0, pos), NewValue, Text.AsSpan(pos + OldValue.Length))
         End Function
-
         ''' <summary>
         ''' Removes extra spaces from a string, leaving only a single space between words.
         ''' </summary>
@@ -155,8 +149,7 @@ Namespace Extensions
         ''' <returns>A string with extra spaces removed.</returns>
         <Extension()>
         Public Function RemoveExtraSpaces(Text As String) As String
-            Return String.Join(" ", Text.Split(New Char() {" "c}, StringSplitOptions.RemoveEmptyEntries))
+            Return String.Join(" ", Text.Split(RemoveExtraSpacesSeparator, StringSplitOptions.RemoveEmptyEntries))
         End Function
-
     End Module
 End Namespace

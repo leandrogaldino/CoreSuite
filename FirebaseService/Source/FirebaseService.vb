@@ -13,7 +13,6 @@ Public Class FirebaseService
     Private _Auth As FirebaseAuth
     Private _Firestore As FirebaseFirestore
     Private _Storage As FirebaseStorage
-
     ''' <summary>
     ''' Firebase authentication service.
     ''' </summary>
@@ -25,7 +24,6 @@ Public Class FirebaseService
             Return _Auth
         End Get
     End Property
-
     ''' <summary>
     ''' Firestore Database access service.
     ''' </summary>
@@ -37,7 +35,6 @@ Public Class FirebaseService
             Return _Firestore
         End Get
     End Property
-
     ''' <summary>
     ''' Firebase Storage access service.
     ''' </summary>
@@ -49,20 +46,17 @@ Public Class FirebaseService
             Return _Storage
         End Get
     End Property
-
     Friend ReadOnly Property Client As FirebaseClient
         Get
             Return _Client
         End Get
     End Property
-
     ''' <summary>
     ''' Creates a FirebaseService instance without initialization.
     ''' Calling Initialize is required before using any service.
     ''' </summary>
     Public Sub New()
     End Sub
-
     ''' <summary>
     ''' Initializes a new instance of <see cref="FirebaseService"/> with the specified credentials.
     ''' </summary>
@@ -86,7 +80,6 @@ Public Class FirebaseService
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub
-
     ''' <summary>
     ''' Initializes or reinitializes the Firebase service with new credentials.
     ''' </summary>
@@ -110,5 +103,4 @@ Public Class FirebaseService
         _Firestore = New FirebaseFirestore(Client)
         _Storage = New FirebaseStorage(Client)
     End Sub
-
 End Class

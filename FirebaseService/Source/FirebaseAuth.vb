@@ -1,6 +1,5 @@
 ﻿Imports System.Net.Http
 Imports System.Text
-Imports CoreSuite.Helpers
 ''' <summary>
 ''' Provides authentication and session management for Firebase using email and password.
 ''' </summary>
@@ -147,6 +146,9 @@ Public Class FirebaseAuth
             End If
         End If
     End Function
+    ''' <summary>
+    ''' Logs the user out by clearing the authentication token, refresh token, and session expiration.
+    ''' </summary>
     Public Sub Logout()
         _Client.Token = Nothing
         _RefreshToken = Nothing
