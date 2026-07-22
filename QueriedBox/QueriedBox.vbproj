@@ -13,8 +13,4 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Helpers\Helpers.vbproj" />
-  </ItemGroup>
-
 </Project>

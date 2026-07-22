@@ -16,8 +16,8 @@ Public Class DataGridViewContentCopy
     ''' Initializes a new instance of the <see cref="DataGridViewContentCopy"/> class.
     ''' </summary>
     Public Sub New()
-        _ToolStripMenuItemCopyCell = New ToolStripMenuItem() With {.Text = "Copiar Celula", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.CellCopy}
-        _ToolStripMenuItemCopyRow = New ToolStripMenuItem() With {.Text = "Copiar Linha", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.RowCopy}
+        _ToolStripMenuItemCopyCell = New ToolStripMenuItem() With {.Text = "Copiar Celula", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.ImageResources.CellCopy}
+        _ToolStripMenuItemCopyRow = New ToolStripMenuItem() With {.Text = "Copiar Linha", .DisplayStyle = ToolStripItemDisplayStyle.ImageAndText, .Image = My.Resources.ImageResources.RowCopy}
         AddHandler _ToolStripMenuItemCopyCell.Click, AddressOf CopyCellClick
         AddHandler _ToolStripMenuItemCopyRow.Click, AddressOf CopyRowClick
         CreateDefaultCms()

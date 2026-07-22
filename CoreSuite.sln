@@ -74,7 +74,7 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ControlSlider", "ControlSli
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DataGridViewContentCopy", "DataGridViewContentCopy\DataGridViewContentCopy.vbproj", "{FBD3059C-1419-4153-B623-41E3A1D22E59}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QueriedBox", "QueriedBox\QueriedBox.vbproj", "{E5D10B7B-C08E-42E7-9441-9E755565C367}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QueriedBox", "QueriedBox\QueriedBox.vbproj", "{4215A402-6E68-48CF-A60E-88FF42484B4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -190,10 +190,10 @@ Global
 		{FBD3059C-1419-4153-B623-41E3A1D22E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBD3059C-1419-4153-B623-41E3A1D22E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBD3059C-1419-4153-B623-41E3A1D22E59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5D10B7B-C08E-42E7-9441-9E755565C367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5D10B7B-C08E-42E7-9441-9E755565C367}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5D10B7B-C08E-42E7-9441-9E755565C367}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5D10B7B-C08E-42E7-9441-9E755565C367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
