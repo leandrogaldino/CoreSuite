@@ -1,6 +1,13 @@
 ﻿Imports CoreSuite
+Imports MySql.Data.MySqlClient
+
 Friend Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Dim DbService As New MySqlService("localhost", "manager", "root", "123456")
+        Dim Con = DbService.Client.CreateDatabaseConnection()
+        QueriedBox.Connection = Con
+
         'CMessageBox.Options = New CMessageBoxOptions With {
         '    .ShowExceptionDetails = True,
         '    .ExceptionEmail = New CMessageBoxExceptionEmail With {
@@ -20,5 +27,6 @@ Friend Class Form1
         'Catch ex As Exception
         '    Dim result = CMessageBox.Show("Leandro Galdino", "ERRO SC001", ex)
         'End Try
+
     End Sub
 End Class

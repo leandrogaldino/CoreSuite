@@ -13,4 +13,13 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Attributes\Attributes.vbproj" />
+    <ProjectReference Include="..\Helpers\Helpers.vbproj" />
+  </ItemGroup>
+
 </Project>

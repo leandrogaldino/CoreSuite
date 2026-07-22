@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="9.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AnimatedBox\AnimatedBox.vbproj" />
     <ProjectReference Include="..\AsyncLoader\AsyncLoader.vbproj" />
     <ProjectReference Include="..\Attributes\Attributes.vbproj" />
@@ -40,6 +44,7 @@
     <ProjectReference Include="..\Locator\Locator.vbproj" />
     <ProjectReference Include="..\MySqlService\MySqlService.vbproj" />
     <ProjectReference Include="..\NoFocusCueButton\NoFocusCueButton.vbproj" />
+    <ProjectReference Include="..\QueriedBox\QueriedBox.vbproj" />
     <ProjectReference Include="..\ToolStripCheckBox\ToolStripCheckBox.vbproj" />
   </ItemGroup>
 
