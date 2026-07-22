@@ -22,42 +22,42 @@ Partial Class UcException
     'Não o modifique usando o editor de códigos.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        TableLayoutPanel1 = New TableLayoutPanel()
+        TlpContainer = New TableLayoutPanel()
         TlpBottomBar = New TableLayoutPanel()
         LblExceptionTitle = New Label()
         TxtExceptionBody = New TextBox()
-        NoFocusCueButton3 = New NoFocusCueButton()
-        TableLayoutPanel1.SuspendLayout()
+        LblNote = New Label()
+        TlpContainer.SuspendLayout()
         TlpBottomBar.SuspendLayout()
         SuspendLayout()
         ' 
-        ' TableLayoutPanel1
+        ' TlpContainer
         ' 
-        TableLayoutPanel1.ColumnCount = 1
-        TableLayoutPanel1.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
-        TableLayoutPanel1.Controls.Add(TlpBottomBar, 0, 2)
-        TableLayoutPanel1.Controls.Add(LblExceptionTitle, 0, 0)
-        TableLayoutPanel1.Controls.Add(TxtExceptionBody, 0, 1)
-        TableLayoutPanel1.Dock = DockStyle.Fill
-        TableLayoutPanel1.Location = New Point(0, 0)
-        TableLayoutPanel1.Name = "TableLayoutPanel1"
-        TableLayoutPanel1.RowCount = 3
-        TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 40F))
-        TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
-        TableLayoutPanel1.RowStyles.Add(New RowStyle(SizeType.Absolute, 50F))
-        TableLayoutPanel1.Size = New Size(530, 400)
-        TableLayoutPanel1.TabIndex = 0
+        TlpContainer.ColumnCount = 1
+        TlpContainer.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
+        TlpContainer.Controls.Add(TlpBottomBar, 0, 2)
+        TlpContainer.Controls.Add(LblExceptionTitle, 0, 0)
+        TlpContainer.Controls.Add(TxtExceptionBody, 0, 1)
+        TlpContainer.Dock = DockStyle.Fill
+        TlpContainer.Location = New Point(0, 0)
+        TlpContainer.Name = "TlpContainer"
+        TlpContainer.RowCount = 3
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 40F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 50F))
+        TlpContainer.Size = New Size(530, 400)
+        TlpContainer.TabIndex = 0
         ' 
         ' TlpBottomBar
         ' 
         TlpBottomBar.BackColor = SystemColors.Control
-        TlpBottomBar.ColumnCount = 5
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
+        TlpBottomBar.ColumnCount = 1
         TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100F))
-        TlpBottomBar.Controls.Add(NoFocusCueButton3, 4, 0)
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 20F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 20F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 20F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 20F))
+        TlpBottomBar.Controls.Add(LblNote, 0, 0)
         TlpBottomBar.Dock = DockStyle.Fill
         TlpBottomBar.Location = New Point(3, 353)
         TlpBottomBar.Name = "TlpBottomBar"
@@ -91,39 +91,34 @@ Partial Class UcException
         TxtExceptionBody.TabIndex = 1
         TxtExceptionBody.WordWrap = False
         ' 
-        ' NoFocusCueButton3
+        ' LblNote
         ' 
-        NoFocusCueButton3.Anchor = AnchorStyles.None
-        NoFocusCueButton3.BackColor = Color.White
-        NoFocusCueButton3.FlatAppearance.BorderColor = Color.Gainsboro
-        NoFocusCueButton3.FlatAppearance.MouseDownBackColor = Color.Silver
-        NoFocusCueButton3.FlatAppearance.MouseOverBackColor = Color.LightGray
-        NoFocusCueButton3.FlatStyle = FlatStyle.Flat
-        NoFocusCueButton3.Location = New Point(427, 6)
-        NoFocusCueButton3.Margin = New Padding(3, 6, 3, 3)
-        NoFocusCueButton3.Name = "NoFocusCueButton3"
-        NoFocusCueButton3.Size = New Size(94, 35)
-        NoFocusCueButton3.TabIndex = 2
-        NoFocusCueButton3.Text = "Salvar"
-        NoFocusCueButton3.TooltipText = ""
-        NoFocusCueButton3.UseVisualStyleBackColor = False
+        LblNote.Dock = DockStyle.Fill
+        LblNote.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        LblNote.Location = New Point(3, 3)
+        LblNote.Margin = New Padding(3)
+        LblNote.Name = "LblNote"
+        LblNote.Size = New Size(518, 38)
+        LblNote.TabIndex = 1
+        LblNote.Text = "Um e-mail foi encaminhado ao suporte técnico contendo todos os detalhes relacionados ao erro ocorrido, incluindo as informações necessárias para análise e diagnóstico do problema."
+        LblNote.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' UcException
         ' 
         AutoScaleMode = AutoScaleMode.None
-        Controls.Add(TableLayoutPanel1)
+        Controls.Add(TlpContainer)
         Name = "UcException"
         Size = New Size(530, 400)
-        TableLayoutPanel1.ResumeLayout(False)
-        TableLayoutPanel1.PerformLayout()
+        TlpContainer.ResumeLayout(False)
+        TlpContainer.PerformLayout()
         TlpBottomBar.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
-    Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents TlpContainer As TableLayoutPanel
     Friend WithEvents LblExceptionTitle As Label
     Friend WithEvents TxtExceptionBody As TextBox
     Friend WithEvents TlpBottomBar As TableLayoutPanel
-    Friend WithEvents NoFocusCueButton3 As NoFocusCueButton
+    Friend WithEvents LblNote As Label
 
 End Class

@@ -61,6 +61,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NoFocusCueButton", "NoFocus
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ControlContainer", "ControlContainer\ControlContainer.vbproj", "{10581B5C-C6EF-4953-A909-D3CC1491086B}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Connectivity", "Connectivity\Connectivity.vbproj", "{E914BDAF-937E-46C3-A821-15993C2A47CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10581B5C-C6EF-4953-A909-D3CC1491086B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E914BDAF-937E-46C3-A821-15993C2A47CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E914BDAF-937E-46C3-A821-15993C2A47CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E914BDAF-937E-46C3-A821-15993C2A47CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E914BDAF-937E-46C3-A821-15993C2A47CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

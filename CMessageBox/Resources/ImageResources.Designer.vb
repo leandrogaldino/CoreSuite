@@ -77,6 +77,16 @@ Namespace My.Resources
         '''<summary>
         '''  Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         '''</summary>
+        Friend Shared ReadOnly Property Close() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Close", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        '''</summary>
         Friend Shared ReadOnly Property Information() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Information", resourceCulture)

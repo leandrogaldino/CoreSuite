@@ -92,10 +92,10 @@ Public Class FrmMessageBox
             .TextAlign = ContentAlignment.MiddleCenter,
                     .FlatStyle = FlatStyle.Flat
         }
-        Btn.FlatAppearance.BorderColor = Color.WhiteSmoke
+        Btn.FlatAppearance.BorderColor = Color.Gainsboro
         Btn.FlatAppearance.BorderSize = 1
-        Btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(225, 225, 225)
-        Btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(205, 205, 205)
+        Btn.FlatAppearance.MouseOverBackColor = Color.LightGray
+        Btn.FlatAppearance.MouseDownBackColor = Color.Silver
         Return Btn
     End Function
     Friend Sub SetMessageIcon(MessageType As CMessageBoxType)

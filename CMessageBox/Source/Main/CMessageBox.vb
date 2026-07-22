@@ -21,14 +21,6 @@ Public Class CMessageBox
         Return Show(Message, Title, CMessageBoxType.Error, Exception)
     End Function
     Public Shared Function Show(Message As String, Title As String, MessageType As CMessageBoxType, Optional Exception As Exception = Nothing) As DialogResult
-        Task.Run(Async Function()
-                     Try
-                         Await SendEmailAsync()
-                     Catch ex As Exception
-                         ' Não deixe falha de email derrubar a aplicação
-                         MsgBox(ex.Message)
-                     End Try
-                 End Function)
         If Exception IsNot Nothing AndAlso MessageType <> CMessageBoxType.Error Then
             Throw New ArgumentException("The 'Exception' parameter can only be specified when 'MessageType' is 'Error'.", NameOf(Exception))
         End If
@@ -40,7 +32,7 @@ Public Class CMessageBox
                         .Message = Message,
                         .ExceptionMessage = Exception.Message,
                         .StackTrace = Exception.StackTrace,
-                        .ExceptionDate = Now
+                        .ExceptionDate = Now.ToString("yyyy-MM-dd HH:mm:ss")
                     }
                     If Exception.InnerException IsNot Nothing Then
                         CMessageBoxException.ExceptionInnerMessage = Exception.InnerException.Message
@@ -51,13 +43,25 @@ Public Class CMessageBox
                         Next AdditionalInformation
                     End If
                     Dim Json As String = JsonSerializer.Serialize(CMessageBoxException, _JsonSerializer)
+                    Uc.TxtExceptionBody.Font = Options.MessageFont
+                    Uc.LblExceptionTitle.Font = Options.TitleFont
                     Uc.TxtExceptionBody.Text = Json
+                    If Options.ExceptionEmail Is Nothing Then
+                        Uc.TlpContainer.RowStyles(2).SizeType = SizeType.Absolute
+                        Uc.TlpContainer.RowStyles(2).Height = 0
+                    End If
+
+
                     If Options.ShowExceptionDetails Then
                         Frm.CcException.DropDownControl = Uc
                     End If
-                    If Options.SendEmailOnException AndAlso Options.Email IsNot Nothing Then
-
-
+                    If Options.ExceptionEmail IsNot Nothing Then
+                        Task.Run(Async Function()
+                                     Try
+                                         Await SendEmailAsync(Options.ExceptionEmail, Json)
+                                     Catch ex As Exception
+                                     End Try
+                                 End Function)
                     End If
                 End If
                 Frm.LblTitle.Text = Title
@@ -73,17 +77,24 @@ Public Class CMessageBox
         End Using
     End Function
 
-    Public shared Async Function SendEmailAsync() As Task
-        Dim Message As New MimeMessage()
-        Message.From.Add(New MailboxAddress("My Application", "compras@reicolservice.com.br"))
-        Message.To.Add(New MailboxAddress("Leandro", "compras@reicolservice.com.br"))
-        Message.Subject = "Test email"
-        Message.Body = New TextPart("plain") With {.Text = "This is a test email."}
-        Using Client As New SmtpClient()
-            Await Client.ConnectAsync("email-ssl.com.br", 465, MailKit.Security.SecureSocketOptions.Auto)
-            Await Client.AuthenticateAsync("compras@reicolservice.com.br", "7y9$ORz5!WxP")
-            Await Client.SendAsync(Message)
-            Await Client.DisconnectAsync(True)
-        End Using
+    Public Shared Async Function SendEmailAsync(ExceptionEmail As CMessageBoxExceptionEmail, Json As String) As Task
+        Try
+            Using Connectivity As New Connectivity()
+                If Await Connectivity.IsAvailableAsync() Then
+                    Dim Message As New MimeMessage()
+                    Message.From.Add(New MailboxAddress(ExceptionEmail.FromName, ExceptionEmail.FromEmail))
+                    Message.To.Add(New MailboxAddress(ExceptionEmail.ToName, ExceptionEmail.ToEmail))
+                    Message.Subject = "Aviso de Exceção na Aplicação"
+                    Message.Body = New TextPart("plain") With {.Text = Json}
+                    Using Client As New SmtpClient()
+                        Await Client.ConnectAsync(ExceptionEmail.Host, ExceptionEmail.Port, CType(ExceptionEmail.SecureSocket, MailKit.Security.SecureSocketOptions))
+                        Await Client.AuthenticateAsync(ExceptionEmail.FromEmail, ExceptionEmail.Password)
+                        Await Client.SendAsync(Message)
+                        Await Client.DisconnectAsync(True)
+                    End Using
+                End If
+            End Using
+        Catch ex As Exception
+        End Try
     End Function
 End Class

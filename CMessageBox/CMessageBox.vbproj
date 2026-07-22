@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Connectivity\Connectivity.vbproj" />
     <ProjectReference Include="..\ControlContainer\ControlContainer.vbproj" />
     <ProjectReference Include="..\NoFocusCueButton\NoFocusCueButton.vbproj" />
   </ItemGroup>

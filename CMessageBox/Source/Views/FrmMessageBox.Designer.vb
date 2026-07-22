@@ -78,11 +78,11 @@ Partial Class FrmMessageBox
         BtnClose.FlatAppearance.BorderSize = 0
         BtnClose.FlatAppearance.MouseOverBackColor = Color.LightCoral
         BtnClose.FlatStyle = FlatStyle.Flat
+        BtnClose.Image = My.Resources.ImageResources.Close
         BtnClose.Location = New Point(414, 3)
         BtnClose.Name = "BtnClose"
         BtnClose.Size = New Size(44, 28)
         BtnClose.TabIndex = 0
-        BtnClose.Text = "X"
         BtnClose.TooltipText = ""
         BtnClose.UseVisualStyleBackColor = True
         ' 

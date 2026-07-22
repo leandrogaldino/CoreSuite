@@ -1,19 +1,11 @@
-﻿Imports System.Net.Mail
-
-Public Class CMessageBoxOptions
+﻿Public Class CMessageBoxOptions
     Private _ErrorImage As Image = My.Resources.ImageResources._Error
     Private _SuccessImage As Image = My.Resources.ImageResources.Success
     Private _InformationImage As Image = My.Resources.ImageResources.Information
     Private _WarningImage As Image = My.Resources.ImageResources.Warning
     Private _QuestionImage As Image = My.Resources.ImageResources.Question
     Public Property ShowExceptionDetails As Boolean = False
-    Public Property ExceptionEmailFrom As String
-    Public Property ExceptionEmailTo As String
-    Public Property ExceptionEmailPassword As String
-    Public Property ExceptionEmailPort As Integer
-    Public Property ExceptionEmailHost As String
-
-    Public Property SendEmailOnException As Boolean = False
+    Public Property ExceptionEmail As CMessageBoxExceptionEmail
     Public Property TitleFont As Font = New Font("Segoe UI", 11.25, FontStyle.Bold)
     Public Property TitleForeColor As Color = SystemColors.ControlText
     Public Property MessageFont As Font = New Font("Segoe UI", 9.75)
