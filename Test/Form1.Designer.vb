@@ -24,6 +24,7 @@ Partial Class Form1
     Private Sub InitializeComponent()
         Dim QueriedBoxField1 As CoreSuite.QueriedBoxField = New CoreSuite.QueriedBoxField()
         QueriedBox1 = New CoreSuite.QueriedBox()
+        Button1 = New Button()
         SuspendLayout()
         ' 
         ' QueriedBox1
@@ -61,11 +62,21 @@ Partial Class Form1
         QueriedBox1.Suffix = Nothing
         QueriedBox1.TabIndex = 0
         ' 
+        ' Button1
+        ' 
+        Button1.Location = New Point(228, 214)
+        Button1.Name = "Button1"
+        Button1.Size = New Size(75, 23)
+        Button1.TabIndex = 1
+        Button1.Text = "Button1"
+        Button1.UseVisualStyleBackColor = True
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 450)
+        Controls.Add(Button1)
         Controls.Add(QueriedBox1)
         Name = "Form1"
         Text = "Form1"
@@ -74,5 +85,6 @@ Partial Class Form1
     End Sub
 
     Friend WithEvents QueriedBox1 As CoreSuite.QueriedBox
+    Friend WithEvents Button1 As Button
 
 End Class

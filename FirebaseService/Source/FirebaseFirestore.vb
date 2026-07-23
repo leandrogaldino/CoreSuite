@@ -369,80 +369,143 @@ Public Class FirebaseFirestore
     Private Shared Function FirestoreJsonToMap(JsonRaw As String) As Dictionary(Of String, Object)
         Dim Resultado As New Dictionary(Of String, Object)
         Try
-            Dim Root As JsonElement = JsonSerializer.Deserialize(Of JsonElement)(JsonRaw)
-            If Root.ValueKind <> JsonValueKind.Object Then
-                Return Resultado
-            End If
-            Dim NameProperty As JsonElement
-            If Root.TryGetProperty("name", NameProperty) Then
-                Dim FullPath As String = NameProperty.GetString()
-                Dim DocumentID As String = FullPath.Split("/"c).Last()
-                Resultado.Add(DocumentIDFieldName, DocumentID)
-            End If
-            Dim FieldsProperty As JsonElement
-            If Root.TryGetProperty("fields", FieldsProperty) Then
-                For Each Field As JsonProperty In FieldsProperty.EnumerateObject()
-                    If Field.Name = DocumentIDFieldName Then Continue For
-                    Dim TypeAndValue As Dictionary(Of String, Object) =
-                    JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(Field.Value.GetRawText())
-                    Resultado(Field.Name) = ParseFirestoreValue(TypeAndValue)
-                Next Field
-            End If
+            Using Doc As JsonDocument = JsonDocument.Parse(JsonRaw)
+                Dim Root As JsonElement = Doc.RootElement
+                If Root.ValueKind <> JsonValueKind.Object Then
+                    Return Resultado
+                End If
+
+                ' Extrai o ID do Documento
+                Dim NameProperty As JsonElement
+                If Root.TryGetProperty("name", NameProperty) Then
+                    Dim FullPath As String = NameProperty.GetString()
+                    Dim DocumentID As String = FullPath.Split("/"c).Last()
+                    Resultado.Add(DocumentIDFieldName, DocumentID)
+                End If
+
+                ' Processa os campos
+                Dim FieldsProperty As JsonElement
+                If Root.TryGetProperty("fields", FieldsProperty) Then
+                    For Each Field As JsonProperty In FieldsProperty.EnumerateObject()
+                        If Field.Name = DocumentIDFieldName Then Continue For
+                        Resultado(Field.Name) = ParseFirestoreJsonElement(Field.Value)
+                    Next Field
+                End If
+            End Using
         Catch ex As Exception
             Throw New Exception($"Error converting Firestore JSON to Dictionary.{Environment.NewLine}JSON: {JsonRaw}", ex)
         End Try
         Return Resultado
     End Function
+
+    ''' <summary>
+    ''' Parses a Firestore-typed JsonElement into its corresponding native .NET value.
+    ''' </summary>
+    Private Shared Function ParseFirestoreJsonElement(Element As JsonElement) As Object
+        If Element.ValueKind <> JsonValueKind.Object Then Return Nothing
+
+        For Each Prop In Element.EnumerateObject()
+            Select Case Prop.Name
+                Case "integerValue"
+                    ' No Firestore REST API, inteiros são retornados como strings
+                    If Prop.Value.ValueKind = JsonValueKind.String Then
+                        Return Convert.ToInt64(Prop.Value.GetString())
+                    End If
+                    Return Prop.Value.GetInt64()
+
+                Case "doubleValue"
+                    If Prop.Value.ValueKind = JsonValueKind.String Then
+                        Return Convert.ToDouble(Prop.Value.GetString(), Globalization.CultureInfo.InvariantCulture)
+                    End If
+                    Return Prop.Value.GetDouble()
+
+                Case "booleanValue"
+                    Return Prop.Value.GetBoolean()
+
+                Case "stringValue"
+                    Return Prop.Value.GetString()
+
+                Case "timestampValue"
+                    Return DateTime.Parse(Prop.Value.GetString(), Nothing, Globalization.DateTimeStyles.RoundtripKind)
+
+                Case "nullValue"
+                    Return Nothing
+
+                Case "arrayValue"
+                    Dim Result As New List(Of Object)
+                    Dim ValuesElement As JsonElement
+                    If Prop.Value.TryGetProperty("values", ValuesElement) AndAlso ValuesElement.ValueKind = JsonValueKind.Array Then
+                        For Each Item In ValuesElement.EnumerateArray()
+                            Result.Add(ParseFirestoreJsonElement(Item))
+                        Next
+                    End If
+                    Return Result
+
+                Case "mapValue"
+                    Dim Result As New Dictionary(Of String, Object)
+                    Dim FieldsElement As JsonElement
+                    If Prop.Value.TryGetProperty("fields", FieldsElement) AndAlso FieldsElement.ValueKind = JsonValueKind.Object Then
+                        For Each Field In FieldsElement.EnumerateObject()
+                            Result(Field.Name) = ParseFirestoreJsonElement(Field.Value)
+                        Next
+                    End If
+                    Return Result
+            End Select
+        Next
+
+        Return Nothing
+    End Function
+
     ''' <summary>
     ''' Parses a Firestore-typed value object into its corresponding native .NET value.
     ''' </summary>
     ''' <param name="ValueObj">A dictionary representing the Firestore value type and its raw value.</param>
     ''' <returns>The parsed native value, which may be a primitive, list, dictionary, or <c>Nothing</c>.</returns>
-    Private Shared Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
-        For Each Kvp In ValueObj
-            Select Case Kvp.Key
-                Case "integerValue"
-                    Return Convert.ToInt64(Kvp.Value)
-                Case "doubleValue"
-                    Return Convert.ToDouble(Kvp.Value, Globalization.CultureInfo.InvariantCulture)
-                Case "booleanValue"
-                    Return Convert.ToBoolean(Kvp.Value)
-                Case "stringValue"
-                    Return Convert.ToString(Kvp.Value)
-                Case "timestampValue"
-                    Return Convert.ToDateTime(Kvp.Value)
-                Case "nullValue"
-                    Return Nothing
-                Case "arrayValue"
-                    Dim Result As New List(Of Object)
-                    Dim ArrayObj = TryCast(Kvp.Value, Dictionary(Of String, Object))
-                    Dim Value As Object = Nothing
-                    If ArrayObj IsNot Nothing AndAlso ArrayObj.TryGetValue("values", Value) Then
-                        Dim values = TryCast(Value, IEnumerable)
-                        If values IsNot Nothing Then
-                            For Each item In values
-                                Dim itemDict = DirectCast(item, Dictionary(Of String, Object))
-                                Result.Add(ParseFirestoreValue(itemDict))
-                            Next item
-                        End If
-                    End If
-                    Return Result
-                Case "mapValue"
-                    Dim Result As New Dictionary(Of String, Object)
-                    Dim MapObj = DirectCast(Kvp.Value, Dictionary(Of String, Object))
-                    Dim value As Object = Nothing
-                    If MapObj.TryGetValue("fields", value) Then
-                        Dim Fields = DirectCast(value, Dictionary(Of String, Object))
-                        For Each Field In Fields
-                            Dim FieldValue = DirectCast(Field.Value, Dictionary(Of String, Object))
-                            Result(Field.Key) = ParseFirestoreValue(FieldValue)
-                        Next Field
-                    End If
-                    Return Result
-            End Select
-        Next Kvp
-        Return Nothing
-    End Function
+    'Private Shared Function ParseFirestoreValue(ValueObj As Dictionary(Of String, Object)) As Object
+    '    For Each Kvp In ValueObj
+    '        Select Case Kvp.Key
+    '            Case "integerValue"
+    '                Return Convert.ToInt64(Kvp.Value)
+    '            Case "doubleValue"
+    '                Return Convert.ToDouble(Kvp.Value, Globalization.CultureInfo.InvariantCulture)
+    '            Case "booleanValue"
+    '                Return Convert.ToBoolean(Kvp.Value)
+    '            Case "stringValue"
+    '                Return Convert.ToString(Kvp.Value)
+    '            Case "timestampValue"
+    '                Return Convert.ToDateTime(Kvp.Value)
+    '            Case "nullValue"
+    '                Return Nothing
+    '            Case "arrayValue"
+    '                Dim Result As New List(Of Object)
+    '                Dim ArrayObj = TryCast(Kvp.Value, Dictionary(Of String, Object))
+    '                Dim Value As Object = Nothing
+    '                If ArrayObj IsNot Nothing AndAlso ArrayObj.TryGetValue("values", Value) Then
+    '                    Dim values = TryCast(Value, IEnumerable)
+    '                    If values IsNot Nothing Then
+    '                        For Each item In values
+    '                            Dim itemDict = DirectCast(item, Dictionary(Of String, Object))
+    '                            Result.Add(ParseFirestoreValue(itemDict))
+    '                        Next item
+    '                    End If
+    '                End If
+    '                Return Result
+    '            Case "mapValue"
+    '                Dim Result As New Dictionary(Of String, Object)
+    '                Dim MapObj = DirectCast(Kvp.Value, Dictionary(Of String, Object))
+    '                Dim value As Object = Nothing
+    '                If MapObj.TryGetValue("fields", value) Then
+    '                    Dim Fields = DirectCast(value, Dictionary(Of String, Object))
+    '                    For Each Field In Fields
+    '                        Dim FieldValue = DirectCast(Field.Value, Dictionary(Of String, Object))
+    '                        Result(Field.Key) = ParseFirestoreValue(FieldValue)
+    '                    Next Field
+    '                End If
+    '                Return Result
+    '        End Select
+    '    Next Kvp
+    '    Return Nothing
+    'End Function
     ''' <summary>
     ''' Converts a <see cref="FirestoreOperator"/> enumeration value into its corresponding
     ''' Firestore REST API operator string.
