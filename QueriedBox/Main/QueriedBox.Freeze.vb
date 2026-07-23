@@ -13,7 +13,7 @@
             Query = GetQuery()
             Query &= $"{Environment.NewLine}WHERE{Environment.NewLine}{vbTab}{TableName}.{MainReturnFieldName} = {ID}"
             ParameterList = New Dictionary(Of String, Object)
-            For Each p As Parameter In Parameters
+            For Each p As QueriedBoxParameter In Parameters
                 ParameterList.Add(p.ParameterName, p.ParameterValue)
             Next p
             TableResults = ExecuteQuery(Query, ParameterList)
@@ -24,7 +24,7 @@
                 If Not String.IsNullOrEmpty(MainValue) Then
                     FullValue &= Prefix & MainValue & Suffix
                 End If
-                For Each o As OtherField In OtherFields
+                For Each o As QueriedBoxField In OtherFields
                     OtherValue = TableResults.Rows(0).Item(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).ToString
                     _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                     If o.Freeze Then
@@ -128,7 +128,7 @@
                 If Not String.IsNullOrEmpty(MainValue) Then
                     FullValue &= Prefix & MainValue & Suffix
                 End If
-                For Each o As OtherField In OtherFields
+                For Each o As QueriedBoxField In OtherFields
                     OtherValue = DropDownResultsForm.DgvResults.SelectedRows(0).Cells(If(o.DisplayFieldAlias = Nothing, o.DisplayFieldName, o.DisplayFieldAlias)).Value.ToString
                     _RawFreezedValues.Add((o.DisplayTableName, o.DisplayFieldName, OtherValue))
                     If o.Freeze Then

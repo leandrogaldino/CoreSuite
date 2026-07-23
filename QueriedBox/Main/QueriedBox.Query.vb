@@ -18,7 +18,7 @@ Partial Public Class QueriedBox
                                   If(IfNull <> Nothing, "IFNULL(", Nothing), '8
                                   If(IfNull <> Nothing, ", " & IfNull & ") ", Nothing) '9
                               )
-        For Each o As OtherField In OtherFields
+        For Each o As QueriedBoxField In OtherFields
             Query += String.Format(",{0}{1}{5}{2}.{3}{6} AS '{4}'",
                                        Environment.NewLine, '0
                                        vbTab, '1
@@ -33,7 +33,7 @@ Partial Public Class QueriedBox
                                Environment.NewLine, '0
                                MainTableName, '1 
                                If(MainTableAlias = Nothing, MainTableName, MainTableAlias)) '2)
-        For Each r As Relation In Relations
+        For Each r As QueriedBoxRelation In Relations
             Query += String.Format("{0}{1} JOIN {2} AS {3} ON {3}.{4} {5} {6}.{7}",
                                        Environment.NewLine, '0
                                        r.RelationType, '1
@@ -44,7 +44,7 @@ Partial Public Class QueriedBox
                                        If(r.WithTableAlias = Nothing, r.WithTableName, r.WithTableAlias), '6
                                        r.WithFieldName '7
                                    )
-            For Each c As Condition In r.Conditions
+            For Each c As QueriedBoxCondition In r.Conditions
                 Query += String.Format(" AND{0}{1}{2}.{3} {4} {5}",
                                            Environment.NewLine,
                                            vbTab,
@@ -107,7 +107,7 @@ Partial Public Class QueriedBox
                                     DisplayFieldName,
                                     ValueParameter
                                )
-        For Each o As OtherField In OtherFields
+        For Each o As QueriedBoxField In OtherFields
             Query += String.Format(" OR{0}{1}{2}.{3} LIKE {4}",
                                    Environment.NewLine,
                                    vbTab,
@@ -119,7 +119,7 @@ Partial Public Class QueriedBox
         Query += String.Format("{0})", Environment.NewLine)
         If Conditions.Count > 0 Then
             Query += String.Format(" AND{0}(", Environment.NewLine)
-            For Each c As Condition In Conditions
+            For Each c As QueriedBoxCondition In Conditions
                 Query += String.Format("{0}{1}{2}.{3} {4} {5} AND",
                                        Environment.NewLine,
                                        vbTab,
@@ -140,7 +140,7 @@ Partial Public Class QueriedBox
         ParameterList = New Dictionary(Of String, Object) From {
             {ValueParameter, "%" & Text & "%"}
         }
-        For Each p As Parameter In Parameters
+        For Each p As QueriedBoxParameter In Parameters
             ParameterList.Add(p.ParameterName, p.ParameterValue)
         Next p
         Try
@@ -149,7 +149,7 @@ Partial Public Class QueriedBox
             If DropDownResultsForm IsNot Nothing Then
                 DropDownResultsForm.DgvResults.DataSource = TableResult
                 DropDownResultsForm.DgvResults.Columns("mainid").Visible = False
-                For Each o As OtherField In OtherFields
+                For Each o As QueriedBoxField In OtherFields
                     If Not o.Display Then
                         If DropDownResultsForm.DgvResults.Columns.Contains(If(String.IsNullOrEmpty(o.DisplayFieldAlias), o.DisplayFieldName, o.DisplayFieldAlias)) Then
                             DropDownResultsForm.DgvResults.Columns(If(String.IsNullOrEmpty(o.DisplayFieldAlias), o.DisplayFieldName, o.DisplayFieldAlias)).Visible = False

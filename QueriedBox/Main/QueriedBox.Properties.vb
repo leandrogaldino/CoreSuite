@@ -99,7 +99,7 @@ Partial Public Class QueriedBox
     <Description("Define os outros campos que serão mostrados nos resultados da pesquisa.")>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
-    Public Property OtherFields As New Collection(Of OtherField)
+    Public Property OtherFields As New Collection(Of QueriedBoxField)
     ''' <summary>
     ''' Define o nome do campo da tabela a ser pesquisado.
     ''' </summary>
@@ -107,7 +107,7 @@ Partial Public Class QueriedBox
     <Description("Define condições para a pesquisa. Deve ser definida com a sintaxe SQL.")>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
-    Public Property Conditions As New Collection(Of Condition)
+    Public Property Conditions As New Collection(Of QueriedBoxCondition)
     ''' <summary>
     ''' Define os parâmetos utilizados nas condições da Query.
     ''' </summary>
@@ -115,7 +115,7 @@ Partial Public Class QueriedBox
     <Description("Define os parâmetos utilizados nas condições da Query.")>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
-    Public Property Parameters As New Collection(Of Parameter)
+    Public Property Parameters As New Collection(Of QueriedBoxParameter)
     ''' <summary>
     ''' Define o nome do campo da tabela a ser pesquisado.
     ''' </summary>
@@ -123,7 +123,7 @@ Partial Public Class QueriedBox
     <Description("Define condições para a pesquisa. Deve ser definida com a sintaxe SQL.")>
     <DesignerSerializationVisibility(DesignerSerializationVisibility.Content)>
     <MergableProperty(False)>
-    Public Property Relations As New Collection(Of Relation)
+    Public Property Relations As New Collection(Of QueriedBoxRelation)
     ''' <summary>
     ''' Define como a largura da coluna será ajustada nos resultados.
     ''' </summary>
@@ -134,7 +134,7 @@ Partial Public Class QueriedBox
     ''' <summary>
     ''' Define cor do texto para quando um resultado da pesquisa for selecionado.
     ''' </summary>
-    <LocalizedCategory("Appearance")>
+    <Category("Aparência")>
     <DefaultValue(GetType(Color), "Blue")>
     <Description("Define cor do texto para quando um resultado da pesquisa for selecionado.")>
     Public Property FreezeColor As Color
