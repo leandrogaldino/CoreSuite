@@ -22,69 +22,36 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim QueriedBoxField1 As CoreSuite.QueriedBoxField = New CoreSuite.QueriedBoxField()
-        QueriedBox1 = New CoreSuite.QueriedBox()
-        Button1 = New Button()
+        Dim QueriedBoxOrderBy1 As CoreSuite.QueriedBoxOrderBy = New CoreSuite.QueriedBoxOrderBy()
+        SearchBox1 = New CoreSuite.SearchBox()
         SuspendLayout()
         ' 
-        ' QueriedBox1
+        ' SearchBox1
         ' 
-        QueriedBox1.DebugOnTextChanged = False
-        QueriedBox1.DisplayFieldAlias = "Nome"
-        QueriedBox1.DisplayFieldAutoSizeColumnMode = DataGridViewAutoSizeColumnMode.NotSet
-        QueriedBox1.DisplayFieldName = "name"
-        QueriedBox1.DisplayMainFieldName = "id"
-        QueriedBox1.DisplayTableAlias = ""
-        QueriedBox1.DisplayTableName = "person"
-        QueriedBox1.Distinct = False
-        QueriedBox1.DropDownAutoStretchRight = False
-        QueriedBox1.GridHeaderBackColor = SystemColors.Window
-        QueriedBox1.IfNull = Nothing
-        QueriedBox1.Location = New Point(179, 89)
-        QueriedBox1.MainReturnFieldName = "id"
-        QueriedBox1.MainTableAlias = ""
-        QueriedBox1.MainTableName = "person"
-        QueriedBox1.Name = "QueriedBox1"
-        QueriedBoxField1.Display = True
-        QueriedBoxField1.DisplayFieldAlias = "CPF"
-        QueriedBoxField1.DisplayFieldAutoSizeColumnMode = DataGridViewAutoSizeColumnMode.NotSet
-        QueriedBoxField1.DisplayFieldName = "document"
-        QueriedBoxField1.DisplayMainFieldName = "id"
-        QueriedBoxField1.DisplayTableAlias = ""
-        QueriedBoxField1.DisplayTableName = "person"
-        QueriedBoxField1.Freeze = True
-        QueriedBoxField1.IfNull = Nothing
-        QueriedBoxField1.Prefix = " - "
-        QueriedBoxField1.Suffix = Nothing
-        QueriedBox1.OtherFields.Add(QueriedBoxField1)
-        QueriedBox1.Prefix = Nothing
-        QueriedBox1.Size = New Size(288, 23)
-        QueriedBox1.Suffix = Nothing
-        QueriedBox1.TabIndex = 0
-        ' 
-        ' Button1
-        ' 
-        Button1.Location = New Point(228, 214)
-        Button1.Name = "Button1"
-        Button1.Size = New Size(75, 23)
-        Button1.TabIndex = 1
-        Button1.Text = "Button1"
-        Button1.UseVisualStyleBackColor = True
+        SearchBox1.Location = New Point(391, 138)
+        SearchBox1.Name = "SearchBox1"
+        SearchBox1.Query.Limit = Nothing
+        SearchBox1.Query.Offset = Nothing
+        QueriedBoxOrderBy1.Column.ColumnName = "a"
+        QueriedBoxOrderBy1.Direction = CoreSuite.QueryOrderByDirection.Ascending
+        SearchBox1.Query.OrderBy.Add(QueriedBoxOrderBy1)
+        SearchBox1.Query.Table.Alias = "p"
+        SearchBox1.Query.Table.TableName = "person"
+        SearchBox1.Size = New Size(100, 23)
+        SearchBox1.TabIndex = 0
         ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 450)
-        Controls.Add(Button1)
-        Controls.Add(QueriedBox1)
+        Controls.Add(SearchBox1)
         Name = "Form1"
         Text = "Form1"
         ResumeLayout(False)
         PerformLayout()
     End Sub
 
-    Friend WithEvents QueriedBox1 As CoreSuite.QueriedBox
-    Friend WithEvents Button1 As Button
+    Friend WithEvents SearchBox1 As CoreSuite.SearchBox
 
 End Class

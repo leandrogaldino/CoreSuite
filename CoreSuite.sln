@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{22
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "FirebaseService", "FirebaseService\FirebaseService.vbproj", "{3F3FBD5B-B906-45E1-8952-E5073D6CD3A4}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Test", "Test\Test.vbproj", "{E6E71D37-D000-43D7-BDB8-999DFFACC636}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Helpers.Windows", "Helpers.Windows\Helpers.Windows.vbproj", "{B54412CA-CE13-4810-8223-A0A16E0A1DFD}"
@@ -76,6 +74,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DataGridViewContentCopy", "
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QueriedBox", "QueriedBox\QueriedBox.vbproj", "{4215A402-6E68-48CF-A60E-88FF42484B4D}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Test", "Test\Test.vbproj", "{DD4A0D15-96D1-4DB5-A4E0-E45C5F0E977A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,10 +90,6 @@ Global
 		{3F3FBD5B-B906-45E1-8952-E5073D6CD3A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F3FBD5B-B906-45E1-8952-E5073D6CD3A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F3FBD5B-B906-45E1-8952-E5073D6CD3A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6E71D37-D000-43D7-BDB8-999DFFACC636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6E71D37-D000-43D7-BDB8-999DFFACC636}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6E71D37-D000-43D7-BDB8-999DFFACC636}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6E71D37-D000-43D7-BDB8-999DFFACC636}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B54412CA-CE13-4810-8223-A0A16E0A1DFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B54412CA-CE13-4810-8223-A0A16E0A1DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B54412CA-CE13-4810-8223-A0A16E0A1DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -194,6 +190,10 @@ Global
 		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4215A402-6E68-48CF-A60E-88FF42484B4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD4A0D15-96D1-4DB5-A4E0-E45C5F0E977A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD4A0D15-96D1-4DB5-A4E0-E45C5F0E977A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD4A0D15-96D1-4DB5-A4E0-E45C5F0E977A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD4A0D15-96D1-4DB5-A4E0-E45C5F0E977A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
