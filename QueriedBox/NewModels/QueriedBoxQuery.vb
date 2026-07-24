@@ -86,30 +86,22 @@ Public Class QueriedBoxQuery
             Dim Col = If(String.IsNullOrWhiteSpace(o.Column.ColumnName), "?", o.Column.ColumnName)
             OrderSql.Add($"{Col} {o.Direction.ToString().ToUpper()}")
         Next o
-        Dim Sql As String =
-        $"SELECT {String.Join(", ", ColumnsSql)} FROM {TableSql}"
-
+        Dim Sql As String = $"SELECT {String.Join(", ", ColumnsSql)} FROM {TableSql}"
         If JoinsSql.Count > 0 Then
             Sql &= " " & String.Join(" ", JoinsSql)
         End If
-
         If WhereSql.Count > 0 Then
             Sql &= " WHERE " & String.Join(" ", WhereSql)
         End If
-
         If OrderSql.Count > 0 Then
             Sql &= " ORDER BY " & String.Join(", ", OrderSql)
         End If
-
         If Limit.HasValue Then
             Sql &= $" LIMIT {Limit.Value}"
         End If
-
         If Offset.HasValue Then
             Sql &= $" OFFSET {Offset.Value}"
         End If
-
         Return Sql
-
     End Function
 End Class

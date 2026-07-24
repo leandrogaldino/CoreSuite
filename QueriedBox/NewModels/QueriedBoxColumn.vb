@@ -4,6 +4,8 @@
 Public Class QueriedBoxColumn
     Public Property ColumnName As String
     Public Property ColumnAlias As String
+    Public Property IfNull As String
+    Public Property Distinct As Boolean = False
     Public Property Freeze As Boolean = True
     Public Property Display As Boolean = True
     Public Property Prefix As String
