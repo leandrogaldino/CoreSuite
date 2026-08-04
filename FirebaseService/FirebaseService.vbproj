@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.FirebaseService</AssemblyName>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.FirebaseService</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite FirebaseService</Title>
+		<Description>Lightweight .NET 8 Firebase REST client for email and password authentication, Cloud Firestore document operations and Cloud Storage file transfers with progress reporting.</Description>
+		<PackageTags>coresuite;firebase;authentication;firestore;storage;cloud;rest;database;files;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/FirebaseService</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReleaseNotes>Initial release with validated configuration, safe authentication renewal, paginated Cloud Firestore operations, typed Firestore value conversion, atomic Cloud Storage downloads, cancellation and structured Firebase errors.</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Controls</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<PackageId>CoreSuite.TimeBox</PackageId>
+		<Version>1.0.0</Version>
+		<PackageReleaseNotes>Initial release of the TimeBox control.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite TimeBox</Title>
+		<Description>A culture-aware Windows Forms time input control with masking, validation and a drop-down time selector.</Description>
+		<PackageTags>coresuite;winforms;time;clock;maskedtextbox;input;vbnet;dotnet;net8</PackageTags>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<ItemGroup>
+		<Import Include="System.Data" />
+		<Import Include="System.Drawing" />
+		<Import Include="System.Windows.Forms" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ControlContainer\ControlContainer.vbproj" />
+		<ProjectReference Include="..\DateTimeBoxBase\DateTimeBoxBase.vbproj" />
+	</ItemGroup>
+</Project>
+

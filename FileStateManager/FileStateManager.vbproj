@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.FileStateManager</AssemblyName>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.FileStateManager</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite FileStateManager</Title>
+		<Description>Tracks pending file additions, replacements and removals and applies them through TxFileManager with ambient transaction support.</Description>
+		<PackageTags>coresuite;files;state;transaction;transactionscope;copy;delete;txfilemanager;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/FileStateManager</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReleaseNotes>Initial release for tracking and applying file additions, replacements and removals through TxFileManager.</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="TxFileManager" Version="1.5.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

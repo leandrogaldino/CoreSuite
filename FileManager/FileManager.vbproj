@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.FileManager</AssemblyName>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.FileManager</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite FileManager</Title>
+		<Description>Asynchronous .NET 8 file and directory copy and deletion service with progress events, cancellation and exclusion support.</Description>
+		<PackageTags>coresuite;files;directories;copy;delete;progress;cancellation;async;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/FileManager</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReleaseNotes>Initial release with asynchronous file and directory copy and deletion operations, progress reporting, cancellation and exclusions.</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

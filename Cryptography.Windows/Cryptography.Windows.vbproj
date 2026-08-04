@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services.Cryptography</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<AssemblyName>CoreSuite.Cryptography.Windows</AssemblyName>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.Cryptography.Windows</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite Cryptography.Windows</Title>
+		<Description>Windows DPAPI-based storage for protecting JSON objects and binary data with atomic synchronous and asynchronous file operations.</Description>
+		<PackageTags>coresuite;cryptography;security;windows;dpapi;protecteddata;storage;json;encryption;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/Cryptography.Windows</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReleaseNotes>Initial release of Windows DPAPI-protected JSON and binary file storage with user or machine scope, optional entropy and atomic synchronous and asynchronous operations.</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

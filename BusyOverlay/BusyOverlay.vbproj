@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Controls</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.BusyOverlay</PackageId>
+		<Version>1.0.1</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite BusyOverlay</Title>
+		<Description>A designer-friendly Windows Forms component that blocks any control with a customizable animated overlay while synchronous scopes or asynchronous operations are active.</Description>
+		<PackageTags>coresuite;winforms;busy;overlay;loading;progress;async;cancellation;component;vbnet;dotnet</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>Code Adaptation.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/BusyOverlay</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+	<ItemGroup>
+		<Import Include="System.Data" />
+		<Import Include="System.Drawing" />
+		<Import Include="System.Windows.Forms" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Source\BusyOverlay.vb">
+			<SubType>Component</SubType>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

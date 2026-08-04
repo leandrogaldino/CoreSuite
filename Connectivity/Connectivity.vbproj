@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.Connectivity</AssemblyName>
+		<PackageId>CoreSuite.Connectivity</PackageId>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Updated the README documentation with expanded usage examples, API reference, connectivity-check behavior, monitoring details, threading guidance, and disposal recommendations.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite Connectivity</Title>
+		<Description>Lightweight .NET 8 service for checking and continuously monitoring internet connectivity.</Description>
+		<PackageTags>coresuite;connectivity;internet;network;monitoring;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

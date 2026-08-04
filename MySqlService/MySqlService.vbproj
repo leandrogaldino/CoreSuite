@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.MySqlService</AssemblyName>
+		<PackageId>CoreSuite.MySqlService</PackageId>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Initial release with parameterized CRUD operations, structured selects, multiple result sets, stored procedure outputs, explicit transactions, cancellation, protected full-table mutations, database creation, atomic backup, restore and complete XML documentation.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite MySqlService</Title>
+		<Description>Structured .NET 8 service for MySQL queries, CRUD operations, local transactions, stored procedures, database creation, backup and restore.</Description>
+		<PackageTags>coresuite;mysql;database;data-access;crud;transactions;backup;restore;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/MySqlService</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="26.7.0" />
+		<PackageReference Include="MySqlBackup.NET" Version="2.7.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

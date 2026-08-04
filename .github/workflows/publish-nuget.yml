@@ -1,0 +1,140 @@
+name: Publish NuGet Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to publish
+        required: true
+        type: choice
+        options:
+          - AnimatedBox
+          - AsyncLoader
+          - AsyncLookupBox
+          - BusyOverlay
+          - CentralizedComboBox
+          - CMessageBox
+          - CodeCompiler
+          - ColoredProgressBar
+          - ColorPicker
+          - Connectivity
+          - ControlContainer
+          - ControlSlider
+          - Cryptography
+          - Cryptography.Windows
+          - CToolStripRender
+          - CurrencyBox
+          - DataGridViewContentCopy
+          - DataGridViewFilterBox
+          - DataGridViewLayoutManager
+          - DataGridViewNavigator
+          - DateBox
+          - DateTimeBox
+          - DateTimeBoxBase
+          - DecimalBox
+          - ExceptionReporter
+          - Extensions
+          - Extensions.Windows
+          - FileManager
+          - FileMerger
+          - FileStateManager
+          - FirebaseService
+          - FluidResizer
+          - Helpers
+          - Helpers.Windows
+          - JsonFileStore
+          - Locator
+          - MySqlService
+          - NoFocusCueButton
+          - NumericBoxBase
+          - PercentageBox
+          - PictureViewer
+          - QueriedBox
+          - RichTextButton
+          - Separator
+          - SplitButton
+          - TextBoxActionPanel
+          - TimeBox
+          - ToolStripCheckBox
+          - ValidationProvider
+
+
+concurrency:
+  group: publish-nuget-${{ inputs.package }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish CoreSuite.${{ inputs.package }}
+    runs-on: windows-latest
+    environment: release
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Select project
+        id: package
+        shell: pwsh
+        run: |
+          $PackageName = "${{ inputs.package }}"
+          $ProjectPath = ".\$PackageName\$PackageName.vbproj"
+          $PackageId = "CoreSuite.$PackageName"
+
+          If (-Not (Test-Path $ProjectPath)) {
+            Throw "Project file was not found: $ProjectPath"
+          }
+
+          "project=$ProjectPath" >> $env:GITHUB_OUTPUT
+          "package_id=$PackageId" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Selected project: $ProjectPath"
+          Write-Host "Package ID: $PackageId"
+
+      - name: Restore
+        run: dotnet restore "${{ steps.package.outputs.project }}"
+
+      - name: Build
+        run: dotnet build "${{ steps.package.outputs.project }}" -c Release --no-restore
+
+      - name: Pack
+        run: dotnet pack "${{ steps.package.outputs.project }}" -c Release --no-build --output ".\artifacts\packages"
+
+      - name: Show generated packages
+        shell: pwsh
+        run: Get-ChildItem ".\artifacts\packages"
+
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: LeandroGaldino
+
+      - name: Publish to NuGet.org
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          $Package = Get-ChildItem ".\artifacts\packages" -Filter "${{ steps.package.outputs.package_id }}.*.nupkg" |
+            Where-Object { $_.Name -notlike "*.snupkg" } |
+            Select-Object -First 1
+
+          If ($Null -eq $Package) {
+            Throw "Package ${{ steps.package.outputs.package_id }} was not generated."
+          }
+
+          Write-Host "Publishing $($Package.Name)"
+
+          dotnet nuget push $Package.FullName `
+            --api-key $env:NUGET_API_KEY `
+            --source "https://api.nuget.org/v3/index.json"

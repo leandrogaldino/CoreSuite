@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>CoreSuite.Controls</RootNamespace>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+	<OptionStrict>On</OptionStrict>
+	<OptionExplicit>On</OptionExplicit>
+	<OptionInfer>On</OptionInfer>
+	<IsPackable>true</IsPackable>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageId>CoreSuite.AnimatedBox</PackageId>
+	<Version>1.0.1</Version>
+	<Authors>CoreSuite</Authors>
+	<Title>CoreSuite AnimatedBox</Title>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<Description>Animated WinForms control for displaying GIFs and image sequences with configurable scaling and playback behavior.</Description>
+	<PackageTags>coresuite;winforms;animation;gif;control;vbnet;dotnet</PackageTags>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<PackageReleaseNotes>Fixed XML documentation.</PackageReleaseNotes>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+	  <None Update="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+
+</Project>

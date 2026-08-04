@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<PackageId>CoreSuite.ExceptionReporter</PackageId>
+		<Version>1.0.0</Version>
+		<PackageReleaseNotes>Initial release of the ExceptionReporter service for capturing, serializing, saving and emailing exception reports independently of user-interface components.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite ExceptionReporter</Title>
+		<Description>UI-independent .NET 8 service for capturing, serializing, saving and emailing structured exception reports.</Description>
+		<PackageTags>coresuite;exception;reporting;diagnostics;logging;email;smtp;mailkit;vbnet;dotnet;net8</PackageTags>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MailKit" Version="4.17.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Connectivity\Connectivity.vbproj" />
+	</ItemGroup>
+</Project>
