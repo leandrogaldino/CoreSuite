@@ -11,26 +11,33 @@ Public Class EnumHelper
     ''' Gets the enum value whose <see cref="DescriptionAttribute"/> matches the specified description.
     ''' </summary>
     ''' <typeparam name="T">
-    ''' The enum type.
+    ''' The enum type to search.
     ''' </typeparam>
     ''' <param name="Description">
-    ''' The description text associated with the enum value.
+    ''' The description associated with the enum value.
     ''' </param>
     ''' <returns>
-    ''' The enum value whose <see cref="DescriptionAttribute"/> matches the specified description.
+    ''' The enum value whose <see cref="DescriptionAttribute"/> matches
+    ''' <paramref name="Description"/>.
     ''' </returns>
-    ''' <exception cref="Exception">
-    ''' Thrown when no enum value with the specified description is found.
+    ''' <exception cref="ArgumentException">
+    ''' Thrown when <typeparamref name="T"/> is not an enum type.
     ''' </exception>
-    Public Shared Function GetEnumValue(Of T)(Description As String) As T
-        For Each Field In GetType(T).GetFields()
-            Dim Attr As DescriptionAttribute = TryCast(Attribute.GetCustomAttribute(Field, GetType(DescriptionAttribute)), DescriptionAttribute)
-            If Attr Is Nothing Then Continue For
-            If Attr.Description = Description Then
-                Return Field.GetValue(Nothing)
+    ''' <exception cref="InvalidOperationException">
+    ''' Thrown when no enum value has the specified description.
+    ''' </exception>
+    Public Shared Function GetValueFromDescription(Of T As Structure)(Description As String) As T
+        If Not GetType(T).IsEnum Then
+            Throw New ArgumentException($"Type '{GetType(T).FullName}' must be an enum.")
+        End If
+        ArgumentException.ThrowIfNullOrWhiteSpace(Description)
+        For Each Field As FieldInfo In GetType(T).GetFields(BindingFlags.Public Or BindingFlags.Static)
+            Dim Attribute As DescriptionAttribute = Field.GetCustomAttribute(Of DescriptionAttribute)()
+            If Attribute IsNot Nothing AndAlso String.Equals(Attribute.Description, Description, StringComparison.Ordinal) Then
+                Return DirectCast(Field.GetValue(Nothing), T)
             End If
         Next
-        Throw New Exception("No elements found with this description.")
+        Throw New InvalidOperationException($"No value of enum '{GetType(T).FullName}' has the description '{Description}'.")
     End Function
 
     ''' <summary>
@@ -122,4 +129,67 @@ Public Class EnumHelper
         Return Attribute?.Description
     End Function
 
+    ''' <summary>
+    ''' Attempts to convert a textual value to a defined member of the specified enum type.
+    ''' </summary>
+    ''' <typeparam name="T">
+    ''' The enum type to which the supplied value should be converted.
+    ''' </typeparam>
+    ''' <param name="Value">
+    ''' The enum member name or numeric value to convert.
+    ''' </param>
+    ''' <param name="Result">
+    ''' When this method returns <see langword="True"/>, contains the converted enum value.
+    ''' When this method returns <see langword="False"/>, contains the default value of
+    ''' <typeparamref name="T"/>.
+    ''' </param>
+    ''' <returns>
+    ''' <see langword="True"/> when <paramref name="Value"/> represents a defined enum member;
+    ''' otherwise, <see langword="False"/>.
+    ''' </returns>
+    ''' <exception cref="ArgumentException">
+    ''' Thrown when <typeparamref name="T"/> is not an enum type.
+    ''' </exception>
+    Public Shared Function TryParseEnum(Of T As Structure)(Value As String, ByRef Result As T) As Boolean
+        If Not GetType(T).IsEnum Then
+            Throw New ArgumentException($"Type '{GetType(T).FullName}' must be an enum.")
+        End If
+        Result = Nothing
+        If String.IsNullOrWhiteSpace(Value) Then Return False
+        If Not [Enum].TryParse(Value, True, Result) Then
+            Result = Nothing
+            Return False
+        End If
+        If Not [Enum].IsDefined(GetType(T), Result) Then
+            Result = Nothing
+            Return False
+        End If
+        Return True
+    End Function
+
+    ''' <summary>
+    ''' Converts a textual value to a defined member of the specified enum type or returns a
+    ''' fallback value when conversion is not possible.
+    ''' </summary>
+    ''' <typeparam name="T">
+    ''' The enum type to which the supplied value should be converted.
+    ''' </typeparam>
+    ''' <param name="Value">
+    ''' The enum member name or numeric value to convert.
+    ''' </param>
+    ''' <param name="DefaultValue">
+    ''' The enum value returned when <paramref name="Value"/> is null, empty, invalid or does
+    ''' not represent a defined enum member.
+    ''' </param>
+    ''' <returns>
+    ''' The converted enum value, or <paramref name="DefaultValue"/> when conversion fails.
+    ''' </returns>
+    ''' <exception cref="ArgumentException">
+    ''' Thrown when <typeparamref name="T"/> is not an enum type.
+    ''' </exception>
+    Public Shared Function ParseEnumOrDefault(Of T As Structure)(Value As String, DefaultValue As T) As T
+        Dim Result As T = Nothing
+        If TryParseEnum(Value, Result) Then Return Result
+        Return DefaultValue
+    End Function
 End Class

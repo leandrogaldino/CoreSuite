@@ -4,8 +4,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>CoreSuite.Helpers</AssemblyName>
 		<PackageId>CoreSuite.Helpers</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Improved documentation.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Added enum parsing helpers, fallback conversion support and improved enum description lookup.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Helpers</Title>
