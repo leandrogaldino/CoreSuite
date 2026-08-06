@@ -82,6 +82,7 @@ These projects target `.NET 8 for Windows` and can be installed separately accor
 | [CoreSuite.DateTimeBoxBase](./DateTimeBoxBase/) | Supplies shared culture, mask, parsing, formatting, value, and designer behavior for date and time controls. |
 | [CoreSuite.DecimalBox](./DecimalBox/) | Provides culture-aware decimal input with configurable precision, grouping, and rounding. |
 | [CoreSuite.FluidResizer](./FluidResizer/) | Resizes and repositions controls proportionally as their parent form or container changes size. |
+| [CoreSuite.NavigationView](./NavigationView/) | Provides a configurable navigation pane that lazily creates, displays, caches, reloads, and disposes `UserControl` pages. |
 | [CoreSuite.NoFocusCueButton](./NoFocusCueButton/) | Extends `Button` with built-in tooltip support while suppressing the standard dotted focus rectangle. |
 | [CoreSuite.NumericBoxBase](./NumericBoxBase/) | Supplies shared parsing, formatting, culture, keyboard, and value behavior for numeric input controls. |
 | [CoreSuite.PercentageBox](./PercentageBox/) | Provides culture-aware percentage input and formatting on top of the shared numeric infrastructure. |

@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Controls</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CoreSuite.NavigationView</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite NavigationView</Title>
+		<Description>A Windows Forms navigation control that displays configurable buttons and manages lazily created UserControl pages with optional instance caching.</Description>
+		<PackageTags>coresuite;winforms;navigation;sidebar;usercontrol;lazy-loading;designer;control;vbnet;dotnet;net8</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>Initial release of NavigationView with designer-serializable pages, lazy UserControl creation, factory support, configurable caching, cancelable navigation, page lifecycle management, and customizable navigation appearance.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/NavigationView</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Import Include="System.Data" />
+		<Import Include="System.Drawing" />
+		<Import Include="System.Windows.Forms" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Source\Main\NavigationView.vb">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Source\Main\NavigationView.Layout.vb">
+			<DependentUpon>NavigationView.vb</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Source\Main\NavigationView.Navigation.vb">
+			<DependentUpon>NavigationView.vb</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Source\Main\NavigationView.Pages.vb">
+			<DependentUpon>NavigationView.vb</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Source\Main\NavigationView.Properties.vb">
+			<DependentUpon>NavigationView.vb</DependentUpon>
+			<SubType>Code</SubType>
+		</Compile>
+	</ItemGroup>
+</Project>

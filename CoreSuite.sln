@@ -123,6 +123,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BusyOverlay", "BusyOverlay\
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MySqlService", "MySqlService\MySqlService.vbproj", "{38468A29-B8F6-4E51-BCF8-FE3FFF01C58B}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NavigationView", "NavigationView\NavigationView.vbproj", "{189AC859-DA57-411C-9CF6-D445D1B87371}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,6 +331,10 @@ Global
 		{38468A29-B8F6-4E51-BCF8-FE3FFF01C58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38468A29-B8F6-4E51-BCF8-FE3FFF01C58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38468A29-B8F6-4E51-BCF8-FE3FFF01C58B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{189AC859-DA57-411C-9CF6-D445D1B87371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{189AC859-DA57-411C-9CF6-D445D1B87371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{189AC859-DA57-411C-9CF6-D445D1B87371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{189AC859-DA57-411C-9CF6-D445D1B87371}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -389,6 +395,7 @@ Global
 		{369D00CE-9425-250D-125D-D67890A430B8} = {222757F2-0D37-4E4B-A95B-7048BCFFA03C}
 		{3B8B96C2-B592-D21C-1830-9AF2F1291EBB} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 		{38468A29-B8F6-4E51-BCF8-FE3FFF01C58B} = {222757F2-0D37-4E4B-A95B-7048BCFFA03C}
+		{189AC859-DA57-411C-9CF6-D445D1B87371} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9D22103-398C-42E5-8401-284AD9ECDDC3}

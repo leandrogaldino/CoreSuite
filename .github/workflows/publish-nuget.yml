@@ -45,6 +45,7 @@ on:
           - JsonFileStore
           - Locator
           - MySqlService
+          - NavigationView
           - NoFocusCueButton
           - NumericBoxBase
           - PercentageBox
