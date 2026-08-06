@@ -45,29 +45,33 @@ Or add `ExceptionReporter/ExceptionReporter.vbproj` as a project reference when 
 
 ## Quick start
 
-Create an `ExceptionReporter`, capture the exception, and save the resulting report.
+Create an `ExceptionReporter`, capture the exception inside the `Catch`, and save the resulting report after leaving the exception handler.
 
 ```vb
 Imports CoreSuite.Services
-Dim reporter As New ExceptionReporter()
-Try
-    RunOperation()
-Catch ex As Exception
-    Dim report As ExceptionReport = reporter.Capture(
-        ex,
-        "Application error",
-        "The operation could not be completed.",
-        New Dictionary(Of String, Object) From {
-            {"ApplicationVersion", My.Application.Info.Version.ToString()},
-            {"MachineName", Environment.MachineName}
-        },
-        "The error occurred after selecting a file and clicking Import."
-    )
+Private Async Function RunOperationWithReportingAsync() As Task
+    Dim reporter As New ExceptionReporter()
+    Dim report As ExceptionReport = Nothing
+    Try
+        RunOperation()
+    Catch ex As Exception
+        report = reporter.Capture(
+            ex,
+            "Application error",
+            "The operation could not be completed.",
+            New Dictionary(Of String, Object) From {
+                {"ApplicationVersion", My.Application.Info.Version.ToString()},
+                {"MachineName", Environment.MachineName}
+            },
+            "The error occurred after selecting a file and clicking Import."
+        )
+    End Try
+    If report Is Nothing Then Return
     Await reporter.SaveAsync(report, "Reports\latest-error.json")
-End Try
+End Function
 ```
 
-The resulting report combines the information supplied by the application with the technical details extracted from the exception.
+The resulting report combines the information supplied by the application with the technical details extracted from the exception. The asynchronous file operation runs only after execution has left the `Catch` block.
 
 ## Capturing reports
 
