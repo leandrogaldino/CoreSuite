@@ -1,22 +1,28 @@
 ﻿Imports System.ComponentModel
+Imports System.Runtime.InteropServices
+Imports System.Threading
+
 ''' <summary>
 ''' Provides a reusable drop-down container component capable of hosting any
-''' Windows Forms control inside a floating borderless window.
+''' Windows Forms control inside a floating drop-down.
 ''' </summary>
 ''' <remarks>
-''' The container can be attached to a host control and displays the hosted
-''' content when triggered. It automatically manages positioning, focus handling,
-''' and closing behavior.
+''' The container manages positioning, outside clicks, keyboard dismissal,
+''' modal dialog ownership and the complete opening and closing lifecycle.
 ''' </remarks>
-<ToolboxItem(True)>
-<ToolboxItemFilter("CoreSuite")>
 Public Class ControlContainer
     Inherits Component
-    Private _DropDownContainer As DropDownContainer
+    Private _DropDown As ToolStripDropDown
+    Private _ControlHost As ToolStripControlHost
+    Private _HostPanel As Panel
     Private _HostedControl As Control
+    Private _HostControl As Control
+    Private _HostParent As Control
+    Private _OwnerForm As Form
     Private _ClosedWhileInControl As Boolean
     Private _DropState As ControlContainerDropDownState
-    Private _HostControl As Control
+    Private _AllowDropDownClose As Boolean
+    Private _AutomaticCloseScheduled As Boolean
     ''' <summary>
     ''' Occurs when the drop-down state changes.
     ''' </summary>
@@ -43,19 +49,8 @@ Public Class ControlContainer
     <Category("ControlContainer")>
     Public Event Closed(sender As Object)
     ''' <summary>
-    ''' Initializes a new instance of the <see cref="ControlContainer"/> class.
+    ''' Gets or sets the control used as the anchor for the drop-down.
     ''' </summary>
-    Public Sub New()
-        InitializeDropDown(_HostedControl)
-    End Sub
-    ''' <summary>
-    ''' Gets or sets the control that is used as the anchor for displaying
-    ''' the drop-down container.
-    ''' </summary>
-    ''' <value>
-    ''' The control that receives the user interaction and determines the
-    ''' position where the drop-down container is displayed.
-    ''' </value>
     <Description("Defines the control used as the anchor for displaying the drop-down container.")>
     <Category("ControlContainer")>
     Public Property HostControl As Control
@@ -63,40 +58,63 @@ Public Class ControlContainer
             Return _HostControl
         End Get
         Set(value As Control)
-            _HostControl = value
+            If ReferenceEquals(_HostControl, value) Then Return
             If _HostControl IsNot Nothing Then
                 RemoveHandler _HostControl.Click, AddressOf HostControl_Click
+            End If
+            _HostControl = value
+            If _HostControl IsNot Nothing Then
                 AddHandler _HostControl.Click, AddressOf HostControl_Click
             End If
         End Set
     End Property
     ''' <summary>
-    ''' Gets a value indicating whether the drop-down container can currently
-    ''' be displayed.
+    ''' Gets or sets the control displayed inside the drop-down.
     ''' </summary>
-    ''' <value>
-    ''' <see langword="True"/> if the drop-down can be opened; otherwise,
-    ''' <see langword="False"/>.
-    ''' </value>
+    <Description("Defines the control displayed inside the drop-down container.")>
+    <Category("ControlContainer")>
+    Public Property HostedControl As Control
+        Get
+            Return _HostedControl
+        End Get
+        Set(value As Control)
+            If ReferenceEquals(_HostedControl, value) Then Return
+            CloseDropDown()
+            _HostedControl = value
+            SetDropState(ControlContainerDropDownState.Closed)
+        End Set
+    End Property
+    ''' <summary>
+    ''' Gets or sets whether clicking the host control opens the drop-down.
+    ''' </summary>
+    <Description("Determines whether the drop-down container can be opened by the host control.")>
+    <Category("ControlContainer")>
+    <DefaultValue(True)>
+    Public Property DropDownEnabled As Boolean = True
+    ''' <summary>
+    ''' Gets or sets the border color of the drop-down.
+    ''' </summary>
+    <Description("Defines the border color of the drop-down container.")>
+    <Category("ControlContainer")>
+    Public Property DropDownBorderColor As Color = SystemColors.HotTrack
+    ''' <summary>
+    ''' Gets whether the drop-down can currently be opened.
+    ''' </summary>
     <Description("Indicates whether the drop-down container can currently be opened.")>
     <Category("ControlContainer")>
     Public Overridable ReadOnly Property CanDrop As Boolean
         Get
-            If _DropDownContainer IsNot Nothing Then Return False
-            If _DropDownContainer Is Nothing AndAlso _ClosedWhileInControl Then
+            If _DropDown IsNot Nothing Then Return False
+            If _ClosedWhileInControl Then
                 _ClosedWhileInControl = False
                 Return False
             End If
-            Return Not _ClosedWhileInControl
+            Return True
         End Get
     End Property
     ''' <summary>
-    ''' Gets the current state of the drop-down container.
+    ''' Gets the current drop-down lifecycle state.
     ''' </summary>
-    ''' <value>
-    ''' A value that indicates whether the container is closed, opening,
-    ''' open, or closing.
-    ''' </value>
     <Description("Indicates the current state of the drop-down container.")>
     <Category("ControlContainer")>
     Public ReadOnly Property DropState As ControlContainerDropDownState
@@ -105,251 +123,288 @@ Public Class ControlContainer
         End Get
     End Property
     ''' <summary>
-    ''' Gets or sets the control displayed inside the drop-down container.
+    ''' Displays the configured hosted control below the host control.
     ''' </summary>
-    ''' <value>
-    ''' The control hosted by the floating drop-down window.
-    ''' </value>
-    <Description("Defines the control displayed inside the drop-down container.")>
-    <Category("ControlContainer")>
-    Public Property HostedControl As Control
-        Get
-            Return _HostedControl
-        End Get
-        Set(value As Control)
-            _HostedControl = value
-            InitializeDropDown(_HostedControl)
-        End Set
-    End Property
+    ''' <exception cref="InvalidOperationException">
+    ''' Thrown when the host control or hosted control has not been assigned.
+    ''' </exception>
+    Public Sub ShowDropDown()
+        If HostControl Is Nothing Then
+            Throw New InvalidOperationException("The host control has not been defined.")
+        End If
+        If HostedControl Is Nothing Then
+            Throw New InvalidOperationException("The hosted control has not been defined.")
+        End If
+        If HostControl.IsDisposed OrElse HostedControl.IsDisposed Then Return
+        If Not CanDrop Then Return
+        RaiseEvent Dropping(Me)
+        SetDropState(ControlContainerDropDownState.Dropping)
+        _OwnerForm = HostControl.FindForm()
+        CreateDropDown()
+        _HostParent = HostControl.Parent
+        If _HostParent IsNot Nothing Then
+            AddHandler _HostParent.Move, AddressOf HostParent_Move
+        End If
+        _DropDown.Show(HostControl, New Point(0, HostControl.Height))
+    End Sub
     ''' <summary>
-    ''' Gets or sets a value indicating whether the drop-down container can
-    ''' be opened when the host control is clicked.
+    ''' Closes the drop-down when it is open.
     ''' </summary>
-    ''' <value>
-    ''' <see langword="True"/> to allow opening the drop-down container;
-    ''' otherwise, <see langword="False"/>.
-    ''' The default value is True.
-    ''' </value>
-    <Description("Determines whether the drop-down container can be opened by the host control.")>
-    <Category("ControlContainer")>
-    <DefaultValue(True)>
-    Public Property DropDownEnabled As Boolean = True
-    ''' <summary>
-    ''' Gets or sets the border color of the drop-down container.
-    ''' </summary>
-    ''' <value>
-    ''' The color used to draw the border around the floating container.
-    ''' </value>
-    <Description("Defines the border color of the drop-down container.")>
-    <Category("ControlContainer")>
-    Public Property DropDownBorderColor As Color = SystemColors.HotTrack
-    ''' <summary>
-    ''' Handles the host control's click event, opening the drop-down if enabled.
-    ''' </summary>
-    ''' <param name="sender">The source of the event.</param>
-    ''' <param name="e">An <see cref="EventArgs"/> that contains no event data.</param>
+    Public Sub CloseDropDown()
+        Dim DropDown As ToolStripDropDown = _DropDown
+        If DropDown Is Nothing OrElse DropDown.IsDisposed Then Return
+        _AllowDropDownClose = True
+        Try
+            DropDown.Close(ToolStripDropDownCloseReason.CloseCalled)
+        Finally
+            _AllowDropDownClose = False
+        End Try
+    End Sub
     Private Sub HostControl_Click(sender As Object, e As EventArgs)
         If DropDownEnabled Then ShowDropDown()
     End Sub
-    ''' <summary>
-    ''' Prepares the specified control to be used as the drop-down content, removing it
-    ''' from the host control's collection if necessary and resetting the drop state.
-    ''' </summary>
-    ''' <param name="DropDownControl">The control to initialize as the drop-down content.</param>
-    Private Sub InitializeDropDown(ByVal DropDownControl As Control)
-        _DropState = ControlContainerDropDownState.Closed
-        If HostControl IsNot Nothing AndAlso HostControl.Controls.Contains(DropDownControl) Then
-            HostControl.Controls.Remove(DropDownControl)
-        End If
-        _HostedControl = DropDownControl
-    End Sub
-    ''' <summary>
-    ''' Closes the drop-down when the host control's parent is moved.
-    ''' </summary>
-    ''' <param name="sender">The source of the event.</param>
-    ''' <param name="e">An <see cref="EventArgs"/> that contains no event data.</param>
-    Private Sub Parent_Move(ByVal sender As Object, ByVal e As EventArgs)
+    Private Sub HostParent_Move(sender As Object, e As EventArgs)
         CloseDropDown()
     End Sub
-    ''' <summary>
-    ''' Handles the drop-down container's closed event, cleaning up event handlers,
-    ''' disposing the container, and updating the drop state.
-    ''' </summary>
-    ''' <param name="sender">The source of the event.</param>
-    ''' <param name="e">A <see cref="FormClosedEventArgs"/> that contains the event data.</param>
-    Private Sub DropContainer_Closed(ByVal sender As Object, ByVal e As FormClosedEventArgs)
-        RaiseEvent Closing(Me)
-        If Not _DropDownContainer.IsDisposed Then
-            RemoveHandler _DropDownContainer.DropStateChange, AddressOf DropContainer_DropStateChange
-            RemoveHandler _DropDownContainer.FormClosed, AddressOf DropContainer_Closed
-            RemoveHandler HostControl.Parent.Move, AddressOf Parent_Move
-            _DropDownContainer.Dispose()
-        End If
-        _DropDownContainer = Nothing
-        _ClosedWhileInControl = (HostControl.RectangleToScreen(HostControl.ClientRectangle).Contains(Cursor.Position))
-        _DropState = ControlContainerDropDownState.Closed
-        HostControl.Invalidate()
-        RaiseEvent Closed(Me)
-    End Sub
-    ''' <summary>
-    ''' Updates the current drop-down state when notified by the drop-down container.
-    ''' </summary>
-    ''' <param name="state">The new drop-down state.</param>
-    Private Sub DropContainer_DropStateChange(ByVal state As ControlContainerDropDownState)
-        _DropState = state
-    End Sub
-    ''' <summary>
-    ''' Calculates the screen bounds where the drop-down container should be displayed,
-    ''' positioning it relative to the host control and adjusting it to fit within the working area.
-    ''' </summary>
-    ''' <returns>A <see cref="Rectangle"/> representing the screen bounds for the drop-down container.</returns>
-    Private Function GetDropDownBounds() As Rectangle
-        Dim InflatedDropSize As New Size(_HostedControl.Width + 2, _HostedControl.Height + 2)
-        Dim ScreenBounds As New Rectangle(HostControl.Parent.PointToScreen(New Point(HostControl.Bounds.X, HostControl.Bounds.Bottom)), InflatedDropSize)
-        Dim WorkingArea As Rectangle = Screen.GetWorkingArea(ScreenBounds)
-        If ScreenBounds.X < WorkingArea.X Then ScreenBounds.X = WorkingArea.X
-        If ScreenBounds.Y < WorkingArea.Y Then ScreenBounds.Y = WorkingArea.Y
-        If ScreenBounds.Right > WorkingArea.Right AndAlso WorkingArea.Width > ScreenBounds.Width Then ScreenBounds.X = WorkingArea.Right - ScreenBounds.Width
-        If ScreenBounds.Bottom > WorkingArea.Bottom AndAlso WorkingArea.Height > ScreenBounds.Height Then ScreenBounds.Y = WorkingArea.Bottom - ScreenBounds.Height
-        Return ScreenBounds
-    End Function
-    ''' <summary>
-    ''' Displays the drop-down container anchored to the host control.
-    ''' </summary>
-    ''' <exception cref="Exception">
-    ''' Thrown when <see cref="HostControl"/> or <see cref="HostedControl"/> has not been set.
-    ''' </exception>
-    Public Sub ShowDropDown()
-        If HostControl Is Nothing Then Throw New Exception("O controle hospedeiro não foi definido.")
-        If HostedControl Is Nothing Then Throw New Exception("O controle a ser hospedado não foi definido.")
-        If Not CanDrop Then Return
-        RaiseEvent Dropping(Me)
-        _DropDownContainer = New DropDownContainer(_HostedControl, DropDownBorderColor) With {
-            .Bounds = GetDropDownBounds()
+    Private Sub CreateDropDown()
+        Dim hostedSize As Size = HostedControl.Size
+        _HostPanel = New Panel With {
+            .AutoSize = False,
+            .BackColor = HostedControl.BackColor,
+            .Margin = Padding.Empty,
+            .Padding = Padding.Empty,
+            .Size = hostedSize
         }
-        AddHandler _DropDownContainer.DropStateChange, New DropDownContainer.DropWindowArgs(AddressOf DropContainer_DropStateChange)
-        AddHandler _DropDownContainer.FormClosed, AddressOf DropContainer_Closed
-        AddHandler HostControl.Parent.Move, New EventHandler(AddressOf Parent_Move)
-        _DropState = ControlContainerDropDownState.Dropping
-        If HostControl.GetType = GetType(Button) Then
-            If CType(HostControl, Button).FlatStyle = FlatStyle.Standard Or CType(HostControl, Button).FlatStyle = FlatStyle.System Then
-                _DropDownContainer.Top -= 2
-                _DropDownContainer.Left += 1
-            Else
-                _DropDownContainer.Top -= 1
-                _DropDownContainer.Left += 0
-            End If
+        HostedControl.Location = Point.Empty
+        _HostPanel.Controls.Add(HostedControl)
+        _ControlHost = New ToolStripControlHost(_HostPanel) With {
+            .AutoSize = False,
+            .Margin = Padding.Empty,
+            .Padding = Padding.Empty,
+            .Size = hostedSize
+        }
+        _DropDown = New ToolStripDropDown With {
+            .AutoClose = True,
+            .AutoSize = False,
+            .BackColor = DropDownBorderColor,
+            .DropShadowEnabled = False,
+            .LayoutStyle = ToolStripLayoutStyle.Flow,
+            .Margin = Padding.Empty,
+            .Padding = New Padding(1),
+            .Size = New Size(hostedSize.Width + 2, hostedSize.Height + 2)
+        }
+        _DropDown.Items.Add(_ControlHost)
+        AddHandler _DropDown.Opened, AddressOf DropDown_Opened
+        AddHandler _DropDown.Closing, AddressOf DropDown_Closing
+        AddHandler _DropDown.Closed, AddressOf DropDown_Closed
+    End Sub
+    Private Sub DropDown_Opened(sender As Object, e As EventArgs)
+        SetDropState(ControlContainerDropDownState.Dropped)
+        If HostControl IsNot Nothing AndAlso Not HostControl.IsDisposed Then
+            HostControl.Invalidate()
         End If
-        _DropDownContainer.Show(HostControl)
-        _DropState = ControlContainerDropDownState.Dropped
-        HostControl.Invalidate()
         RaiseEvent Dropped(Me)
     End Sub
-    ''' <summary>
-    ''' Closes the drop-down container if it is currently open.
-    ''' </summary>
-    Public Sub CloseDropDown()
-        If _DropDownContainer IsNot Nothing Then
-            _DropState = ControlContainerDropDownState.Closing
-            _DropDownContainer.Close()
+    Private Sub DropDown_Closing(sender As Object, e As ToolStripDropDownClosingEventArgs)
+        Dim DropDown As ToolStripDropDown = TryCast(sender, ToolStripDropDown)
+        If DropDown Is Nothing Then Return
+        If Not _AllowDropDownClose AndAlso IsAutomaticCloseReason(e.CloseReason) Then
+            If TryScheduleAutomaticClose(DropDown, e.CloseReason) Then
+                e.Cancel = True
+                Return
+            End If
+        End If
+        SetDropState(ControlContainerDropDownState.Closing)
+        RaiseEvent Closing(Me)
+    End Sub
+    Private Sub DropDown_Closed(sender As Object, e As ToolStripDropDownClosedEventArgs)
+        Dim ClosedDropDown As ToolStripDropDown = TryCast(sender, ToolStripDropDown)
+        Dim ClosedControlHost As ToolStripControlHost = _ControlHost
+        Dim ClosedHostPanel As Panel = _HostPanel
+        Dim ClosedHostedControl As Control = _HostedControl
+        Dim CleanupInvoker As Control = GetInvoker()
+        If _HostParent IsNot Nothing Then
+            RemoveHandler _HostParent.Move, AddressOf HostParent_Move
+            _HostParent = Nothing
+        End If
+        If ClosedDropDown IsNot Nothing Then
+            RemoveHandler ClosedDropDown.Opened, AddressOf DropDown_Opened
+            RemoveHandler ClosedDropDown.Closing, AddressOf DropDown_Closing
+            RemoveHandler ClosedDropDown.Closed, AddressOf DropDown_Closed
+        End If
+        If HostControl IsNot Nothing AndAlso Not HostControl.IsDisposed Then
+            Dim HostBounds As Rectangle = HostControl.RectangleToScreen(HostControl.ClientRectangle)
+            _ClosedWhileInControl = HostBounds.Contains(Cursor.Position)
+            HostControl.Invalidate()
+        Else
+            _ClosedWhileInControl = False
+        End If
+        If ReferenceEquals(_DropDown, ClosedDropDown) Then
+            _DropDown = Nothing
+            _ControlHost = Nothing
+            _HostPanel = Nothing
+        End If
+        _OwnerForm = Nothing
+        _AutomaticCloseScheduled = False
+        SetDropState(ControlContainerDropDownState.Closed)
+        RaiseEvent Closed(Me)
+        ScheduleCleanup(CleanupInvoker, ClosedDropDown, ClosedControlHost, ClosedHostPanel, ClosedHostedControl)
+    End Sub
+    Private Shared Function IsAutomaticCloseReason(CloseReason As ToolStripDropDownCloseReason) As Boolean
+        Return CloseReason = ToolStripDropDownCloseReason.AppClicked OrElse CloseReason = ToolStripDropDownCloseReason.AppFocusChange
+    End Function
+    Private Function TryScheduleAutomaticClose(dropDown As ToolStripDropDown, closeReason As ToolStripDropDownCloseReason) As Boolean
+        If _AutomaticCloseScheduled Then Return True
+        Dim Invoker As Control = GetInvoker()
+        If Invoker Is Nothing OrElse Invoker.IsDisposed OrElse Not Invoker.IsHandleCreated Then Return False
+        _AutomaticCloseScheduled = True
+        Try
+            Invoker.BeginInvoke(
+                New MethodInvoker(
+                    Sub()
+                        HandleDeferredAutomaticClose(dropDown, closeReason)
+                    End Sub))
+            Return True
+        Catch ex As InvalidOperationException
+            _AutomaticCloseScheduled = False
+            Return False
+        End Try
+    End Function
+    Private Sub HandleDeferredAutomaticClose(DropDown As ToolStripDropDown, closeReason As ToolStripDropDownCloseReason)
+        _AutomaticCloseScheduled = False
+        If DropDown Is Nothing OrElse DropDown.IsDisposed OrElse Not DropDown.Visible Then Return
+        If Not DropDown.IsHandleCreated Then Return
+        Dim ForegroundWindow As IntPtr = NativeMethods.GetForegroundWindow()
+        If ForegroundWindow = DropDown.Handle Then Return
+        TransferForegroundWindowOwnership(ForegroundWindow, DropDown.Handle)
+        _AllowDropDownClose = True
+        Try
+            DropDown.Close(closeReason)
+        Finally
+            _AllowDropDownClose = False
+        End Try
+    End Sub
+    Private Sub TransferForegroundWindowOwnership(WindowHandle As IntPtr, dropDownHandle As IntPtr)
+        If WindowHandle = IntPtr.Zero OrElse dropDownHandle = IntPtr.Zero Then Return
+        If _OwnerForm Is Nothing OrElse _OwnerForm.IsDisposed OrElse Not _OwnerForm.IsHandleCreated Then Return
+        If Not IsWindowOwnedBy(WindowHandle, dropDownHandle) Then Return
+        NativeMethods.SetOwner(WindowHandle, _OwnerForm.Handle)
+    End Sub
+    Private Shared Function IsWindowOwnedBy(windowHandle As IntPtr, ownerHandle As IntPtr) As Boolean
+        Dim CurrentOwner As IntPtr = NativeMethods.GetWindow(windowHandle, NativeMethods.GW_OWNER)
+        Dim InspectedOwners As Integer
+        While CurrentOwner <> IntPtr.Zero AndAlso InspectedOwners < 32
+            If CurrentOwner = ownerHandle Then Return True
+            CurrentOwner = NativeMethods.GetWindow(CurrentOwner, NativeMethods.GW_OWNER)
+            InspectedOwners += 1
+        End While
+        Return False
+    End Function
+    Private Function GetInvoker() As Control
+        If HostControl IsNot Nothing AndAlso
+           Not HostControl.IsDisposed AndAlso
+           HostControl.IsHandleCreated Then
+            Return HostControl
+        End If
+        If _OwnerForm IsNot Nothing AndAlso
+           Not _OwnerForm.IsDisposed AndAlso
+           _OwnerForm.IsHandleCreated Then
+            Return _OwnerForm
+        End If
+        Return Nothing
+    End Function
+    Private Shared Sub ScheduleCleanup(Invoker As Control, dropDown As ToolStripDropDown, controlHost As ToolStripControlHost, hostPanel As Panel, hostedControl As Control)
+        If Invoker IsNot Nothing AndAlso
+           Not Invoker.IsDisposed AndAlso
+           Invoker.IsHandleCreated Then
+            Try
+                Invoker.BeginInvoke(
+                    New MethodInvoker(
+                        Sub()
+                            CleanupDropDown(dropDown, controlHost, hostPanel, hostedControl)
+                        End Sub))
+                Return
+            Catch ex As InvalidOperationException
+            End Try
+        End If
+        Dim SynchronizationContext As SynchronizationContext = SynchronizationContext.Current
+        SynchronizationContext?.Post(
+                Sub(state)
+                    CleanupDropDown(dropDown, controlHost, hostPanel, hostedControl)
+                End Sub,
+                Nothing)
+    End Sub
+    Private Shared Sub CleanupDropDown(DropDown As ToolStripDropDown, ControlHost As ToolStripControlHost, HostPanel As Panel, HostedControl As Control)
+        If HostPanel IsNot Nothing AndAlso
+           HostedControl IsNot Nothing AndAlso
+           ReferenceEquals(HostedControl.Parent, HostPanel) Then
+            HostPanel.Controls.Remove(HostedControl)
+        End If
+        If DropDown IsNot Nothing AndAlso
+           ControlHost IsNot Nothing AndAlso
+           Not DropDown.IsDisposed AndAlso
+           DropDown.Items.Contains(ControlHost) Then
+
+            DropDown.Items.Remove(ControlHost)
+        End If
+        If ControlHost IsNot Nothing AndAlso Not ControlHost.IsDisposed Then
+            ControlHost.Dispose()
+        End If
+        If HostPanel IsNot Nothing AndAlso Not HostPanel.IsDisposed Then
+            HostPanel.Dispose()
+        End If
+        If DropDown IsNot Nothing AndAlso Not DropDown.IsDisposed Then
+            DropDown.Dispose()
         End If
     End Sub
-    ''' <summary>
-    ''' Represents the floating, borderless window used internally to host and display
-    ''' the drop-down content.
-    ''' </summary>
-    Friend NotInheritable Class DropDownContainer
-        Inherits Form
-        Implements IMessageFilter
-        Private Const WM_LBUTTONDOWN As Integer = &H201
-        Private Const WM_RBUTTONDOWN As Integer = &H204
-        Private Const WM_MBUTTONDOWN As Integer = &H207
-        Private Const WM_NCLBUTTONDOWN As Integer = &HA1
-        Private Const WM_NCRBUTTONDOWN As Integer = &HA4
-        Private Const WM_NCMBUTTONDOWN As Integer = &HA7
-        Private ReadOnly _DropDownBorderColor As Color
-        Private ReadOnly _DropDownItem As Control
-        ''' <summary>
-        ''' Occurs when the drop-down container's visibility state changes.
-        ''' </summary>
-        Public Event DropStateChange As DropWindowArgs
-        ''' <summary>
-        ''' Represents the method that handles a change in the drop-down container's state.
-        ''' </summary>
-        ''' <param name="State">The new drop-down state.</param>
-        Public Delegate Sub DropWindowArgs(ByVal State As ControlContainerDropDownState)
-        ''' <summary>
-        ''' Initializes a new instance of the <see cref="DropDownContainer"/> class with the
-        ''' specified content control and border color.
-        ''' </summary>
-        ''' <param name="DropDownItem">The control to be hosted inside the drop-down window.</param>
-        ''' <param name="DropDownBorderColor">The border color of the drop-down window.</param>
-        Public Sub New(DropDownItem As Control, DropDownBorderColor As Color)
-            Dim DropDownMinSize As New Size(136, 39)
-            _DropDownBorderColor = DropDownBorderColor
-            _DropDownItem = DropDownItem
-            FormBorderStyle = FormBorderStyle.None
-            DropDownItem.Location = New Point(1, 1)
-            Controls.Add(DropDownItem)
-            StartPosition = FormStartPosition.Manual
-            ShowInTaskbar = False
-            KeyPreview = True
-            Size = New Size(200, 200)
-            If DropDownItem.Width < DropDownMinSize.Width Or DropDownItem.Height < DropDownMinSize.Height Then
-                DropDownItem.Left = (DropDownMinSize.Width - DropDownItem.Width) / 2
-                DropDownItem.Top = (DropDownMinSize.Height - DropDownItem.Height) / 2
+    Private Sub SetDropState(State As ControlContainerDropDownState)
+        If _DropState = State Then Return
+        _DropState = State
+        RaiseEvent DropStateChanged(Me)
+    End Sub
+    Protected Overrides Sub Dispose(Disposing As Boolean)
+        If Disposing Then
+            If _HostControl IsNot Nothing Then
+                RemoveHandler _HostControl.Click, AddressOf HostControl_Click
             End If
-            Application.AddMessageFilter(Me)
-        End Sub
-        ''' <summary>
-        ''' Paints the border of the drop-down window.
-        ''' </summary>
-        ''' <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
-        Protected Overrides Sub OnPaint(e As PaintEventArgs)
-            MyBase.OnPaint(e)
-            ControlPaint.DrawBorder(Me.CreateGraphics, ClientRectangle, _DropDownBorderColor, ButtonBorderStyle.Solid)
-        End Sub
-        ''' <summary>
-        ''' Closes the drop-down window when the Escape key is pressed.
-        ''' </summary>
-        ''' <param name="e">A <see cref="KeyEventArgs"/> that contains the event data.</param>
-        Protected Overrides Sub OnKeyDown(e As KeyEventArgs)
-            MyBase.OnKeyDown(e)
-            If e.KeyCode = Keys.Escape Then
-                Close()
+            If _HostParent IsNot Nothing Then
+                RemoveHandler _HostParent.Move, AddressOf HostParent_Move
+                _HostParent = Nothing
             End If
-        End Sub
-        ''' <summary>
-        ''' Removes the message filter and detaches the hosted control before the window closes.
-        ''' </summary>
-        ''' <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
-        Protected Overrides Sub OnClosing(ByVal e As CancelEventArgs)
-            Application.RemoveMessageFilter(Me)
-            Controls.RemoveAt(0)
-            MyBase.OnClosing(e)
-        End Sub
-        ''' <summary>
-        ''' Filters application messages to detect clicks outside the drop-down window
-        ''' and close it accordingly.
-        ''' </summary>
-        ''' <param name="m">The message to be filtered.</param>
-        ''' <returns><c>False</c> to allow the message to continue to the next filter or control.</returns>
-        Private Function IMessageFilter_PreFilterMessage(ByRef m As Message) As Boolean Implements IMessageFilter.PreFilterMessage
-            Dim CursorPos As Point = Cursor.Position
-            If Visible AndAlso (ActiveForm Is Nothing OrElse Not ActiveForm.Equals(Me)) Then
-                Close()
+            Dim DropDown As ToolStripDropDown = _DropDown
+            If DropDown IsNot Nothing AndAlso Not DropDown.IsDisposed Then
+                _AllowDropDownClose = True
+                Try
+                    DropDown.Close(ToolStripDropDownCloseReason.CloseCalled)
+                Finally
+                    _AllowDropDownClose = False
+                End Try
             End If
-            Select Case m.Msg
-                Case WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN, WM_NCLBUTTONDOWN, WM_NCRBUTTONDOWN, WM_NCMBUTTONDOWN
-                    If _DropDownItem.Parent IsNot Nothing AndAlso Not Bounds.Contains(CursorPos) Then
-                        If Not _DropDownItem.Bounds.Contains(_DropDownItem.Parent.PointToClient(CursorPos)) Then
-                            Application.RemoveMessageFilter(Me)
-                            Close()
-                        End If
-                    End If
-            End Select
-            Return False
+        End If
+        MyBase.Dispose(Disposing)
+    End Sub
+    Private NotInheritable Class NativeMethods
+        Public Const GW_OWNER As UInteger = 4UI
+        Private Const GWLP_HWNDPARENT As Integer = -8
+        Private Sub New()
+        End Sub
+        <DllImport("user32.dll")>
+        Public Shared Function GetForegroundWindow() As IntPtr
+        End Function
+        <DllImport("user32.dll")>
+        Public Shared Function GetWindow(windowHandle As IntPtr, command As UInteger) As IntPtr
+        End Function
+        <DllImport("user32.dll", EntryPoint:="SetWindowLongW", SetLastError:=True)>
+        Private Shared Function SetWindowLong32(windowHandle As IntPtr, index As Integer, newValue As IntPtr) As IntPtr
+        End Function
+        <DllImport("user32.dll", EntryPoint:="SetWindowLongPtrW", SetLastError:=True)>
+        Private Shared Function SetWindowLongPtr64(windowHandle As IntPtr, index As Integer, newValue As IntPtr) As IntPtr
+        End Function
+        Public Shared Function SetOwner(windowHandle As IntPtr, ownerHandle As IntPtr) As IntPtr
+            If IntPtr.Size = 8 Then
+                Return SetWindowLongPtr64(windowHandle, GWLP_HWNDPARENT, ownerHandle)
+            End If
+            Return SetWindowLong32(windowHandle, GWLP_HWNDPARENT, ownerHandle)
         End Function
     End Class
 End Class
-

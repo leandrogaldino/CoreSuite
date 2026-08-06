@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.ControlContainer</AssemblyName>
 		<PackageId>CoreSuite.ControlContainer</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>README updated.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Fixed drop-down behavior when hosted controls open modal forms or custom dialogs, ensuring the popup closes without closing the opened window.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite ControlContainer</Title>
