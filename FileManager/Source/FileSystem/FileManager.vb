@@ -28,14 +28,14 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Path comparisons are case-insensitive on Windows and case-sensitive on other supported operating systems.
     ''' </remarks>
-    Private Shared ReadOnly FileSystemPathComparer As StringComparer = If(OperatingSystem.IsWindows(), StringComparer.OrdinalIgnoreCase, StringComparer.Ordinal)
+    Private ReadOnly FileSystemPathComparer As StringComparer = If(OperatingSystem.IsWindows(), StringComparer.OrdinalIgnoreCase, StringComparer.Ordinal)
     ''' <summary>
     ''' Defines the string comparison mode used when determining path ancestry and path equality.
     ''' </summary>
     ''' <remarks>
     ''' Path comparisons are case-insensitive on Windows and case-sensitive on other supported operating systems.
     ''' </remarks>
-    Private Shared ReadOnly FileSystemPathComparison As StringComparison = If(OperatingSystem.IsWindows(), StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
+    Private ReadOnly FileSystemPathComparison As StringComparison = If(OperatingSystem.IsWindows(), StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
     ''' <summary>
     ''' Occurs when progress changes during an asynchronous directory copy operation.
     ''' </summary>
@@ -376,7 +376,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Shared Async Function DeleteDirectoryContentAsync(Directory As DirectoryInfo, Optional ExceptDirectories As IEnumerable(Of DirectoryInfo) = Nothing, Optional ExceptFiles As IEnumerable(Of FileInfo) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Async Function DeleteDirectoryContentAsync(Directory As DirectoryInfo, Optional ExceptDirectories As IEnumerable(Of DirectoryInfo) = Nothing, Optional ExceptFiles As IEnumerable(Of FileInfo) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Directory)
         Directory.Refresh()
         If Not Directory.Exists Then Throw New DirectoryNotFoundException($"Directory '{Directory.FullName}' was not found.")
@@ -428,7 +428,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="IOException">
     ''' An I/O error occurs while creating a directory or copying a file.
     ''' </exception>
-    Private Shared Async Function ExecuteDirectoryCopyPlansAsync(Plans As IReadOnlyList(Of DirectoryCopyPlan), TotalSize As Long, InitialHandledSize As Long, Progress As IProgress(Of ProgressEventArgs), CancellationToken As CancellationToken) As Task(Of Long)
+    Private Async Function ExecuteDirectoryCopyPlansAsync(Plans As IReadOnlyList(Of DirectoryCopyPlan), TotalSize As Long, InitialHandledSize As Long, Progress As IProgress(Of ProgressEventArgs), CancellationToken As CancellationToken) As Task(Of Long)
         Await Task.Run(Sub()
                            For Each CurrentPlan As DirectoryCopyPlan In Plans
                                CancellationToken.ThrowIfCancellationRequested()
@@ -494,7 +494,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Shared Async Function CopyFileCoreAsync(SourcePath As String, DestinationPath As String, ProgressCallback As Action(Of Long), CancellationToken As CancellationToken) As Task(Of Long)
+    Private Async Function CopyFileCoreAsync(SourcePath As String, DestinationPath As String, ProgressCallback As Action(Of Long), CancellationToken As CancellationToken) As Task(Of Long)
         Dim DestinationDirectoryPath As String = Path.GetDirectoryName(DestinationPath)
         If String.IsNullOrWhiteSpace(DestinationDirectoryPath) Then Throw New DirectoryNotFoundException($"The destination directory for '{DestinationPath}' could not be determined.")
         System.IO.Directory.CreateDirectory(DestinationDirectoryPath)
@@ -544,7 +544,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Shared Function BuildDirectoryCopyPlan(CopyInfo As CopyDirectoryInfo, CancellationToken As CancellationToken) As DirectoryCopyPlan
+    Private Function BuildDirectoryCopyPlan(CopyInfo As CopyDirectoryInfo, CancellationToken As CancellationToken) As DirectoryCopyPlan
         ArgumentNullException.ThrowIfNull(CopyInfo.Source)
         ArgumentNullException.ThrowIfNull(CopyInfo.Destination)
         CopyInfo.Source.Refresh()
@@ -594,7 +594,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Shared Function BuildDirectoryDeletePlan(Requests As IReadOnlyList(Of DeleteDirectoryInfo), CancellationToken As CancellationToken) As DirectoryDeletePlan
+    Private Function BuildDirectoryDeletePlan(Requests As IReadOnlyList(Of DeleteDirectoryInfo), CancellationToken As CancellationToken) As DirectoryDeletePlan
         Dim Roots As New List(Of DirectoryDeleteRoot)
         For Each CurrentRequest As DeleteDirectoryInfo In Requests
             CancellationToken.ThrowIfCancellationRequested()
@@ -634,7 +634,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item or an invalid path.
     ''' </exception>
-    Private Shared Function GetDistinctFiles(Files As IEnumerable(Of FileInfo)) As List(Of FileInfo)
+    Private Function GetDistinctFiles(Files As IEnumerable(Of FileInfo)) As List(Of FileInfo)
         Dim Results As New Dictionary(Of String, FileInfo)(FileSystemPathComparer)
         For Each CurrentFile As FileInfo In Files
             If CurrentFile Is Nothing Then Throw New ArgumentException("The file collection cannot contain null items.", NameOf(Files))
@@ -658,7 +658,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item, an invalid path, or a directory outside <paramref name="RootPath"/>.
     ''' </exception>
-    Private Shared Function GetExcludedDirectoryPaths(RootPath As String, Directories As IEnumerable(Of DirectoryInfo)) As HashSet(Of String)
+    Private Function GetExcludedDirectoryPaths(RootPath As String, Directories As IEnumerable(Of DirectoryInfo)) As HashSet(Of String)
         Dim Results As New HashSet(Of String)(FileSystemPathComparer)
         If Directories Is Nothing Then Return Results
         For Each CurrentDirectory As DirectoryInfo In Directories
@@ -684,7 +684,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item, an invalid path, or a file outside <paramref name="RootPath"/>.
     ''' </exception>
-    Private Shared Function GetExcludedFilePaths(RootPath As String, Files As IEnumerable(Of FileInfo)) As HashSet(Of String)
+    Private Function GetExcludedFilePaths(RootPath As String, Files As IEnumerable(Of FileInfo)) As HashSet(Of String)
         Dim Results As New HashSet(Of String)(FileSystemPathComparer)
         If Files Is Nothing Then Return Results
         For Each CurrentFile As FileInfo In Files
@@ -710,7 +710,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the file is explicitly excluded or is located inside an excluded directory; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Shared Function ShouldPreserveFile(FilePath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
+    Private Function ShouldPreserveFile(FilePath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
         If ExcludedFiles.Contains(FilePath) Then Return True
         For Each ExcludedDirectory As String In ExcludedDirectories
             If IsSameOrChildPath(FilePath, ExcludedDirectory) Then Return True
@@ -732,7 +732,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the directory is excluded, contains an excluded item, or is located inside an excluded directory; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Shared Function ShouldPreserveDirectory(DirectoryPath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
+    Private Function ShouldPreserveDirectory(DirectoryPath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
         For Each ExcludedDirectory As String In ExcludedDirectories
             If IsSameOrChildPath(DirectoryPath, ExcludedDirectory) OrElse IsSameOrChildPath(ExcludedDirectory, DirectoryPath) Then Return True
         Next
@@ -750,7 +750,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' Two root paths overlap.
     ''' </exception>
-    Private Shared Sub ValidateNonOverlappingRoots(Roots As IReadOnlyList(Of DirectoryDeleteRoot))
+    Private Sub ValidateNonOverlappingRoots(Roots As List(Of DirectoryDeleteRoot))
         For FirstIndex As Integer = 0 To Roots.Count - 2
             For SecondIndex As Integer = FirstIndex + 1 To Roots.Count - 1
                 Dim FirstPath As String = Roots(FirstIndex).Path
@@ -768,7 +768,7 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Inaccessible entries cause an exception because <see cref="EnumerationOptions.IgnoreInaccessible"/> is disabled.
     ''' </remarks>
-    Private Shared Function CreateEnumerationOptions() As EnumerationOptions
+    Private Function CreateEnumerationOptions() As EnumerationOptions
         Return New EnumerationOptions With {.RecurseSubdirectories = True, .IgnoreInaccessible = False, .ReturnSpecialDirectories = False, .AttributesToSkip = FileAttributes.ReparsePoint}
     End Function
     ''' <summary>
@@ -789,7 +789,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="PathTooLongException">
     ''' The path exceeds a limit supported by the current platform or file system.
     ''' </exception>
-    Private Shared Function NormalizePath(PathValue As String) As String
+    Private Function NormalizePath(PathValue As String) As String
         If String.IsNullOrWhiteSpace(PathValue) Then Throw New ArgumentException("The path cannot be empty.", NameOf(PathValue))
         Return Path.TrimEndingDirectorySeparator(Path.GetFullPath(PathValue))
     End Function
@@ -805,7 +805,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the paths are equal according to the current operating system path rules; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Shared Function AreSamePath(FirstPath As String, SecondPath As String) As Boolean
+    Private Function AreSamePath(FirstPath As String, SecondPath As String) As Boolean
         Return FileSystemPathComparer.Equals(FirstPath, SecondPath)
     End Function
     ''' <summary>
@@ -823,7 +823,7 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Equal paths are not considered a parent-child relationship.
     ''' </remarks>
-    Private Shared Function IsPathInside(CandidatePath As String, ParentPath As String) As Boolean
+    Private Function IsPathInside(CandidatePath As String, ParentPath As String) As Boolean
         If AreSamePath(CandidatePath, ParentPath) Then Return False
         Dim ParentPathWithSeparator As String = ParentPath
         If Not ParentPathWithSeparator.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) AndAlso Not ParentPathWithSeparator.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal) Then ParentPathWithSeparator &= Path.DirectorySeparatorChar
@@ -841,7 +841,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the paths are equal or the candidate is located below the parent; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Shared Function IsSameOrChildPath(CandidatePath As String, ParentPath As String) As Boolean
+    Private Function IsSameOrChildPath(CandidatePath As String, ParentPath As String) As Boolean
         Return AreSamePath(CandidatePath, ParentPath) OrElse IsPathInside(CandidatePath, ParentPath)
     End Function
     ''' <summary>

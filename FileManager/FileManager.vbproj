@@ -5,10 +5,11 @@
 		<AssemblyName>CoreSuite.FileManager</AssemblyName>
 		<OptionStrict>On</OptionStrict>
 		<OptionExplicit>On</OptionExplicit>
+		<NoWarn>$(NoWarn);CA1822</NoWarn>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.FileManager</PackageId>
-		<Version>1.0.0</Version>
+		<Version>2.0.0</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite FileManager</Title>
@@ -20,11 +21,11 @@
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/FileManager</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageReleaseNotes>Initial release with asynchronous file and directory copy and deletion operations, progress reporting, cancellation and exclusions.</PackageReleaseNotes>
+		<PackageReleaseNotes>Changed FileManager to a fully instance-based service. All operations and internal helpers now use instance members, providing a consistent API alongside instance-scoped progress events. Suppressed CA1822 for the project to preserve the intentional instance-based design.</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+		<PackageOutputPath>..\artifacts\packages\</PackageOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Update="README.md" Pack="true" PackagePath="\" />

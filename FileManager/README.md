@@ -201,9 +201,6 @@ When a directory is excluded, all of its descendants are preserved. The service 
 
 Every exclusion must be located inside the supplied root. Passing the root itself in `exceptDirectories` makes the method return without deleting anything.
 
-> [!NOTE]
-> `DeleteDirectoryContentAsync` is shared and does not raise one of the instance progress events.
-
 ## Progress events
 
 Each operation has its own event:

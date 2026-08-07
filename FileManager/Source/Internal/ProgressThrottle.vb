@@ -8,7 +8,7 @@ Friend NotInheritable Class ProgressThrottle
     ''' <summary>
     ''' Defines the minimum elapsed time required between non-forced progress reports.
     ''' </summary>
-    Private Shared ReadOnly ReportInterval As TimeSpan = TimeSpan.FromMilliseconds(75)
+    Private ReadOnly ReportInterval As TimeSpan = TimeSpan.FromMilliseconds(75)
     ''' <summary>
     ''' Measures the elapsed time since the throttle instance was created.
     ''' </summary>
