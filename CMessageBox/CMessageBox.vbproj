@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.CMessageBox</PackageId>
-		<Version>1.1.0</Version>
-		<PackageReleaseNotes>Added ExceptionReporter integration and a localizable footer message for the exception details popup through CMessageBoxOptions.FooterMessageExceptionDetailsPopup.</PackageReleaseNotes>
+		<Version>1.1.1</Version>
+		<PackageReleaseNotes>Updated the CoreSuite.ControlContainer dependency to version 1.0.2 to include the latest important fixes.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite CMessageBox</Title>

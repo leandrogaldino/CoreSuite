@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.DateBox</PackageId>
-		<Version>1.0.0</Version>
-		<PackageReleaseNotes>Initial release of the DateBox control.</PackageReleaseNotes>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Updated the CoreSuite.ControlContainer dependency to version 1.0.2 to include the latest important fixes.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite DateBox</Title>
