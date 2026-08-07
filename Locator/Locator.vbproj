@@ -6,19 +6,19 @@
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.Locator</PackageId>
-		<Version>2.0.0</Version>
+		<Version>2.1.0</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Locator</Title>
-		<Description>Lightweight .NET 8 service locator with singleton, factory and keyed registrations.</Description>
-		<PackageTags>coresuite;locator;service-locator;dependency-injection;ioc;singleton;factory;vbnet;dotnet;net8</PackageTags>
+		<Description>Lightweight .NET 8 service locator with singleton, lazy singleton, factory and keyed registrations.</Description>
+		<PackageTags>coresuite;locator;service-locator;dependency-injection;ioc;singleton;lazy-singleton;factory;vbnet;dotnet;net8</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/Locator</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageReleaseNotes>Corrected the root namespace from CoreSuite.Infraestructure to CoreSuite.Infrastructure.</PackageReleaseNotes>
+		<PackageReleaseNotes>Added lazy singleton registrations, allowing services to be instantiated only when first requested while reusing the same instance for subsequent resolutions.</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
