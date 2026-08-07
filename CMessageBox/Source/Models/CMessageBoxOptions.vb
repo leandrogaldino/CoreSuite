@@ -1,4 +1,5 @@
 ﻿Imports CoreSuite.Controls.My.Resources
+Imports CoreSuite.Services
 
 ''' <summary>
 ''' Represents the configuration options used to customize the appearance and behavior of the CMessageBox.
@@ -17,7 +18,7 @@ Public Class CMessageBoxOptions
     ''' <summary>
     ''' Gets or sets the email configuration used to send exception notifications.
     ''' </summary>
-    Public Property ExceptionEmail As CMessageBoxExceptionEmail
+    Public Property ExceptionEmail As ExceptionEmailOptions
 
     ''' <summary>
     ''' Gets or sets the font used for the message box title.

@@ -153,7 +153,7 @@ Public Class CMessageBox
                     If Options.ExceptionEmail IsNot Nothing Then
                         Task.Run(Async Function()
                                      Try
-                                         Await ExceptionReporter.SendEmailAsync(Json, CreateEmailOptions(Options.ExceptionEmail))
+                                         Await ExceptionReporter.SendEmailAsync(Json, Options.ExceptionEmail)
                                      Catch ex As Exception
                                      End Try
                                  End Function)
@@ -183,7 +183,7 @@ Public Class CMessageBox
     ''' Any exceptions that occur during the email sending process are handled internally
     ''' to prevent communication failures from affecting the main application flow.
     ''' </remarks>
-    ''' <param name="ExceptionEmail">
+    ''' <param name="EmailOptions">
     ''' Contains the SMTP configuration and email information required to send the message,
     ''' including sender, recipient, server, port, authentication credentials and security mode.
     ''' </param>
@@ -193,25 +193,14 @@ Public Class CMessageBox
     ''' <returns>
     ''' Returns a task representing the asynchronous email sending operation.
     ''' </returns>
-    Public Shared Async Function SendEmailAsync(ExceptionEmail As CMessageBoxExceptionEmail, Json As String) As Task
+    Public Shared Async Function SendEmailAsync(EmailOptions As ExceptionEmailOptions, Json As String) As Task
         Try
             Dim Reporter As New ExceptionReporter()
-            Await ExceptionReporter.SendEmailAsync(Json, CreateEmailOptions(ExceptionEmail))
+            Await ExceptionReporter.SendEmailAsync(Json, EmailOptions)
         Catch ex As Exception
         End Try
     End Function
-    Private Shared Function CreateEmailOptions(ExceptionEmail As CMessageBoxExceptionEmail) As ExceptionEmailOptions
-        Return New ExceptionEmailOptions With {
-            .FromName = ExceptionEmail.FromName,
-            .FromEmail = ExceptionEmail.FromEmail,
-            .ToName = ExceptionEmail.ToName,
-            .ToEmail = ExceptionEmail.ToEmail,
-            .Password = ExceptionEmail.Password,
-            .Port = ExceptionEmail.Port,
-            .Host = ExceptionEmail.Host,
-            .SecureSocket = ConvertSecureSocket(ExceptionEmail.SecureSocket)
-        }
-    End Function
+
     Private Shared Function ConvertSecureSocket(SecureSocket As CMessageBoxSecureSocket) As ExceptionReporterSecureSocket
         Select Case SecureSocket
             Case CMessageBoxSecureSocket.Auto
