@@ -85,8 +85,8 @@ These projects target `.NET 8 for Windows` and can be installed separately accor
 | [CoreSuite.NavigationView](./NavigationView/) | Provides a configurable navigation pane that lazily creates, displays, caches, reloads, and disposes `UserControl` pages. |
 | [CoreSuite.NoFocusCueButton](./NoFocusCueButton/) | Extends `Button` with built-in tooltip support while suppressing the standard dotted focus rectangle. |
 | [CoreSuite.NumericBoxBase](./NumericBoxBase/) | Supplies shared parsing, formatting, culture, keyboard, and value behavior for numeric input controls. |
-| [CoreSuite.PercentageBox](./PercentageBox/) | Provides culture-aware percentage input and formatting on top of the shared numeric infrastructure. |
 | [CoreSuite.PasswordBox](./PasswordBox/) | Provides secure password entry and replacement with a right-aligned action button, customizable show, hide, and change-password images, and support for representing an existing password without loading its plaintext value. |
+| [CoreSuite.PercentageBox](./PercentageBox/) | Provides culture-aware percentage input and formatting on top of the shared numeric infrastructure. |
 | [CoreSuite.PictureViewer](./PictureViewer/) | Displays and navigates image collections with configurable navigation, inclusion, removal, and save actions. |
 | [CoreSuite.QueriedBox](./QueriedBox/) | Performs database-backed lookups in a floating result grid while retaining the selected primary key and raw row values. |
 | [CoreSuite.RichTextButton](./RichTextButton/) | Builds a button caption from individually styled text parts for richer visual emphasis. |
