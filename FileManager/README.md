@@ -1,20 +1,21 @@
 # CoreSuite.FileManager
 
-**Asynchronous file and directory copy and deletion with progress reporting and cancellation.**
+**Asynchronous file and directory copy and deletion with shared operations, percentage progress and cancellation.**
 
 > [!NOTE]
 > `CoreSuite.FileManager` is one of the libraries included in the **CoreSuite** solution. It targets plain .NET 8, works independently of Windows Forms and has no CoreSuite or third-party package dependencies.
 
 ## Overview
 
-`CoreSuite.FileManager` provides a focused service for copying and deleting files or complete directory trees without blocking the calling thread during expensive file-system work.
+`CoreSuite.FileManager` provides shared asynchronous operations for copying and deleting files or complete directory trees without requiring a `FileManager` instance.
 
-Operations support `CancellationToken`, normalize paths, validate unsafe source and destination combinations and report byte and item progress through dedicated events. Directory traversal deliberately skips reparse points, preventing the service from following symbolic links, junctions and other redirected directory structures.
+All public operations are exposed through `Shared` methods. Operations that can report progress accept an optional `IProgress(Of Integer)` parameter and report completion values from `0` through `100`. Directory traversal deliberately skips reparse points, preventing the service from following symbolic links, junctions and other redirected directory structures.
 
 The package also includes a helper for clearing a directory while preserving selected files and subdirectories.
 
 ## Features
 
+- Fully shared `FileManager` API; no service instance is required.
 - Copies individual files asynchronously.
 - Copies one or several directory trees asynchronously.
 - Creates missing destination directories automatically during copy operations.
@@ -24,8 +25,8 @@ The package also includes a helper for clearing a directory while preserving sel
 - Deletes one or several directory trees asynchronously.
 - Optionally preserves the root directory while deleting its contents.
 - Clears a directory while preserving selected files and subdirectories.
-- Reports progress by bytes and completed file count.
-- Captures the caller's synchronization context for progress events.
+- Reports optional percentage progress through `IProgress(Of Integer)`.
+- Supports `Progress(Of Integer)` synchronization-context capture for UI applications.
 - Supports cancellation across enumeration, copy and deletion work.
 - Removes duplicate file paths from multi-file deletion requests.
 - Rejects directory copies whose destination is equal to or inside the source.
@@ -64,30 +65,36 @@ Imports CoreSuite.Services
 
 ## Quick start
 
-Copy one file and receive progress updates:
+Copy one file and receive percentage progress updates:
 
 ```vb
-Dim manager As New FileManager()
-
-AddHandler manager.CopyFileProgressChanged,
-    Sub(sender, e)
-        Console.WriteLine($"{e.PercentCompleted}% - {e.CurrentPath}")
-    End Sub
-
 Dim sourceFile As New FileInfo("C:\Data\large-export.zip")
 Dim destinationFile As New FileInfo("D:\Backup\large-export.zip")
+Dim progress As New Progress(Of Integer)(
+    Sub(percent)
+        Console.WriteLine($"{percent}%")
+    End Sub)
 
-Await manager.CopyFileAsync(sourceFile, destinationFile)
+Await FileManager.CopyFileAsync(sourceFile, destinationFile, progress)
 ```
 
 The destination parent directory is created when necessary. An existing destination file is overwritten.
+
+Progress is optional. When it is not needed, simply omit the parameter:
+
+```vb
+Await FileManager.CopyFileAsync(sourceFile, destinationFile)
+```
 
 ## Copy a file with cancellation
 
 ```vb
 Using cancellationSource As New CancellationTokenSource()
     Try
-        Await manager.CopyFileAsync(sourceFile, destinationFile, cancellationSource.Token)
+        Await FileManager.CopyFileAsync(
+            sourceFile,
+            destinationFile,
+            CancellationToken:=cancellationSource.Token)
     Catch ex As OperationCanceledException
         Console.WriteLine("Copy canceled.")
     End Try
@@ -101,32 +108,40 @@ Cancellation does not roll back bytes already written. If the operation is cance
 Create a `CopyDirectoryInfo` containing the source and destination:
 
 ```vb
-Dim manager As New FileManager()
 Dim copyRequest As New CopyDirectoryInfo(
     New DirectoryInfo("C:\ApplicationData"),
     New DirectoryInfo("D:\Backup\ApplicationData"))
 
-AddHandler manager.CopyDirectoryProgressChanged,
-    Sub(sender, e)
-        Console.WriteLine($"{e.PercentCompleted}% - {e.ProcessedItems}/{e.TotalItems}")
-    End Sub
+Dim progress As New Progress(Of Integer)(
+    Sub(percent)
+        Console.WriteLine($"{percent}%")
+    End Sub)
 
-Dim copiedBytes As Long = Await manager.CopyDirectoryAsync(copyRequest)
+Dim copiedBytes As Long = Await FileManager.CopyDirectoryAsync(
+    copyRequest,
+    Progress:=progress)
 ```
 
-The complete source tree is planned before copying starts. This allows the service to calculate the total number of bytes and files. Empty directories are created at the destination.
+The complete source tree is planned before copying starts. This allows the service to calculate the total number of bytes. Empty directories are created at the destination.
 
 ### Participate in a larger progress calculation
 
-`CopyDirectoryAsync` accepts optional `totalSize` and `handledSize` values when its progress should be combined with other work:
+`CopyDirectoryAsync` accepts optional `TotalSize` and `HandledSize` values when its progress should be combined with other work:
 
 ```vb
 Dim alreadyCopied As Long = 500000
 Dim completeOperationSize As Long = 2000000
-Dim copiedNow As Long = Await manager.CopyDirectoryAsync(copyRequest, completeOperationSize, alreadyCopied, cancellationToken)
+Dim progress As New Progress(Of Integer)(Sub(percent) Console.WriteLine($"{percent}%"))
+
+Dim copiedNow As Long = Await FileManager.CopyDirectoryAsync(
+    copyRequest,
+    TotalSize:=completeOperationSize,
+    HandledSize:=alreadyCopied,
+    Progress:=progress,
+    CancellationToken:=cancellationToken)
 ```
 
-The returned value is the number of bytes copied by the supplied directory request, not the accumulated `handledSize`.
+The returned value is the number of bytes copied by the supplied directory request, not the accumulated `HandledSize`.
 
 ## Copy multiple directories
 
@@ -136,7 +151,9 @@ Dim requests As CopyDirectoryInfo() = {
     New CopyDirectoryInfo(New DirectoryInfo("C:\Data\Orders"), New DirectoryInfo("D:\Backup\Orders"))
 }
 
-Await manager.CopyDirectoriesAsync(requests, cancellationToken)
+Dim progress As New Progress(Of Integer)(Sub(percent) Console.WriteLine($"{percent}%"))
+
+Await FileManager.CopyDirectoriesAsync(requests, progress, cancellationToken)
 ```
 
 Progress is calculated across all planned files in all requests.
@@ -149,12 +166,9 @@ Dim filesToDelete As FileInfo() = {
     New FileInfo("C:\Temp\result-2.tmp")
 }
 
-AddHandler manager.DeleteFilesProgressChanged,
-    Sub(sender, e)
-        Console.WriteLine($"Deleted {e.ProcessedItems} of {e.TotalItems} files.")
-    End Sub
+Dim progress As New Progress(Of Integer)(Sub(percent) Console.WriteLine($"{percent}%"))
 
-Await manager.DeleteFilesAsync(filesToDelete, cancellationToken)
+Await FileManager.DeleteFilesAsync(filesToDelete, progress, cancellationToken)
 ```
 
 Duplicate normalized paths are processed only once. Every requested file must exist when the deletion plan is built; otherwise, `FileNotFoundException` is thrown.
@@ -169,12 +183,9 @@ Dim requests As DeleteDirectoryInfo() = {
     New DeleteDirectoryInfo(New DirectoryInfo("C:\Temp\Working"), False)
 }
 
-AddHandler manager.DeleteDirectoriesProgressChanged,
-    Sub(sender, e)
-        Console.WriteLine($"{e.PercentCompleted}%")
-    End Sub
+Dim progress As New Progress(Of Integer)(Sub(percent) Console.WriteLine($"{percent}%"))
 
-Await manager.DeleteDirectoriesAsync(requests, cancellationToken)
+Await FileManager.DeleteDirectoriesAsync(requests, progress, cancellationToken)
 ```
 
 The first request deletes `OldImports` and its contents. The second deletes everything inside `Working` but preserves the `Working` root directory.
@@ -183,7 +194,7 @@ Missing directory roots are ignored. Existing roots in the same request may not 
 
 ## Clear a directory with exclusions
 
-`DeleteDirectoryContentAsync` removes content without deleting the supplied root. It can preserve complete subtrees and individual files:
+`DeleteDirectoryContentAsync` removes content without deleting the supplied root. It can preserve complete subtrees and individual files and can also report percentage progress:
 
 ```vb
 Dim rootDirectory As New DirectoryInfo("C:\Application\Cache")
@@ -193,75 +204,68 @@ Dim directoriesToKeep As DirectoryInfo() = {
 Dim filesToKeep As FileInfo() = {
     New FileInfo("C:\Application\Cache\settings.json")
 }
+Dim progress As New Progress(Of Integer)(Sub(percent) Console.WriteLine($"{percent}%"))
 
-Await FileManager.DeleteDirectoryContentAsync(rootDirectory, directoriesToKeep, filesToKeep, cancellationToken)
+Await FileManager.DeleteDirectoryContentAsync(
+    rootDirectory,
+    directoriesToKeep,
+    filesToKeep,
+    progress,
+    cancellationToken)
 ```
 
 When a directory is excluded, all of its descendants are preserved. The service also preserves the required ancestors of excluded items so that those items remain reachable.
 
-Every exclusion must be located inside the supplied root. Passing the root itself in `exceptDirectories` makes the method return without deleting anything.
+Every exclusion must be located inside the supplied root. Passing the root itself in `ExceptDirectories` makes the method return without deleting anything and reports completion when a progress reporter is supplied.
 
-## Progress events
+## Progress reporting
 
-Each operation has its own event:
+Progress is supplied per operation through an optional `IProgress(Of Integer)` parameter. Reported values are always clamped to the range `0` through `100`.
 
-| Event | Raised by |
-| --- | --- |
-| `CopyFileProgressChanged` | `CopyFileAsync` |
-| `CopyDirectoryProgressChanged` | `CopyDirectoryAsync` and `CopyDirectoriesAsync` |
-| `DeleteFilesProgressChanged` | `DeleteFilesAsync` |
-| `DeleteDirectoriesProgressChanged` | `DeleteDirectoriesAsync` |
+For copy operations and file/directory deletion operations, byte-based progress is preferred when a positive total byte size is available. Item-based progress is used when there is no positive byte total. `DeleteDirectoryContentAsync` uses item-based progress for the files and directories it removes.
 
-Progress notifications use `ProgressEventArgs`:
-
-| Property | Type | Description |
-| --- | --- | --- |
-| `TotalSize` | `Long` | Total bytes represented by the operation. |
-| `HandledSize` | `Long` | Bytes copied or deleted so far. |
-| `CurrentPath` | `String` | Current file path, or `Nothing` when no single path applies. |
-| `ProcessedItems` | `Long` | Number of files completely processed. |
-| `TotalItems` | `Long` | Total number of planned files. |
-| `PercentCompleted` | `Integer` | Calculated value from `0` through `100`. |
-
-Byte progress is preferred when `TotalSize` is greater than zero. Item progress is used for zero-byte operations. An empty operation is reported as complete.
-
-Progress is throttled during file streaming to avoid raising an event for every buffer. A final completion notification is still sent.
+Progress updates are throttled during high-throughput work to avoid excessive synchronization-context traffic. A final `100` notification is still reported after successful completion.
 
 ### Windows Forms example
 
-When an operation is started from the UI thread, the event uses the captured synchronization context, so controls can normally be updated directly:
+Create `Progress(Of Integer)` on the UI thread. The standard .NET implementation captures the current synchronization context, so its callback can normally update controls directly:
 
 ```vb
-AddHandler manager.CopyFileProgressChanged,
-    Sub(sender, e)
-        ProgressBar1.Value = e.PercentCompleted
-        StatusLabel.Text = If(e.CurrentPath, "Preparing...")
-    End Sub
+Dim progress As New Progress(Of Integer)(
+    Sub(percent)
+        ProgressBar1.Value = percent
+        StatusLabel.Text = $"{percent}%"
+    End Sub)
 
-Await manager.CopyFileAsync(sourceFile, destinationFile, cancellationToken)
+Await FileManager.CopyFileAsync(
+    sourceFile,
+    destinationFile,
+    progress,
+    cancellationToken)
 ```
 
-If no synchronization context exists, notifications may run on a thread-pool thread.
+No event subscription or `FileManager` instance is required.
 
 ## Public types
 
 | Type | Purpose |
 | --- | --- |
-| `FileManager` | Executes asynchronous copy and deletion operations. |
+| `FileManager` | Exposes shared asynchronous copy and deletion operations. |
 | `CopyDirectoryInfo` | Maps one source directory to one destination directory. |
 | `DeleteDirectoryInfo` | Describes a directory and whether its root should be deleted. |
-| `ProgressEventArgs` | Supplies immutable byte, item and path progress information. |
 
 ## `FileManager` API
 
 | Member | Description |
 | --- | --- |
-| `CopyFileAsync(source, destination, cancellationToken)` | Copies one file and overwrites the destination. |
-| `CopyDirectoryAsync(copyInfo, totalSize, handledSize, cancellationToken)` | Copies one directory and returns the copied byte count. |
-| `CopyDirectoriesAsync(directories, cancellationToken)` | Copies multiple directory mappings as one progress operation. |
-| `DeleteFilesAsync(files, cancellationToken)` | Deletes distinct files. |
-| `DeleteDirectoriesAsync(directories, cancellationToken)` | Deletes directory contents and optionally their roots. |
-| `DeleteDirectoryContentAsync(directory, exceptDirectories, exceptFiles, cancellationToken)` | Clears one root while preserving selected content. |
+| `CopyFileAsync(Source, Destination, Progress, CancellationToken)` | Copies one file and overwrites the destination. |
+| `CopyDirectoryAsync(CopyInfo, TotalSize, HandledSize, Progress, CancellationToken)` | Copies one directory and returns the copied byte count. |
+| `CopyDirectoriesAsync(Directories, Progress, CancellationToken)` | Copies multiple directory mappings as one progress operation. |
+| `DeleteFilesAsync(Files, Progress, CancellationToken)` | Deletes distinct files. |
+| `DeleteDirectoriesAsync(Directories, Progress, CancellationToken)` | Deletes directory contents and optionally their roots. |
+| `DeleteDirectoryContentAsync(Directory, ExceptDirectories, ExceptFiles, Progress, CancellationToken)` | Clears one root while preserving selected content. |
+
+All parameters after the required operation arguments are optional.
 
 ## Path and traversal behavior
 

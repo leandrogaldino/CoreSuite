@@ -8,13 +8,18 @@ Imports System.Threading
 ''' The service performs potentially expensive directory enumeration and deletion operations on background threads and uses asynchronous file streams when copying file contents.
 ''' </para>
 ''' <para>
-''' Progress is reported through operation-specific events. When an operation is started from a thread that has a synchronization context, such as the WinForms UI thread, progress events are raised through that captured context.
+''' Progress can be reported through optional <see cref="IProgress(Of Integer)"/> parameters. A <see cref="Progress(Of Integer)"/> instance captures the caller's synchronization context when it is created, allowing UI callers to receive progress updates on their original context.
 ''' </para>
 ''' <para>
 ''' Directory enumeration skips reparse points to avoid following symbolic links, junctions, and other redirected directory structures.
 ''' </para>
 ''' </remarks>
 Public NotInheritable Class FileManager
+    ''' <summary>
+    ''' Prevents creation of <see cref="FileManager"/> instances because the service exposes only shared operations.
+    ''' </summary>
+    Private Sub New()
+    End Sub
     ''' <summary>
     ''' Defines the buffer size, in bytes, used when asynchronously reading and writing file streams.
     ''' </summary>
@@ -28,47 +33,22 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Path comparisons are case-insensitive on Windows and case-sensitive on other supported operating systems.
     ''' </remarks>
-    Private ReadOnly FileSystemPathComparer As StringComparer = If(OperatingSystem.IsWindows(), StringComparer.OrdinalIgnoreCase, StringComparer.Ordinal)
+    Private Shared ReadOnly FileSystemPathComparer As StringComparer = If(OperatingSystem.IsWindows(), StringComparer.OrdinalIgnoreCase, StringComparer.Ordinal)
     ''' <summary>
     ''' Defines the string comparison mode used when determining path ancestry and path equality.
     ''' </summary>
     ''' <remarks>
     ''' Path comparisons are case-insensitive on Windows and case-sensitive on other supported operating systems.
     ''' </remarks>
-    Private ReadOnly FileSystemPathComparison As StringComparison = If(OperatingSystem.IsWindows(), StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
-    ''' <summary>
-    ''' Occurs when progress changes during an asynchronous directory copy operation.
-    ''' </summary>
-    ''' <remarks>
-    ''' The event may be raised periodically while a file is being copied and after an individual file has been completely processed.
-    ''' </remarks>
-    Public Event CopyDirectoryProgressChanged As EventHandler(Of ProgressEventArgs)
-    ''' <summary>
-    ''' Occurs when progress changes during an asynchronous directory deletion operation.
-    ''' </summary>
-    ''' <remarks>
-    ''' Progress is based primarily on the number and total size of files deleted. Directory removal does not increase the handled byte count.
-    ''' </remarks>
-    Public Event DeleteDirectoriesProgressChanged As EventHandler(Of ProgressEventArgs)
-    ''' <summary>
-    ''' Occurs when progress changes during an asynchronous file copy operation.
-    ''' </summary>
-    ''' <remarks>
-    ''' The event is raised periodically while the file is being copied and once more when the operation completes successfully.
-    ''' </remarks>
-    Public Event CopyFileProgressChanged As EventHandler(Of ProgressEventArgs)
-    ''' <summary>
-    ''' Occurs when progress changes during an asynchronous file deletion operation.
-    ''' </summary>
-    ''' <remarks>
-    ''' Progress is calculated from the combined size and number of files scheduled for deletion.
-    ''' </remarks>
-    Public Event DeleteFilesProgressChanged As EventHandler(Of ProgressEventArgs)
+    Private Shared ReadOnly FileSystemPathComparison As StringComparison = If(OperatingSystem.IsWindows(), StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
     ''' <summary>
     ''' Asynchronously deletes the specified files and reports the accumulated deletion progress.
     ''' </summary>
     ''' <param name="Files">
     ''' The collection of files to delete. Duplicate paths are processed only once.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -94,7 +74,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="IOException">
     ''' An I/O error occurs while accessing or deleting a file.
     ''' </exception>
-    Public Async Function DeleteFilesAsync(Files As IEnumerable(Of FileInfo), Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Shared Async Function DeleteFilesAsync(Files As IEnumerable(Of FileInfo), Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Files)
         Dim FileList As List(Of FileInfo) = GetDistinctFiles(Files)
         Dim Entries As List(Of FileDeleteEntry) = Await Task.Run(Function()
@@ -107,7 +87,6 @@ Public NotInheritable Class FileManager
                                                                      Next
                                                                      Return Results
                                                                  End Function, CancellationToken)
-        Dim Progress As IProgress(Of ProgressEventArgs) = New Progress(Of ProgressEventArgs)(AddressOf OnDeleteFilesProgressChanged)
         Await Task.Run(Sub()
                            Dim TotalSize As Long = Entries.Sum(Function(CurrentFile) CurrentFile.Length)
                            Dim HandledSize As Long = 0
@@ -118,9 +97,9 @@ Public NotInheritable Class FileManager
                                File.Delete(CurrentFile.Path)
                                HandledSize += CurrentFile.Length
                                ProcessedItems += 1
-                               If Reporter.ShouldReport(ProcessedItems = Entries.Count) Then Progress.Report(New ProgressEventArgs(TotalSize, HandledSize, CurrentFile.Path, ProcessedItems, Entries.Count))
+                               If Reporter.ShouldReport(ProcessedItems = Entries.Count) Then ReportProgress(Progress, TotalSize, HandledSize, ProcessedItems, Entries.Count)
                            Next
-                           If Entries.Count = 0 Then Progress.Report(New ProgressEventArgs(0, 0, Nothing, 0, 0))
+                           If Entries.Count = 0 Then ReportProgress(Progress, 0, 0, 0, 0)
                        End Sub, CancellationToken)
     End Function
     ''' <summary>
@@ -131,6 +110,9 @@ Public NotInheritable Class FileManager
     ''' </param>
     ''' <param name="Destination">
     ''' Information describing the destination file to create or overwrite.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -156,7 +138,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Async Function CopyFileAsync(Source As FileInfo, Destination As FileInfo, Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Shared Async Function CopyFileAsync(Source As FileInfo, Destination As FileInfo, Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Source)
         ArgumentNullException.ThrowIfNull(Destination)
         Source.Refresh()
@@ -165,18 +147,20 @@ Public NotInheritable Class FileManager
         Dim DestinationPath As String = NormalizePath(Destination.FullName)
         If AreSamePath(SourcePath, DestinationPath) Then Throw New IOException("The source and destination files cannot be the same.")
         Dim TotalSize As Long = Source.Length
-        Dim Progress As IProgress(Of ProgressEventArgs) = New Progress(Of ProgressEventArgs)(AddressOf OnCopyFileProgressChanged)
         Dim Reporter As New ProgressThrottle()
         Dim CopiedSize As Long = Await CopyFileCoreAsync(SourcePath, DestinationPath, Sub(CurrentCopiedSize As Long)
-                                                                                          If Reporter.ShouldReport() Then Progress.Report(New ProgressEventArgs(TotalSize, CurrentCopiedSize, SourcePath, 0, 1))
+                                                                                          If Reporter.ShouldReport() Then ReportProgress(Progress, TotalSize, CurrentCopiedSize, 0, 1)
                                                                                       End Sub, CancellationToken)
-        Progress.Report(New ProgressEventArgs(TotalSize, CopiedSize, SourcePath, 1, 1))
+        ReportProgress(Progress, TotalSize, CopiedSize, 1, 1)
     End Function
     ''' <summary>
     ''' Asynchronously copies multiple directory trees and reports their combined progress.
     ''' </summary>
     ''' <param name="Directories">
     ''' The collection of source and destination directory mappings to process.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -210,7 +194,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Async Function CopyDirectoriesAsync(Directories As IEnumerable(Of CopyDirectoryInfo), Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Shared Async Function CopyDirectoriesAsync(Directories As IEnumerable(Of CopyDirectoryInfo), Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Directories)
         Dim Requests As List(Of CopyDirectoryInfo) = Directories.ToList()
         If Requests.Any(Function(CurrentRequest) CurrentRequest Is Nothing) Then Throw New ArgumentException("The directory collection cannot contain null items.", NameOf(Directories))
@@ -223,7 +207,6 @@ Public NotInheritable Class FileManager
                                                                      Return Results
                                                                  End Function, CancellationToken)
         Dim TotalSize As Long = Plans.Sum(Function(CurrentPlan) CurrentPlan.TotalSize)
-        Dim Progress As IProgress(Of ProgressEventArgs) = New Progress(Of ProgressEventArgs)(AddressOf OnCopyDirectoryProgressChanged)
         Await ExecuteDirectoryCopyPlansAsync(Plans, TotalSize, 0, Progress, CancellationToken)
     End Function
     ''' <summary>
@@ -237,6 +220,9 @@ Public NotInheritable Class FileManager
     ''' </param>
     ''' <param name="HandledSize">
     ''' The optional number of bytes already handled by a larger combined operation.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -265,13 +251,12 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Async Function CopyDirectoryAsync(CopyInfo As CopyDirectoryInfo, Optional TotalSize As Long = 0, Optional HandledSize As Long = 0, Optional CancellationToken As CancellationToken = Nothing) As Task(Of Long)
+    Public Shared Async Function CopyDirectoryAsync(CopyInfo As CopyDirectoryInfo, Optional TotalSize As Long = 0, Optional HandledSize As Long = 0, Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task(Of Long)
         ArgumentNullException.ThrowIfNull(CopyInfo)
         If TotalSize < 0 Then Throw New ArgumentOutOfRangeException(NameOf(TotalSize), "The total size cannot be negative.")
         If HandledSize < 0 Then Throw New ArgumentOutOfRangeException(NameOf(HandledSize), "The handled size cannot be negative.")
         Dim Plan As DirectoryCopyPlan = Await Task.Run(Function() BuildDirectoryCopyPlan(CopyInfo, CancellationToken), CancellationToken)
         Dim EffectiveTotalSize As Long = If(TotalSize > 0, TotalSize, HandledSize + Plan.TotalSize)
-        Dim Progress As IProgress(Of ProgressEventArgs) = New Progress(Of ProgressEventArgs)(AddressOf OnCopyDirectoryProgressChanged)
         Return Await ExecuteDirectoryCopyPlansAsync(New List(Of DirectoryCopyPlan) From {Plan}, EffectiveTotalSize, HandledSize, Progress, CancellationToken)
     End Function
     ''' <summary>
@@ -279,6 +264,9 @@ Public NotInheritable Class FileManager
     ''' </summary>
     ''' <param name="Directories">
     ''' The collection of directory deletion requests to process.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -309,12 +297,11 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Async Function DeleteDirectoriesAsync(Directories As IEnumerable(Of DeleteDirectoryInfo), Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Shared Async Function DeleteDirectoriesAsync(Directories As IEnumerable(Of DeleteDirectoryInfo), Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Directories)
         Dim Requests As List(Of DeleteDirectoryInfo) = Directories.ToList()
         If Requests.Any(Function(CurrentRequest) CurrentRequest Is Nothing) Then Throw New ArgumentException("The directory collection cannot contain null items.", NameOf(Directories))
         Dim Plan As DirectoryDeletePlan = Await Task.Run(Function() BuildDirectoryDeletePlan(Requests, CancellationToken), CancellationToken)
-        Dim Progress As IProgress(Of ProgressEventArgs) = New Progress(Of ProgressEventArgs)(AddressOf OnDeleteDirectoriesProgressChanged)
         Await Task.Run(Sub()
                            Dim HandledSize As Long = 0
                            Dim ProcessedItems As Long = 0
@@ -324,7 +311,7 @@ Public NotInheritable Class FileManager
                                File.Delete(CurrentFile.Path)
                                HandledSize += CurrentFile.Length
                                ProcessedItems += 1
-                               If Reporter.ShouldReport(ProcessedItems = Plan.Files.Count) Then Progress.Report(New ProgressEventArgs(Plan.TotalSize, HandledSize, CurrentFile.Path, ProcessedItems, Plan.Files.Count))
+                               If Reporter.ShouldReport(ProcessedItems = Plan.Files.Count) Then ReportProgress(Progress, Plan.TotalSize, HandledSize, ProcessedItems, Plan.Files.Count)
                            Next
                            For Each CurrentDirectory As String In Plan.Directories.OrderByDescending(Function(DirectoryPath) DirectoryPath.Length)
                                CancellationToken.ThrowIfCancellationRequested()
@@ -334,7 +321,7 @@ Public NotInheritable Class FileManager
                                CancellationToken.ThrowIfCancellationRequested()
                                If CurrentRoot.DeleteRoot AndAlso System.IO.Directory.Exists(CurrentRoot.Path) Then System.IO.Directory.Delete(CurrentRoot.Path, False)
                            Next
-                           Progress.Report(New ProgressEventArgs(Plan.TotalSize, HandledSize, Nothing, Plan.Files.Count, Plan.Files.Count))
+                           ReportProgress(Progress, Plan.TotalSize, HandledSize, Plan.Files.Count, Plan.Files.Count)
                        End Sub, CancellationToken)
     End Function
     ''' <summary>
@@ -348,6 +335,9 @@ Public NotInheritable Class FileManager
     ''' </param>
     ''' <param name="ExceptFiles">
     ''' An optional collection of files to preserve. The required parent directories are also preserved.
+    ''' </param>
+    ''' <param name="Progress">
+    ''' An optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -376,26 +366,37 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Public Async Function DeleteDirectoryContentAsync(Directory As DirectoryInfo, Optional ExceptDirectories As IEnumerable(Of DirectoryInfo) = Nothing, Optional ExceptFiles As IEnumerable(Of FileInfo) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+    Public Shared Async Function DeleteDirectoryContentAsync(Directory As DirectoryInfo, Optional ExceptDirectories As IEnumerable(Of DirectoryInfo) = Nothing, Optional ExceptFiles As IEnumerable(Of FileInfo) = Nothing, Optional Progress As IProgress(Of Integer) = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         ArgumentNullException.ThrowIfNull(Directory)
         Directory.Refresh()
         If Not Directory.Exists Then Throw New DirectoryNotFoundException($"Directory '{Directory.FullName}' was not found.")
         Dim RootPath As String = NormalizePath(Directory.FullName)
         Dim ExcludedDirectoryPaths As HashSet(Of String) = GetExcludedDirectoryPaths(RootPath, ExceptDirectories)
         Dim ExcludedFilePaths As HashSet(Of String) = GetExcludedFilePaths(RootPath, ExceptFiles)
-        If ExcludedDirectoryPaths.Contains(RootPath) Then Return
+        If ExcludedDirectoryPaths.Contains(RootPath) Then
+            ReportProgress(Progress, 0, 0, 0, 0)
+            Return
+        End If
         Await Task.Run(Sub()
                            Dim Options As EnumerationOptions = CreateEnumerationOptions()
-                           Dim FilePaths As List(Of String) = System.IO.Directory.EnumerateFiles(RootPath, "*", Options).Select(AddressOf NormalizePath).ToList()
-                           Dim DirectoryPaths As List(Of String) = System.IO.Directory.EnumerateDirectories(RootPath, "*", Options).Select(AddressOf NormalizePath).OrderByDescending(Function(DirectoryPath) DirectoryPath.Length).ToList()
-                           For Each CurrentFilePath As String In FilePaths
+                           Dim FilesToDelete As List(Of String) = System.IO.Directory.EnumerateFiles(RootPath, "*", Options).Select(AddressOf NormalizePath).Where(Function(FilePath) Not ShouldPreserveFile(FilePath, ExcludedDirectoryPaths, ExcludedFilePaths)).ToList()
+                           Dim DirectoriesToDelete As List(Of String) = System.IO.Directory.EnumerateDirectories(RootPath, "*", Options).Select(AddressOf NormalizePath).Where(Function(DirectoryPath) Not ShouldPreserveDirectory(DirectoryPath, ExcludedDirectoryPaths, ExcludedFilePaths)).OrderByDescending(Function(DirectoryPath) DirectoryPath.Length).ToList()
+                           Dim TotalItems As Long = FilesToDelete.Count + DirectoriesToDelete.Count
+                           Dim ProcessedItems As Long = 0
+                           Dim Reporter As New ProgressThrottle()
+                           For Each CurrentFilePath As String In FilesToDelete
                                CancellationToken.ThrowIfCancellationRequested()
-                               If Not ShouldPreserveFile(CurrentFilePath, ExcludedDirectoryPaths, ExcludedFilePaths) Then File.Delete(CurrentFilePath)
+                               File.Delete(CurrentFilePath)
+                               ProcessedItems += 1
+                               If Reporter.ShouldReport(ProcessedItems = TotalItems) Then ReportProgress(Progress, 0, 0, ProcessedItems, TotalItems)
                            Next
-                           For Each CurrentDirectoryPath As String In DirectoryPaths
+                           For Each CurrentDirectoryPath As String In DirectoriesToDelete
                                CancellationToken.ThrowIfCancellationRequested()
-                               If Not ShouldPreserveDirectory(CurrentDirectoryPath, ExcludedDirectoryPaths, ExcludedFilePaths) AndAlso System.IO.Directory.Exists(CurrentDirectoryPath) Then System.IO.Directory.Delete(CurrentDirectoryPath, False)
+                               If System.IO.Directory.Exists(CurrentDirectoryPath) Then System.IO.Directory.Delete(CurrentDirectoryPath, False)
+                               ProcessedItems += 1
+                               If Reporter.ShouldReport(ProcessedItems = TotalItems) Then ReportProgress(Progress, 0, 0, ProcessedItems, TotalItems)
                            Next
+                           If TotalItems = 0 Then ReportProgress(Progress, 0, 0, 0, 0)
                        End Sub, CancellationToken)
     End Function
     ''' <summary>
@@ -411,7 +412,7 @@ Public NotInheritable Class FileManager
     ''' The number of bytes considered handled before the supplied plans begin.
     ''' </param>
     ''' <param name="Progress">
-    ''' The progress reporter that receives accumulated operation progress.
+    ''' The optional progress reporter that receives completion percentages from 0 through 100.
     ''' </param>
     ''' <param name="CancellationToken">
     ''' A token that may be used to cancel the operation.
@@ -428,7 +429,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="IOException">
     ''' An I/O error occurs while creating a directory or copying a file.
     ''' </exception>
-    Private Async Function ExecuteDirectoryCopyPlansAsync(Plans As IReadOnlyList(Of DirectoryCopyPlan), TotalSize As Long, InitialHandledSize As Long, Progress As IProgress(Of ProgressEventArgs), CancellationToken As CancellationToken) As Task(Of Long)
+    Private Shared Async Function ExecuteDirectoryCopyPlansAsync(Plans As IReadOnlyList(Of DirectoryCopyPlan), TotalSize As Long, InitialHandledSize As Long, Progress As IProgress(Of Integer), CancellationToken As CancellationToken) As Task(Of Long)
         Await Task.Run(Sub()
                            For Each CurrentPlan As DirectoryCopyPlan In Plans
                                CancellationToken.ThrowIfCancellationRequested()
@@ -448,14 +449,14 @@ Public NotInheritable Class FileManager
                 CancellationToken.ThrowIfCancellationRequested()
                 Dim BaseHandledSize As Long = InitialHandledSize + CopiedSize
                 Dim CurrentFileCopiedSize As Long = Await CopyFileCoreAsync(CurrentFile.SourcePath, CurrentFile.DestinationPath, Sub(CurrentCopiedSize As Long)
-                                                                                                                                     If Reporter.ShouldReport() Then Progress.Report(New ProgressEventArgs(TotalSize, BaseHandledSize + CurrentCopiedSize, CurrentFile.SourcePath, ProcessedItems, TotalItems))
+                                                                                                                                     If Reporter.ShouldReport() Then ReportProgress(Progress, TotalSize, BaseHandledSize + CurrentCopiedSize, ProcessedItems, TotalItems)
                                                                                                                                  End Sub, CancellationToken)
                 CopiedSize += CurrentFileCopiedSize
                 ProcessedItems += 1
-                Progress.Report(New ProgressEventArgs(TotalSize, InitialHandledSize + CopiedSize, CurrentFile.SourcePath, ProcessedItems, TotalItems))
+                ReportProgress(Progress, TotalSize, InitialHandledSize + CopiedSize, ProcessedItems, TotalItems)
             Next
         Next
-        If TotalItems = 0 Then Progress.Report(New ProgressEventArgs(TotalSize, InitialHandledSize + CopiedSize, Nothing, 0, 0))
+        If TotalItems = 0 Then ReportProgress(Progress, TotalSize, InitialHandledSize + CopiedSize, 0, 0)
         Return CopiedSize
     End Function
     ''' <summary>
@@ -494,7 +495,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Async Function CopyFileCoreAsync(SourcePath As String, DestinationPath As String, ProgressCallback As Action(Of Long), CancellationToken As CancellationToken) As Task(Of Long)
+    Private Shared Async Function CopyFileCoreAsync(SourcePath As String, DestinationPath As String, ProgressCallback As Action(Of Long), CancellationToken As CancellationToken) As Task(Of Long)
         Dim DestinationDirectoryPath As String = Path.GetDirectoryName(DestinationPath)
         If String.IsNullOrWhiteSpace(DestinationDirectoryPath) Then Throw New DirectoryNotFoundException($"The destination directory for '{DestinationPath}' could not be determined.")
         System.IO.Directory.CreateDirectory(DestinationDirectoryPath)
@@ -510,7 +511,7 @@ Public NotInheritable Class FileManager
                     If BytesRead = 0 Then Exit Do
                     Await DestinationStream.WriteAsync(Buffer.AsMemory(0, BytesRead), CancellationToken).ConfigureAwait(False)
                     CopiedSize += BytesRead
-                    ProgressCallback(CopiedSize)
+                    If ProgressCallback IsNot Nothing Then ProgressCallback(CopiedSize)
                 Loop
                 Await DestinationStream.FlushAsync(CancellationToken).ConfigureAwait(False)
             End Using
@@ -544,7 +545,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Function BuildDirectoryCopyPlan(CopyInfo As CopyDirectoryInfo, CancellationToken As CancellationToken) As DirectoryCopyPlan
+    Private Shared Function BuildDirectoryCopyPlan(CopyInfo As CopyDirectoryInfo, CancellationToken As CancellationToken) As DirectoryCopyPlan
         ArgumentNullException.ThrowIfNull(CopyInfo.Source)
         ArgumentNullException.ThrowIfNull(CopyInfo.Destination)
         CopyInfo.Source.Refresh()
@@ -594,7 +595,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="OperationCanceledException">
     ''' The operation is canceled through <paramref name="CancellationToken"/>.
     ''' </exception>
-    Private Function BuildDirectoryDeletePlan(Requests As IReadOnlyList(Of DeleteDirectoryInfo), CancellationToken As CancellationToken) As DirectoryDeletePlan
+    Private Shared Function BuildDirectoryDeletePlan(Requests As IReadOnlyList(Of DeleteDirectoryInfo), CancellationToken As CancellationToken) As DirectoryDeletePlan
         Dim Roots As New List(Of DirectoryDeleteRoot)
         For Each CurrentRequest As DeleteDirectoryInfo In Requests
             CancellationToken.ThrowIfCancellationRequested()
@@ -634,7 +635,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item or an invalid path.
     ''' </exception>
-    Private Function GetDistinctFiles(Files As IEnumerable(Of FileInfo)) As List(Of FileInfo)
+    Private Shared Function GetDistinctFiles(Files As IEnumerable(Of FileInfo)) As List(Of FileInfo)
         Dim Results As New Dictionary(Of String, FileInfo)(FileSystemPathComparer)
         For Each CurrentFile As FileInfo In Files
             If CurrentFile Is Nothing Then Throw New ArgumentException("The file collection cannot contain null items.", NameOf(Files))
@@ -658,7 +659,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item, an invalid path, or a directory outside <paramref name="RootPath"/>.
     ''' </exception>
-    Private Function GetExcludedDirectoryPaths(RootPath As String, Directories As IEnumerable(Of DirectoryInfo)) As HashSet(Of String)
+    Private Shared Function GetExcludedDirectoryPaths(RootPath As String, Directories As IEnumerable(Of DirectoryInfo)) As HashSet(Of String)
         Dim Results As New HashSet(Of String)(FileSystemPathComparer)
         If Directories Is Nothing Then Return Results
         For Each CurrentDirectory As DirectoryInfo In Directories
@@ -684,7 +685,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' The collection contains a <see langword="Nothing"/> item, an invalid path, or a file outside <paramref name="RootPath"/>.
     ''' </exception>
-    Private Function GetExcludedFilePaths(RootPath As String, Files As IEnumerable(Of FileInfo)) As HashSet(Of String)
+    Private Shared Function GetExcludedFilePaths(RootPath As String, Files As IEnumerable(Of FileInfo)) As HashSet(Of String)
         Dim Results As New HashSet(Of String)(FileSystemPathComparer)
         If Files Is Nothing Then Return Results
         For Each CurrentFile As FileInfo In Files
@@ -710,7 +711,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the file is explicitly excluded or is located inside an excluded directory; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Function ShouldPreserveFile(FilePath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
+    Private Shared Function ShouldPreserveFile(FilePath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
         If ExcludedFiles.Contains(FilePath) Then Return True
         For Each ExcludedDirectory As String In ExcludedDirectories
             If IsSameOrChildPath(FilePath, ExcludedDirectory) Then Return True
@@ -732,7 +733,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the directory is excluded, contains an excluded item, or is located inside an excluded directory; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Function ShouldPreserveDirectory(DirectoryPath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
+    Private Shared Function ShouldPreserveDirectory(DirectoryPath As String, ExcludedDirectories As HashSet(Of String), ExcludedFiles As HashSet(Of String)) As Boolean
         For Each ExcludedDirectory As String In ExcludedDirectories
             If IsSameOrChildPath(DirectoryPath, ExcludedDirectory) OrElse IsSameOrChildPath(ExcludedDirectory, DirectoryPath) Then Return True
         Next
@@ -750,7 +751,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="ArgumentException">
     ''' Two root paths overlap.
     ''' </exception>
-    Private Sub ValidateNonOverlappingRoots(Roots As List(Of DirectoryDeleteRoot))
+    Private Shared Sub ValidateNonOverlappingRoots(Roots As List(Of DirectoryDeleteRoot))
         For FirstIndex As Integer = 0 To Roots.Count - 2
             For SecondIndex As Integer = FirstIndex + 1 To Roots.Count - 1
                 Dim FirstPath As String = Roots(FirstIndex).Path
@@ -758,6 +759,38 @@ Public NotInheritable Class FileManager
                 If IsSameOrChildPath(FirstPath, SecondPath) OrElse IsSameOrChildPath(SecondPath, FirstPath) Then Throw New ArgumentException($"Directory deletion requests cannot overlap: '{FirstPath}' and '{SecondPath}'.")
             Next
         Next
+    End Sub
+    ''' <summary>
+    ''' Reports the current completion percentage when a progress reporter was supplied.
+    ''' </summary>
+    ''' <param name="Progress">
+    ''' The optional progress reporter that receives values from 0 through 100.
+    ''' </param>
+    ''' <param name="TotalSize">
+    ''' The total number of bytes represented by the operation.
+    ''' </param>
+    ''' <param name="HandledSize">
+    ''' The number of bytes already processed.
+    ''' </param>
+    ''' <param name="ProcessedItems">
+    ''' The number of completely processed files or items.
+    ''' </param>
+    ''' <param name="TotalItems">
+    ''' The total number of files or items represented by the operation.
+    ''' </param>
+    Private Shared Sub ReportProgress(Progress As IProgress(Of Integer), TotalSize As Long, HandledSize As Long, ProcessedItems As Long, TotalItems As Long)
+        If Progress Is Nothing Then Return
+        Dim PercentCompleted As Integer
+        If TotalItems > 0 AndAlso ProcessedItems >= TotalItems Then
+            PercentCompleted = 100
+        ElseIf TotalSize > 0 Then
+            PercentCompleted = CInt(Math.Clamp(Math.Floor(Math.Max(0, HandledSize) / CDbl(TotalSize) * 100.0), 0.0, 100.0))
+        ElseIf TotalItems > 0 Then
+            PercentCompleted = CInt(Math.Clamp(Math.Floor(Math.Max(0, ProcessedItems) / CDbl(TotalItems) * 100.0), 0.0, 100.0))
+        Else
+            PercentCompleted = 100
+        End If
+        Progress.Report(PercentCompleted)
     End Sub
     ''' <summary>
     ''' Creates the standard options used when recursively enumerating files and directories.
@@ -768,7 +801,7 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Inaccessible entries cause an exception because <see cref="EnumerationOptions.IgnoreInaccessible"/> is disabled.
     ''' </remarks>
-    Private Function CreateEnumerationOptions() As EnumerationOptions
+    Private Shared Function CreateEnumerationOptions() As EnumerationOptions
         Return New EnumerationOptions With {.RecurseSubdirectories = True, .IgnoreInaccessible = False, .ReturnSpecialDirectories = False, .AttributesToSkip = FileAttributes.ReparsePoint}
     End Function
     ''' <summary>
@@ -789,7 +822,7 @@ Public NotInheritable Class FileManager
     ''' <exception cref="PathTooLongException">
     ''' The path exceeds a limit supported by the current platform or file system.
     ''' </exception>
-    Private Function NormalizePath(PathValue As String) As String
+    Private Shared Function NormalizePath(PathValue As String) As String
         If String.IsNullOrWhiteSpace(PathValue) Then Throw New ArgumentException("The path cannot be empty.", NameOf(PathValue))
         Return Path.TrimEndingDirectorySeparator(Path.GetFullPath(PathValue))
     End Function
@@ -805,7 +838,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the paths are equal according to the current operating system path rules; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Function AreSamePath(FirstPath As String, SecondPath As String) As Boolean
+    Private Shared Function AreSamePath(FirstPath As String, SecondPath As String) As Boolean
         Return FileSystemPathComparer.Equals(FirstPath, SecondPath)
     End Function
     ''' <summary>
@@ -823,7 +856,7 @@ Public NotInheritable Class FileManager
     ''' <remarks>
     ''' Equal paths are not considered a parent-child relationship.
     ''' </remarks>
-    Private Function IsPathInside(CandidatePath As String, ParentPath As String) As Boolean
+    Private Shared Function IsPathInside(CandidatePath As String, ParentPath As String) As Boolean
         If AreSamePath(CandidatePath, ParentPath) Then Return False
         Dim ParentPathWithSeparator As String = ParentPath
         If Not ParentPathWithSeparator.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) AndAlso Not ParentPathWithSeparator.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal) Then ParentPathWithSeparator &= Path.DirectorySeparatorChar
@@ -841,43 +874,7 @@ Public NotInheritable Class FileManager
     ''' <returns>
     ''' <see langword="True"/> when the paths are equal or the candidate is located below the parent; otherwise, <see langword="False"/>.
     ''' </returns>
-    Private Function IsSameOrChildPath(CandidatePath As String, ParentPath As String) As Boolean
+    Private Shared Function IsSameOrChildPath(CandidatePath As String, ParentPath As String) As Boolean
         Return AreSamePath(CandidatePath, ParentPath) OrElse IsPathInside(CandidatePath, ParentPath)
     End Function
-    ''' <summary>
-    ''' Raises the <see cref="CopyDirectoryProgressChanged"/> event.
-    ''' </summary>
-    ''' <param name="Args">
-    ''' The progress information associated with the directory copy operation.
-    ''' </param>
-    Private Sub OnCopyDirectoryProgressChanged(Args As ProgressEventArgs)
-        RaiseEvent CopyDirectoryProgressChanged(Me, Args)
-    End Sub
-    ''' <summary>
-    ''' Raises the <see cref="DeleteDirectoriesProgressChanged"/> event.
-    ''' </summary>
-    ''' <param name="Args">
-    ''' The progress information associated with the directory deletion operation.
-    ''' </param>
-    Private Sub OnDeleteDirectoriesProgressChanged(Args As ProgressEventArgs)
-        RaiseEvent DeleteDirectoriesProgressChanged(Me, Args)
-    End Sub
-    ''' <summary>
-    ''' Raises the <see cref="CopyFileProgressChanged"/> event.
-    ''' </summary>
-    ''' <param name="Args">
-    ''' The progress information associated with the file copy operation.
-    ''' </param>
-    Private Sub OnCopyFileProgressChanged(Args As ProgressEventArgs)
-        RaiseEvent CopyFileProgressChanged(Me, Args)
-    End Sub
-    ''' <summary>
-    ''' Raises the <see cref="DeleteFilesProgressChanged"/> event.
-    ''' </summary>
-    ''' <param name="Args">
-    ''' The progress information associated with the file deletion operation.
-    ''' </param>
-    Private Sub OnDeleteFilesProgressChanged(Args As ProgressEventArgs)
-        RaiseEvent DeleteFilesProgressChanged(Me, Args)
-    End Sub
 End Class

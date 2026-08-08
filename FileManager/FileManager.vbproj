@@ -5,15 +5,14 @@
 		<AssemblyName>CoreSuite.FileManager</AssemblyName>
 		<OptionStrict>On</OptionStrict>
 		<OptionExplicit>On</OptionExplicit>
-		<NoWarn>$(NoWarn);CA1822</NoWarn>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.FileManager</PackageId>
-		<Version>2.0.0</Version>
+		<Version>3.0.0</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite FileManager</Title>
-		<Description>Asynchronous .NET 8 file and directory copy and deletion service with progress events, cancellation and exclusion support.</Description>
+		<Description>Asynchronous .NET 8 file and directory copy and deletion service with shared operations, optional percentage progress, cancellation and exclusion support.</Description>
 		<PackageTags>coresuite;files;directories;copy;delete;progress;cancellation;async;vbnet;dotnet;net8</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -21,7 +20,7 @@
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/FileManager</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageReleaseNotes>Changed FileManager to a fully instance-based service. All operations and internal helpers now use instance members, providing a consistent API alongside instance-scoped progress events. Suppressed CA1822 for the project to preserve the intentional instance-based design.</PackageReleaseNotes>
+		<PackageReleaseNotes>Changed FileManager to a fully shared API. Removed instance-scoped progress events and ProgressEventArgs, replacing them with optional IProgress(Of Integer) parameters that report completion percentages from 0 to 100. Added percentage progress support to DeleteDirectoryContentAsync and removed the CA1822 suppression that was only required by the previous instance-based design.</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
