@@ -48,6 +48,7 @@ on:
           - NavigationView
           - NoFocusCueButton
           - NumericBoxBase
+          - PasswordBox
           - PercentageBox
           - PictureViewer
           - QueriedBox

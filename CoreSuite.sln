@@ -125,6 +125,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MySqlService", "MySqlServic
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "NavigationView", "NavigationView\NavigationView.vbproj", "{189AC859-DA57-411C-9CF6-D445D1B87371}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PasswordBox", "PasswordBox\PasswordBox.vbproj", "{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -335,6 +337,10 @@ Global
 		{189AC859-DA57-411C-9CF6-D445D1B87371}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{189AC859-DA57-411C-9CF6-D445D1B87371}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{189AC859-DA57-411C-9CF6-D445D1B87371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
