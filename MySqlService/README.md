@@ -22,7 +22,7 @@ The service uses `MySql.Data` for database access and `MySqlBackup.NET` for mana
 - Stored procedure input, output, input/output and return-value parameters.
 - Last inserted identifier obtained directly from `MySqlCommand.LastInsertedId`.
 - Managed database creation with validated character set and collation values.
-- Backup and restore progress reporting.
+- Backup and restore progress reporting through `IProgress(Of Integer)`.
 - Background backup and restore operations that do not block the calling thread.
 - Atomic backup file replacement through a temporary file.
 - Cleanup of incomplete temporary backup files after failure or cancellation.
@@ -348,7 +348,6 @@ Character set and collation values are validated as single SQL tokens before bei
 Dim progress As New Progress(Of Integer)(
     Sub(value) Debug.WriteLine($"Backup: {value}%"))
 Dim options As New MySqlBackupOptions With {
-    .Progress = progress,
     .Overwrite = True,
     .ExportProcedures = True,
     .ExportFunctions = True,
@@ -356,6 +355,7 @@ Dim options As New MySqlBackupOptions With {
 }
 Await mySqlService.Maintenance.ExecuteBackupAsync(
     "C:\Backups\sample_database.sql",
+    progress,
     options)
 ```
 
@@ -366,30 +366,18 @@ Every backup is written to a temporary file in the destination directory. The de
 ```vbnet
 Dim progress As New Progress(Of Integer)(
     Sub(value) Debug.WriteLine($"Restore: {value}%"))
-Dim options As New MySqlRestoreOptions With {
-    .Progress = progress
-}
 Await mySqlService.Maintenance.ExecuteRestoreAsync(
     "C:\Backups\sample_database.sql",
-    options)
+    progress)
 ```
 
 The backup file must exist before restore begins.
 
-## Progress events
+## Progress reporting
 
-```vbnet
-AddHandler mySqlService.Maintenance.BackupProgressChanged,
-    Sub(sender, eventArgs)
-        Debug.WriteLine($"Backup: {eventArgs.ProgressPercentage}%")
-    End Sub
-AddHandler mySqlService.Maintenance.RestoreProgressChanged,
-    Sub(sender, eventArgs)
-        Debug.WriteLine($"Restore: {eventArgs.ProgressPercentage}%")
-    End Sub
-```
+Backup and restore receive an optional `IProgress(Of Integer)` directly in the operation call. Values range from 0 through 100.
 
-Asynchronous backup and restore events are raised from a worker thread. Marshal UI updates to the UI thread when required. `Progress(Of Integer)` normally captures the current synchronization context and is preferable for Windows Forms interfaces.
+`Progress(Of Integer)` normally captures the current synchronization context, making it convenient for Windows Forms interfaces without requiring temporary event subscriptions.
 
 ## Main classes
 
@@ -405,8 +393,8 @@ Asynchronous backup and restore events are raised from a worker thread. Marshal 
 | `MySqlProcedureParameter` | Defines input, output, input/output and return-value procedure parameters. |
 | `MySqlResponse` | Contains result sets, rows affected, inserted ID and output parameter values. |
 | `MySqlResultSet` | Contains unique column names and read-only rows for one result set. |
-| `MySqlBackupOptions` | Configures export content, progress, overwrite behavior and command timeout. |
-| `MySqlRestoreOptions` | Configures restore progress and command timeout. |
+| `MySqlBackupOptions` | Configures export content, progress interval, overwrite behavior and command timeout. |
+| `MySqlRestoreOptions` | Configures restore progress interval and command timeout. |
 | `MySqlCreateDatabaseOptions` | Configures database creation behavior, character set and collation. |
 
 ## Main request methods

@@ -4,8 +4,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>CoreSuite.MySqlService</AssemblyName>
 		<PackageId>CoreSuite.MySqlService</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Initial release with parameterized CRUD operations, structured selects, multiple result sets, stored procedure outputs, explicit transactions, cancellation, protected full-table mutations, database creation, atomic backup, restore and complete XML documentation.</PackageReleaseNotes>
+		<Version>2.0.0</Version>
+		<PackageReleaseNotes>Breaking change: replaced backup and restore progress events with IProgress(Of Integer) parameters. Progress is now scoped directly to each backup or restore operation, simplifying progress handling and preventing persistent event subscriptions. Updated backup and restore APIs and documentation accordingly.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite MySqlService</Title>

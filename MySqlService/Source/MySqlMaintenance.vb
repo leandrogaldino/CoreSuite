@@ -1,4 +1,3 @@
-Imports System.ComponentModel
 Imports System.Data
 Imports System.IO
 Imports System.Threading
@@ -8,14 +7,6 @@ Imports MySql.Data.MySqlClient
 ''' </summary>
 Public NotInheritable Class MySqlMaintenance
     Private ReadOnly _Client As MySqlClient
-    ''' <summary>
-    ''' Occurs when backup progress changes. Asynchronous operations raise this event from a worker thread.
-    ''' </summary>
-    Public Event BackupProgressChanged As EventHandler(Of ProgressChangedEventArgs)
-    ''' <summary>
-    ''' Occurs when restore progress changes. Asynchronous operations raise this event from a worker thread.
-    ''' </summary>
-    Public Event RestoreProgressChanged As EventHandler(Of ProgressChangedEventArgs)
     Friend Sub New(Client As MySqlClient)
         ArgumentNullException.ThrowIfNull(Client)
         _Client = Client
@@ -52,39 +43,81 @@ Public NotInheritable Class MySqlMaintenance
     ''' Exports the configured database to an atomically replaced SQL file.
     ''' </summary>
     ''' <param name="FilePath">The destination SQL file path.</param>
-    ''' <param name="Options">Optional export content, progress, overwrite, and timeout settings.</param>
+    ''' <param name="Options">Optional export content, overwrite, progress interval, and timeout settings.</param>
     Public Sub ExecuteBackup(FilePath As String, Optional Options As MySqlBackupOptions = Nothing)
-        ExecuteBackupCore(FilePath, ValidateBackupOptions(Options), CancellationToken.None)
+        ExecuteBackupCore(FilePath, ValidateBackupOptions(Options), Nothing, CancellationToken.None)
+    End Sub
+    ''' <summary>
+    ''' Exports the configured database to an atomically replaced SQL file and reports progress.
+    ''' </summary>
+    ''' <param name="FilePath">The destination SQL file path.</param>
+    ''' <param name="Progress">Progress receiver that receives values from 0 through 100.</param>
+    ''' <param name="Options">Optional export content, overwrite, progress interval, and timeout settings.</param>
+    Public Sub ExecuteBackup(FilePath As String, Progress As IProgress(Of Integer), Optional Options As MySqlBackupOptions = Nothing)
+        ExecuteBackupCore(FilePath, ValidateBackupOptions(Options), Progress, CancellationToken.None)
     End Sub
     ''' <summary>
     ''' Asynchronously exports the configured database to an atomically replaced SQL file without blocking the calling thread.
     ''' </summary>
     ''' <param name="FilePath">The destination SQL file path.</param>
-    ''' <param name="Options">Optional export content, progress, overwrite, and timeout settings.</param>
+    ''' <param name="Options">Optional export content, overwrite, progress interval, and timeout settings.</param>
     ''' <param name="CancellationToken">The token used to cancel the export.</param>
     ''' <returns>A task representing the backup operation.</returns>
     Public Function ExecuteBackupAsync(FilePath As String, Optional Options As MySqlBackupOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         Dim ActualOptions As MySqlBackupOptions = ValidateBackupOptions(Options)
-        Return Task.Run(Sub() ExecuteBackupCore(FilePath, ActualOptions, CancellationToken), CancellationToken)
+        Return Task.Run(Sub() ExecuteBackupCore(FilePath, ActualOptions, Nothing, CancellationToken), CancellationToken)
+    End Function
+    ''' <summary>
+    ''' Asynchronously exports the configured database to an atomically replaced SQL file, reports progress, and does not block the calling thread.
+    ''' </summary>
+    ''' <param name="FilePath">The destination SQL file path.</param>
+    ''' <param name="Progress">Progress receiver that receives values from 0 through 100.</param>
+    ''' <param name="Options">Optional export content, overwrite, progress interval, and timeout settings.</param>
+    ''' <param name="CancellationToken">The token used to cancel the export.</param>
+    ''' <returns>A task representing the backup operation.</returns>
+    Public Function ExecuteBackupAsync(FilePath As String, Progress As IProgress(Of Integer), Optional Options As MySqlBackupOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+        Dim ActualOptions As MySqlBackupOptions = ValidateBackupOptions(Options)
+        Return Task.Run(Sub() ExecuteBackupCore(FilePath, ActualOptions, Progress, CancellationToken), CancellationToken)
     End Function
     ''' <summary>
     ''' Imports a SQL backup file into the configured database.
     ''' </summary>
     ''' <param name="FilePath">The source SQL file path.</param>
-    ''' <param name="Options">Optional progress and timeout settings.</param>
+    ''' <param name="Options">Optional progress interval and timeout settings.</param>
     Public Sub ExecuteRestore(FilePath As String, Optional Options As MySqlRestoreOptions = Nothing)
-        ExecuteRestoreCore(FilePath, ValidateRestoreOptions(Options), CancellationToken.None)
+        ExecuteRestoreCore(FilePath, ValidateRestoreOptions(Options), Nothing, CancellationToken.None)
+    End Sub
+    ''' <summary>
+    ''' Imports a SQL backup file into the configured database and reports progress.
+    ''' </summary>
+    ''' <param name="FilePath">The source SQL file path.</param>
+    ''' <param name="Progress">Progress receiver that receives values from 0 through 100.</param>
+    ''' <param name="Options">Optional progress interval and timeout settings.</param>
+    Public Sub ExecuteRestore(FilePath As String, Progress As IProgress(Of Integer), Optional Options As MySqlRestoreOptions = Nothing)
+        ExecuteRestoreCore(FilePath, ValidateRestoreOptions(Options), Progress, CancellationToken.None)
     End Sub
     ''' <summary>
     ''' Asynchronously imports a SQL backup file without blocking the calling thread.
     ''' </summary>
     ''' <param name="FilePath">The source SQL file path.</param>
-    ''' <param name="Options">Optional progress and timeout settings.</param>
+    ''' <param name="Options">Optional progress interval and timeout settings.</param>
     ''' <param name="CancellationToken">The token used to cancel the import.</param>
     ''' <returns>A task representing the restore operation.</returns>
     Public Function ExecuteRestoreAsync(FilePath As String, Optional Options As MySqlRestoreOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
         Dim ActualOptions As MySqlRestoreOptions = ValidateRestoreOptions(Options)
-        Return Task.Run(Sub() ExecuteRestoreCore(FilePath, ActualOptions, CancellationToken), CancellationToken)
+        Return Task.Run(Sub() ExecuteRestoreCore(FilePath, ActualOptions, Nothing, CancellationToken), CancellationToken)
+    End Function
+    ''' <summary>
+    ''' Asynchronously imports a SQL backup file, reports progress, and does not block the calling thread.
+    ''' </summary>
+    ''' <param name="FilePath">The source SQL file path.</param>
+    ''' <param name="Progress">Progress receiver that receives values from 0 through 100.</param>
+    ''' <param name="Options">Optional progress interval and timeout settings.</param>
+    ''' <param name="CancellationToken">The token used to cancel the import.</param>
+    ''' <returns>A task representing the restore operation.</returns>
+    Public Function ExecuteRestoreAsync(FilePath As String, Progress As IProgress(Of Integer), Optional Options As MySqlRestoreOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+        Dim ActualOptions As MySqlRestoreOptions = ValidateRestoreOptions(Options)
+        Return Task.Run(Sub() ExecuteRestoreCore(FilePath, ActualOptions, Progress, CancellationToken), CancellationToken)
     End Function
     Private Function CreateDatabaseCommand(Connection As MySqlConnection, Options As MySqlCreateDatabaseOptions) As MySqlCommand
         Dim CharacterSet As String = ValidateSqlToken(Options.CharacterSet, NameOf(Options.CharacterSet))
@@ -95,7 +128,7 @@ Public NotInheritable Class MySqlMaintenance
         If Options.CommandTimeout.HasValue Then Command.CommandTimeout = Options.CommandTimeout.Value
         Return Command
     End Function
-    Private Sub ExecuteBackupCore(FilePath As String, Options As MySqlBackupOptions, CancellationToken As CancellationToken)
+    Private Sub ExecuteBackupCore(FilePath As String, Options As MySqlBackupOptions, Progress As IProgress(Of Integer), CancellationToken As CancellationToken)
         Dim TargetPath As String = PrepareBackupPath(FilePath, Options)
         Dim TemporaryPath As String = CreateTemporaryPath(TargetPath)
         Try
@@ -109,13 +142,13 @@ Public NotInheritable Class MySqlMaintenance
                         Backup.ExportInfo.ExportProcedures = Options.ExportProcedures
                         Backup.ExportInfo.ExportFunctions = Options.ExportFunctions
                         Backup.ExportInfo.ExportTriggers = Options.ExportTriggers
-                        Dim LastProgress As Integer = ReportBackupProgress(0, Options.Progress, -1)
-                        AddHandler Backup.ExportProgressChanged, Sub(sender, eventArgs) LastProgress = ReportBackupProgress(ClampPercentage(eventArgs.CurrentRowIndexInAllTables, eventArgs.TotalRowsInAllTables), Options.Progress, LastProgress)
+                        Dim LastProgress As Integer = ReportProgress(0, Progress, -1)
+                        AddHandler Backup.ExportProgressChanged, Sub(sender, eventArgs) LastProgress = ReportProgress(ClampPercentage(eventArgs.CurrentRowIndexInAllTables, eventArgs.TotalRowsInAllTables), Progress, LastProgress)
                         Using cancellationRegistration As CancellationTokenRegistration = CancellationToken.Register(Sub() CancelOperation(Backup, Connection))
                             Backup.ExportToFile(TemporaryPath)
                         End Using
                         CancellationToken.ThrowIfCancellationRequested()
-                        LastProgress = ReportBackupProgress(100, Options.Progress, LastProgress)
+                        LastProgress = ReportProgress(100, Progress, LastProgress)
                     End Using
                 End Using
             End Using
@@ -126,7 +159,7 @@ Public NotInheritable Class MySqlMaintenance
             TryDeleteFile(TemporaryPath)
         End Try
     End Sub
-    Private Sub ExecuteRestoreCore(FilePath As String, Options As MySqlRestoreOptions, CancellationToken As CancellationToken)
+    Private Sub ExecuteRestoreCore(FilePath As String, Options As MySqlRestoreOptions, Progress As IProgress(Of Integer), CancellationToken As CancellationToken)
         Dim FullPath As String = ValidateRestorePath(FilePath)
         Dim TotalBytes As Long = New FileInfo(FullPath).Length
         Try
@@ -137,13 +170,13 @@ Public NotInheritable Class MySqlMaintenance
                     If Options.CommandTimeout.HasValue Then Command.CommandTimeout = Options.CommandTimeout.Value
                     Using Backup As New MySqlBackup(Command)
                         Backup.ImportInfo.IntervalForProgressReport = Options.ProgressReportInterval
-                        Dim LastProgress As Integer = ReportRestoreProgress(0, Options.Progress, -1)
-                        AddHandler Backup.ImportProgressChanged, Sub(sender, eventArgs) LastProgress = ReportRestoreProgress(ClampPercentage(eventArgs.CurrentBytes, TotalBytes), Options.Progress, LastProgress)
+                        Dim LastProgress As Integer = ReportProgress(0, Progress, -1)
+                        AddHandler Backup.ImportProgressChanged, Sub(sender, eventArgs) LastProgress = ReportProgress(ClampPercentage(eventArgs.CurrentBytes, TotalBytes), Progress, LastProgress)
                         Using CancellationRegistration As CancellationTokenRegistration = CancellationToken.Register(Sub() CancelOperation(Backup, Connection))
                             Backup.ImportFromFile(FullPath)
                         End Using
                         CancellationToken.ThrowIfCancellationRequested()
-                        LastProgress = ReportRestoreProgress(100, Options.Progress, LastProgress)
+                        LastProgress = ReportProgress(100, Progress, LastProgress)
                     End Using
                 End Using
             End Using
@@ -216,15 +249,8 @@ Public NotInheritable Class MySqlMaintenance
         Catch ex As UnauthorizedAccessException
         End Try
     End Sub
-    Private Function ReportBackupProgress(Percentage As Integer, Progress As IProgress(Of Integer), LastProgress As Integer) As Integer
+    Private Shared Function ReportProgress(Percentage As Integer, Progress As IProgress(Of Integer), LastProgress As Integer) As Integer
         If Percentage = LastProgress Then Return LastProgress
-        RaiseEvent BackupProgressChanged(Me, New ProgressChangedEventArgs(Percentage, Nothing))
-        Progress?.Report(Percentage)
-        Return Percentage
-    End Function
-    Private Function ReportRestoreProgress(Percentage As Integer, Progress As IProgress(Of Integer), LastProgress As Integer) As Integer
-        If Percentage = LastProgress Then Return LastProgress
-        RaiseEvent RestoreProgressChanged(Me, New ProgressChangedEventArgs(Percentage, Nothing))
         Progress?.Report(Percentage)
         Return Percentage
     End Function
