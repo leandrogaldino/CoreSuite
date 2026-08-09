@@ -4,8 +4,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>CoreSuite.Helpers</AssemblyName>
 		<PackageId>CoreSuite.Helpers</PackageId>
-		<Version>1.0.2</Version>
-		<PackageReleaseNotes>Added enum parsing helpers, fallback conversion support and improved enum description lookup.</PackageReleaseNotes>
+		<Version>2.0.0</Version>
+		<PackageReleaseNotes>Corrected public API naming by replacing incorrectly spelled "Formated" method names with "Formatted". This release includes breaking API changes for consumers using the previous method names.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Helpers</Title>
@@ -21,7 +21,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+		<PackageOutputPath>..\artifacts\packages\</PackageOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Update="README.md" Pack="true" PackagePath="\" />

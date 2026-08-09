@@ -71,7 +71,7 @@ Imports CoreSuite.Helpers
 
 ```vb
 Imports CoreSuite.Helpers
-Dim Cep As String = BrazilianFormatHelper.GetFormatedZipCode("12345678")
+Dim Cep As String = BrazilianFormatHelper.GetFormattedZipCode("12345678")
 Dim IsCpfValid As Boolean = BrazilianFormatHelper.IsValidNaturalEntityDocument("52998224725")
 Dim BrasiliaNow As Date = DateTimeHelper.Now()
 Dim ClosestValue As Decimal = MathHelper.ApproximateValue({10D, 20D, 30D}, 24D)
@@ -125,17 +125,17 @@ The method returns `Nothing` when the member exists but does not contain the req
 `BrazilianFormatHelper` contains formatting and validation methods for common Brazilian values.
 
 > [!IMPORTANT]
-> Formatting and validation are separate operations. `GetFormatedDocument` applies a CPF or CNPJ mask based on length, but it does not validate check digits. Use the corresponding validation method when authenticity must also be checked.
+> Formatting and validation are separate operations. `GetFormattedDocument` applies a CPF or CNPJ mask based on length, but it does not validate check digits. Use the corresponding validation method when authenticity must also be checked.
 
 > [!NOTE]
-> The public method names use the spelling `GetFormated...` with one `t`. This README preserves the current API names exactly.
+> The public method names use the spelling `GetFormatted...` with one `t`. This README preserves the current API names exactly.
 
 ### CEP
 
 #### Format a CEP
 
 ```vb
-Dim FormattedCep As String = BrazilianFormatHelper.GetFormatedZipCode("12345678")
+Dim FormattedCep As String = BrazilianFormatHelper.GetFormattedZipCode("12345678")
 ```
 
 Current output format:
@@ -174,9 +174,9 @@ Supported values:
 #### Format a phone number
 
 ```vb
-Dim Mobile As String = BrazilianFormatHelper.GetFormatedPhoneNumber("11987654321")
-Dim Landline As String = BrazilianFormatHelper.GetFormatedPhoneNumber("1134567890")
-Dim Service As String = BrazilianFormatHelper.GetFormatedPhoneNumber("08001234567")
+Dim Mobile As String = BrazilianFormatHelper.GetFormattedPhoneNumber("11987654321")
+Dim Landline As String = BrazilianFormatHelper.GetFormattedPhoneNumber("1134567890")
+Dim Service As String = BrazilianFormatHelper.GetFormattedPhoneNumber("08001234567")
 ```
 
 Typical results:
@@ -194,8 +194,8 @@ Unsupported values are returned in normalized form, with parentheses, hyphens, a
 #### Apply a document mask
 
 ```vb
-Dim Cpf As String = BrazilianFormatHelper.GetFormatedDocument("52998224725")
-Dim Cnpj As String = BrazilianFormatHelper.GetFormatedDocument("11222333000181")
+Dim Cpf As String = BrazilianFormatHelper.GetFormattedDocument("52998224725")
+Dim Cnpj As String = BrazilianFormatHelper.GetFormattedDocument("11222333000181")
 ```
 
 Typical results:

@@ -12,7 +12,7 @@ Public Class BrazilianFormatHelper
     ''' </summary>
     ''' <param name="ZipCode">The ZIP code value.</param>
     ''' <returns>The formatted ZIP code.</returns>
-    Public Shared Function GetFormatedZipCode(ZipCode As String) As String
+    Public Shared Function GetFormattedZipCode(ZipCode As String) As String
         Dim CleanZipCode As String = ZipCode.Replace(".", Nothing).Replace("-", Nothing).Replace(" ", Nothing)
         If IsValidZipCode(CleanZipCode) Then
             Return String.Format("{0}.{1}-{2}", Mid(CleanZipCode, 1, 2), Mid(CleanZipCode, 3, 3), Mid(CleanZipCode, 6, 3))
@@ -38,7 +38,7 @@ Public Class BrazilianFormatHelper
     ''' </summary>
     ''' <param name="PhoneNumber">The phone number value.</param>
     ''' <returns>The formatted phone number.</returns>
-    Public Shared Function GetFormatedPhoneNumber(PhoneNumber As String) As String
+    Public Shared Function GetFormattedPhoneNumber(PhoneNumber As String) As String
         Dim Phone As String = PhoneNumber.Replace("(", Nothing).Replace(")", Nothing).Replace("-", Nothing).Replace(" ", Nothing)
         Dim SpecialPhones As New List(Of String) From {
                                                             "0300", "0500", "0800", "0900"
@@ -132,7 +132,7 @@ Public Class BrazilianFormatHelper
     ''' </summary>
     ''' <param name="Document">The document value.</param>
     ''' <returns>The formatted document.</returns>
-    Public Shared Function GetFormatedDocument(Document As String) As String
+    Public Shared Function GetFormattedDocument(Document As String) As String
         Dim CleanDocument As String = Document.Replace(".", "").Replace("-", "").Replace("/", "")
         If IsNumeric(CleanDocument) Then
             If CleanDocument.Length = 14 Then
@@ -170,21 +170,21 @@ Public Class BrazilianFormatHelper
         Dim Sum As Integer
         Dim Result1 As Integer
         Dim Result2 As Integer
-        Dim FormatedDocument As String = GetFormatedDocument(Document)
-        If IsNumeric(FormatedDocument.Replace(".", "").Replace("-", "").Replace("/", "")) Then
-            If FormatedDocument.Length = 18 Then
+        Dim FormattedDocument As String = GetFormattedDocument(Document)
+        If IsNumeric(FormattedDocument.Replace(".", "").Replace("-", "").Replace("/", "")) Then
+            If FormattedDocument.Length = 18 Then
                 DadosArray = {"111.111.111-11", "222.222.222-22", "333.333.333-33", "444.444.444-44",
                                       "555.555.555-55", "666.666.666-66", "777.777.777-77", "888.888.888-88", "999.999.999-99"}
-                FormatedDocument = Trim(FormatedDocument)
+                FormattedDocument = Trim(FormattedDocument)
                 For i = 0 To DadosArray.Length - 1
-                    If FormatedDocument.Length <> 18 Or DadosArray(i).Equals(FormatedDocument) Then
+                    If FormattedDocument.Length <> 18 Or DadosArray(i).Equals(FormattedDocument) Then
                         Return False
                     End If
                 Next
-                FormatedDocument = FormatedDocument.Substring(0, 2) + FormatedDocument.Substring(3, 3) + FormatedDocument.Substring(7, 3) + FormatedDocument.Substring(11, 4) + FormatedDocument.Substring(16)
-                If FormatedDocument = "00000000000000" Then Return False
+                FormattedDocument = FormattedDocument.Substring(0, 2) + FormattedDocument.Substring(3, 3) + FormattedDocument.Substring(7, 3) + FormattedDocument.Substring(11, 4) + FormattedDocument.Substring(16)
+                If FormattedDocument = "00000000000000" Then Return False
                 For i = 0 To Number.Length - 1
-                    Number(i) = CInt(FormatedDocument.Substring(i, 1))
+                    Number(i) = CInt(FormattedDocument.Substring(i, 1))
                 Next
                 Sum = Number(0) * 5 + Number(1) * 4 + Number(2) * 3 + Number(3) * 2 + Number(4) * 9 + Number(5) * 8 + Number(6) * 7 +
                        Number(7) * 6 + Number(8) * 5 + Number(9) * 4 + Number(10) * 3 + Number(11) * 2
@@ -230,26 +230,26 @@ Public Class BrazilianFormatHelper
         Dim DadosArray() As String
         Dim N1, N2 As Integer
         Dim Number(13) As Integer
-        Dim FormatedDocument As String = GetFormatedDocument(Document)
-        If FormatedDocument.Length = 14 Then
+        Dim FormattedDocument As String = GetFormattedDocument(Document)
+        If FormattedDocument.Length = 14 Then
             DadosArray = {"111.111.111-11", "222.222.222-22", "333.333.333-33", "444.444.444-44",
                                   "555.555.555-55", "666.666.666-66", "777.777.777-77", "888.888.888-88", "999.999.999-99"}
-            FormatedDocument = Trim(FormatedDocument)
+            FormattedDocument = Trim(FormattedDocument)
             For i = 0 To DadosArray.Length - 1
-                If FormatedDocument.Length <> 14 Or DadosArray(i).Equals(FormatedDocument) Then
+                If FormattedDocument.Length <> 14 Or DadosArray(i).Equals(FormattedDocument) Then
                     Return False
                 End If
             Next
-            FormatedDocument = FormatedDocument.Replace(".", Nothing).Replace("-", Nothing).Replace("/", Nothing)
-            If FormatedDocument = "00000000000" Then Return False
+            FormattedDocument = FormattedDocument.Replace(".", Nothing).Replace("-", Nothing).Replace("/", Nothing)
+            If FormattedDocument = "00000000000" Then Return False
             For x = 0 To 1
                 N1 = 0
                 For i = 0 To 8 + x
-                    N1 += Val(FormatedDocument.Substring(i, 1)) * (10 + x - i)
+                    N1 += Val(FormattedDocument.Substring(i, 1)) * (10 + x - i)
                 Next
                 N2 = 11 - (N1 - (Int(N1 / 11) * 11))
                 If N2 = 10 Or N2 = 11 Then N2 = 0
-                If N2 <> Val(FormatedDocument.Substring(9 + x, 1)) Then
+                If N2 <> Val(FormattedDocument.Substring(9 + x, 1)) Then
                     Return False
                 End If
             Next
