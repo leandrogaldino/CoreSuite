@@ -47,7 +47,7 @@ Public Class CMessageBoxOptions
     ''' This collection can be used to attach custom contextual data to error reports,
     ''' helping with troubleshooting and diagnostics.
     ''' </remarks>
-    Public Property AdditionalInformations As Dictionary(Of String, Object)
+    Public Property AdditionalInformations As New Dictionary(Of String, Object)
 
     ''' <summary>
     ''' Gets or sets the image displayed for error messages.
