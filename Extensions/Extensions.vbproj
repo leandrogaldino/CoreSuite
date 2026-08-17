@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<RootNamespace>CoreSuite.Extensions</RootNamespace>
+		<RootNamespace>CoreSuite</RootNamespace>
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>CoreSuite.Extensions</AssemblyName>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.Extensions</PackageId>
-		<Version>1.0.0</Version>
+		<Version>2.0.0</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Extensions</Title>
@@ -18,7 +18,7 @@
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/Extensions</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageReleaseNotes>Initial release of the collection and string utilities.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix namespace.</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
