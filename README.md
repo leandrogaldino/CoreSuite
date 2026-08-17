@@ -63,6 +63,7 @@ These projects target `.NET 8 for Windows` and can be installed separately accor
 
 | Project | Description |
 |---|---|
+| [CoreSuite.ActionTextBox](./ActionTextBox/) | Extends a standard text box with a configurable embedded action button, customizable image, positioning, spacing, tooltip, enabled state, and click handling. |
 | [CoreSuite.AnimatedBox](./AnimatedBox/) | Displays frame-based animations loaded from image collections or GIF files with configurable scaling. |
 | [CoreSuite.AsyncLookupBox](./AsyncLookupBox/) | Performs asynchronous lookups and presents selectable results while retaining the selected value and related data. |
 | [CoreSuite.CentralizedComboBox](./CentralizedComboBox/) | Centralizes and synchronizes reusable data sources and selection behavior across Windows Forms combo boxes. |
