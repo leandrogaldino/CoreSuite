@@ -57,6 +57,7 @@ on:
           - Separator
           - SplitButton
           - TextBoxActionPanel
+          - TileView
           - TimeBox
           - ToolStripCheckBox
           - ValidationProvider

@@ -94,6 +94,7 @@ These projects target `.NET 8 for Windows` and can be installed separately accor
 | [CoreSuite.Separator](./Separator/) | Provides a lightweight horizontal or vertical visual divider with configurable color and thickness. |
 | [CoreSuite.SplitButton](./SplitButton/) | Combines a standard button action with a separate drop-down menu area. |
 | [CoreSuite.TextBoxActionPanel](./TextBoxActionPanel/) | Attaches a configurable floating image-action panel to an existing `TextBoxBase` control. |
+| [CoreSuite.TileView](./TileView/) | Provides a designer-friendly tile-based list with selection, keyboard navigation, filtering, activation events, and reusable UserControl-based tile items. |
 | [CoreSuite.TimeBox](./TimeBox/) | Provides culture-aware masked time input with an integrated time-selection drop-down. |
 | [CoreSuite.ToolStripCheckBox](./ToolStripCheckBox/) | Hosts a standard check box inside a `ToolStrip`, `MenuStrip`, or compatible strip. |
 | [CoreSuite.ValidationProvider](./ValidationProvider/) | Adds reusable control validation, custom validation logic, messages, and validation-state management to Windows Forms. |

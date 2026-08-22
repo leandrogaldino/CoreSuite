@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Controls</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<PackageId>CoreSuite.TileView</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite TileView</Title>
+		<Description>Reusable WinForms tile list and grid control with designer-editable UserControl items, single selection, keyboard navigation, activation, filtering and native-style appearance.</Description>
+		<PackageTags>coresuite;winforms;tile;list;grid;flowlayoutpanel;usercontrol;selection;designer;vbnet;dotnet</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>Initial release with designer-editable TileViewItem controls, centralized single selection, keyboard and spatial navigation, item activation, filtering, bulk item creation and native-style Windows Forms behavior.</PackageReleaseNotes>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>
