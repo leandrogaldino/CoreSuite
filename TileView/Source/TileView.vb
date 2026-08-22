@@ -381,7 +381,12 @@ Public Class TileView
         _UpdateCount -= 1
         If _UpdateCount = 0 Then
             ResumeLayout(True)
-            Invalidate()
+            If _AutoSelectFirst AndAlso _SelectedItem Is Nothing Then
+                Dim item = GetNavigableItems().FirstOrDefault()
+                If item IsNot Nothing Then SelectItem(item)
+            End If
+            Invalidate(True)
+            Update()
         End If
     End Sub
     ''' <summary>
@@ -513,14 +518,14 @@ Public Class TileView
     ''' </summary>
     Protected Overrides Sub OnControlAdded(e As ControlEventArgs)
         MyBase.OnControlAdded(e)
-        Dim Item = TryCast(e.Control, TileViewItem)
-        If Item Is Nothing Then Return
-        If Item.OwnerView IsNot Nothing AndAlso Item.OwnerView IsNot Me Then Throw New InvalidOperationException("A TileViewItem cannot belong to more than one TileView.")
-        Item.SetOwner(Me)
-        AddHandler Item.Click, AddressOf HostedItem_Click
-        AddHandler Item.DoubleClick, AddressOf HostedItem_DoubleClick
-        RaiseEvent ItemAdded(Me, New TileViewItemEventArgs(Item))
-        If _AutoSelectFirst AndAlso _SelectedItem Is Nothing AndAlso Item.Visible AndAlso Item.Enabled Then SelectItem(Item)
+        Dim item = TryCast(e.Control, TileViewItem)
+        If item Is Nothing Then Return
+        If item.OwnerView IsNot Nothing AndAlso item.OwnerView IsNot Me Then Throw New InvalidOperationException("A TileViewItem cannot belong to more than one TileView.")
+        item.SetOwner(Me)
+        AddHandler item.Click, AddressOf HostedItem_Click
+        AddHandler item.DoubleClick, AddressOf HostedItem_DoubleClick
+        RaiseEvent ItemAdded(Me, New TileViewItemEventArgs(item))
+        If _UpdateCount = 0 AndAlso _AutoSelectFirst AndAlso _SelectedItem Is Nothing AndAlso item.Visible AndAlso item.Enabled Then SelectItem(item)
     End Sub
     ''' <summary>
     ''' Detaches tile behavior and clears selection when the selected item is removed.

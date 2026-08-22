@@ -9,6 +9,7 @@
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.TileView</PackageId>
 		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Fixed TileViewItem border rendering by preventing the native BorderStyle from overriding the control's custom normal and selected borders.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite TileView</Title>
@@ -16,8 +17,7 @@
 		<PackageTags>coresuite;winforms;tile;list;grid;flowlayoutpanel;usercontrol;selection;designer;vbnet;dotnet</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Fixed delayed selection border rendering so the selected tile is visually updated immediately after selection.</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>		
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>

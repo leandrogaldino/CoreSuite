@@ -71,6 +71,22 @@ Public Class TileViewItem
     <Category("Action"), Description("Occurs when the item is activated by the owning TileView.")>
     Public Event Activated As EventHandler
     ''' <summary>
+    ''' Gets the native Windows Forms border style used by the control.
+    ''' </summary>
+    ''' <remarks>
+    ''' TileViewItem manages its own borders through BorderColor, BorderWidth,
+    ''' SelectedBorderColor and SelectedBorderWidth.
+    ''' </remarks>
+    <Browsable(False), EditorBrowsable(EditorBrowsableState.Never), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
+    Public Shadows Property BorderStyle As BorderStyle
+        Get
+            Return MyBase.BorderStyle
+        End Get
+        Set(value As BorderStyle)
+            MyBase.BorderStyle = BorderStyle.None
+        End Set
+    End Property
+    ''' <summary>
     ''' Gets a value indicating whether the item is currently selected.
     ''' </summary>
     <Browsable(False), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
