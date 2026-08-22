@@ -215,7 +215,7 @@ Public Class TileViewItem
     Friend Sub SetSelectedInternal(value As Boolean)
         If _IsSelected = value Then Return
         _IsSelected = value
-        Invalidate()
+        Refresh()
     End Sub
     ''' <summary>
     ''' Raises the <see cref="Activated"/> event.

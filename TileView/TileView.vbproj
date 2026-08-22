@@ -8,7 +8,7 @@
 		<OptionInfer>On</OptionInfer>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.TileView</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite TileView</Title>
@@ -17,7 +17,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Initial release with designer-editable TileViewItem controls, centralized single selection, keyboard and spatial navigation, item activation, filtering, bulk item creation and native-style Windows Forms behavior.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fixed delayed selection border rendering so the selected tile is visually updated immediately after selection.</PackageReleaseNotes>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>
