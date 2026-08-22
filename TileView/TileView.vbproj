@@ -8,7 +8,7 @@
 		<OptionInfer>On</OptionInfer>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.TileView</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<PackageReleaseNotes>Fixed TileViewItem border rendering by preventing the native BorderStyle from overriding the control's custom normal and selected borders.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
