@@ -8,8 +8,8 @@
 		<OptionInfer>On</OptionInfer>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.StatusSelector</PackageId>
-		<Version>1.0.2</Version>
-		<PackageReleaseNotes>Fixed StatusSelector display style behavior so new controls default to text-only mode while still allowing Image and ImageAndText after creation, preserving the native ToolStrip default image when switching to image display mode.</PackageReleaseNotes>
+		<Version>1.0.3</Version>
+		<PackageReleaseNotes>Fixed runtime rendering for hover colors, hover border, selection indicator appearance, and BackColor persistence, while preserving existing StatusSelector behavior.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite StatusSelector</Title>

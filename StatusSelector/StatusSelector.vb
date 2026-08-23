@@ -12,6 +12,7 @@ Imports System.Windows.Forms
 Public Class StatusSelector
     Inherits ToolStripDropDownButton
     Private ReadOnly _Items As StatusSelectorItemCollection
+    Private ReadOnly _DropDownMenu As ToolStripDropDownMenu
     Private _SelectedItem As StatusSelectorItem
     Private _MenuBackColor As Color = Color.White
     Private _MenuBorderColor As Color = Color.FromArgb(210, 210, 210)
@@ -27,13 +28,15 @@ Public Class StatusSelector
     Private _UnselectedText As String = "Select..."
     Private _UnselectedForeColor As Color = SystemColors.ControlText
     Private _UnselectedBackColor As Color = Color.Empty
-    Private _MenuItemPadding As New Padding(6, 4, 6, 4)
-    Private _MenuPadding As New Padding(2)
+    Private _MenuItemPadding As Padding = Padding.Empty
+    Private _MenuPadding As Padding = Padding.Empty
     Private _MenuMinimumWidth As Integer
     Private _AutoSizeDropDownWidth As Boolean = True
     Private _MenuRoundedEdges As Boolean
     Private _ItemsUpdateCount As Integer
     Private _IgnoreInitialDesignerImageDisplayStyle As Boolean = True
+    Private _DefaultImage As Image
+    Private _ConfiguredBackColor As Color = Color.Empty
     ''' <summary>
     ''' Gets the default display style used by the selector.
     ''' </summary>
@@ -49,9 +52,9 @@ Public Class StatusSelector
     ''' Gets or sets how the selector displays its text and image.
     ''' </summary>
     ''' <remarks>
-    ''' Image-only display is normalized to text-only display because a status selector must keep its current state visible. Images can still be displayed together with text by using <see cref="ToolStripItemDisplayStyle.ImageAndText"/>.
+    ''' New selectors default to <see cref="ToolStripItemDisplayStyle.Text"/>, while all native display styles remain available after creation.
     ''' </remarks>
-    <Category("Appearance"), Description("Specifies whether the selector displays text only or text together with an image."), DefaultValue(ToolStripItemDisplayStyle.Text)>
+    <Category("Appearance"), Description("Specifies whether the selector displays text, an image, or both."), DefaultValue(ToolStripItemDisplayStyle.Text)>
     Public Overrides Property DisplayStyle As ToolStripItemDisplayStyle
         Get
             Return MyBase.DisplayStyle
@@ -70,6 +73,38 @@ Public Class StatusSelector
 
             _IgnoreInitialDesignerImageDisplayStyle = False
             MyBase.DisplayStyle = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' Gets or sets the image configured for the selector itself.
+    ''' </summary>
+    ''' <remarks>
+    ''' The configured image is preserved separately from any image temporarily displayed by the selected status item.
+    ''' </remarks>
+    <Category("Appearance")>
+    Public Overrides Property Image As Image
+        Get
+            Return MyBase.Image
+        End Get
+        Set(value As Image)
+            _DefaultImage = value
+            If _SelectedItem Is Nothing OrElse _SelectedItem.Image Is Nothing Then MyBase.Image = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' Gets or sets the selector background color used when no StatusSelector-specific background override is active.
+    ''' </summary>
+    ''' <remarks>
+    ''' The configured value is preserved even while <see cref="UnselectedBackColor"/> or a selected item's background color is temporarily displayed.
+    ''' </remarks>
+    <Category("Appearance")>
+    Public Overrides Property BackColor As Color
+        Get
+            Return MyBase.BackColor
+        End Get
+        Set(value As Color)
+            _ConfiguredBackColor = value
+            ApplyButtonBackColor()
         End Set
     End Property
     ''' <summary>
@@ -107,12 +142,13 @@ Public Class StatusSelector
     ''' </summary>
     Public Sub New()
         _Items = New StatusSelectorItemCollection(Me)
+        _DropDownMenu = New ToolStripDropDownMenu()
+        DropDown = _DropDownMenu
         MyBase.DisplayStyle = ToolStripItemDisplayStyle.Text
-        MyBase.Image = Nothing
         Text = _UnselectedText
         ForeColor = _UnselectedForeColor
-        DropDown.BackColor = _MenuBackColor
         ApplyMenuAppearance()
+        ApplyButtonBackColor()
     End Sub
 
     ''' <summary>
@@ -310,7 +346,7 @@ Public Class StatusSelector
         Set(value As Boolean)
             If _ShowSelectedCheckMark = value Then Return
             _ShowSelectedCheckMark = value
-            ApplyMenuAppearance()
+            UpdateMenuSelection()
         End Set
     End Property
     ''' <summary>
@@ -566,6 +602,13 @@ Public Class StatusSelector
         MyBase.OnDropDownShow(e)
     End Sub
     ''' <summary>
+    ''' Releases the dropdown menu created and owned by the selector.
+    ''' </summary>
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        MyBase.Dispose(disposing)
+        If disposing Then _DropDownMenu?.Dispose()
+    End Sub
+    ''' <summary>
     ''' Rebuilds the underlying dropdown menu from the current status item collection.
     ''' </summary>
     Private Sub RebuildDropDown()
@@ -580,9 +623,9 @@ Public Class StatusSelector
                 .Visible = StatusItem.Visible,
                 .Image = StatusItem.Image,
                 .ToolTipText = StatusItem.ToolTipText,
-                .Checked = ReferenceEquals(StatusItem, _SelectedItem),
-                .Padding = _MenuItemPadding
+                .Checked = _ShowSelectedCheckMark AndAlso ReferenceEquals(StatusItem, _SelectedItem)
             }
+            If _MenuItemPadding <> Padding.Empty Then MenuItem.Padding = _MenuItemPadding
             If StatusItem.Font IsNot Nothing Then MenuItem.Font = StatusItem.Font
             AddHandler MenuItem.Click, AddressOf MenuItem_Click
             DropDownItems.Add(MenuItem)
@@ -600,9 +643,10 @@ Public Class StatusSelector
         DropDown.Renderer = New StatusSelectorRenderer(Me)
         Dim Menu = TryCast(DropDown, ToolStripDropDownMenu)
         If Menu IsNot Nothing Then
-            Menu.ShowCheckMargin = _ShowSelectedCheckMark
-            Menu.ShowImageMargin = _Items.Any(Function(StatusItem) StatusItem.Image IsNot Nothing)
+            Menu.ShowCheckMargin = False
+            Menu.ShowImageMargin = True
         End If
+        UpdateMenuSelection()
         UpdateDropDownSize()
         DropDown.Invalidate()
     End Sub
@@ -610,17 +654,10 @@ Public Class StatusSelector
     ''' Updates the dropdown width according to its current items and layout configuration.
     ''' </summary>
     Private Sub UpdateDropDownSize()
-        If IsDisposed OrElse DropDownItems.Count = 0 Then Return
-        Dim DesiredWidth = _MenuMinimumWidth
-        If _AutoSizeDropDownWidth Then
-            For Each ToolItem As ToolStripItem In DropDownItems
-                If Not ToolItem.Available Then Continue For
-                DesiredWidth = Math.Max(DesiredWidth, ToolItem.GetPreferredSize(Size.Empty).Width + DropDown.Padding.Horizontal + 8)
-            Next
-            DesiredWidth = Math.Max(DesiredWidth, Width)
-        End If
-        If DesiredWidth > 0 Then
-            DropDown.MinimumSize = New Size(DesiredWidth, 0)
+        If IsDisposed Then Return
+        DropDown.AutoSize = _AutoSizeDropDownWidth
+        If _MenuMinimumWidth > 0 Then
+            DropDown.MinimumSize = New Size(_MenuMinimumWidth, 0)
         Else
             DropDown.MinimumSize = Size.Empty
         End If
@@ -648,7 +685,7 @@ Public Class StatusSelector
             Dim MenuItem = TryCast(ToolItem, ToolStripMenuItem)
             Dim StatusItem = TryCast(MenuItem?.Tag, StatusSelectorItem)
             If MenuItem Is Nothing OrElse StatusItem Is Nothing Then Continue For
-            MenuItem.Checked = ReferenceEquals(StatusItem, _SelectedItem)
+            MenuItem.Checked = _ShowSelectedCheckMark AndAlso ReferenceEquals(StatusItem, _SelectedItem)
         Next
         DropDown.Invalidate()
     End Sub
@@ -659,16 +696,28 @@ Public Class StatusSelector
         If _SelectedItem Is Nothing Then
             Text = _UnselectedText
             ForeColor = _UnselectedForeColor
-            BackColor = _UnselectedBackColor
-            Image = Nothing
+            ApplyButtonBackColor()
+            MyBase.Image = _DefaultImage
             ToolTipText = String.Empty
             Return
         End If
         Text = _SelectedItem.Text
         ForeColor = If(_UseSelectedItemForeColor, _SelectedItem.ForeColor, _UnselectedForeColor)
-        BackColor = If(_UseSelectedItemBackColor AndAlso _SelectedItem.BackColor <> Color.Empty, _SelectedItem.BackColor, _UnselectedBackColor)
-        Image = _SelectedItem.Image
+        ApplyButtonBackColor()
+        MyBase.Image = If(_SelectedItem.Image, _DefaultImage)
         ToolTipText = _SelectedItem.ToolTipText
+    End Sub
+    ''' <summary>
+    ''' Applies the effective selector button background color without overwriting the configured inherited <see cref="BackColor"/> value.
+    ''' </summary>
+    Private Sub ApplyButtonBackColor()
+        If _SelectedItem IsNot Nothing AndAlso _UseSelectedItemBackColor AndAlso _SelectedItem.BackColor <> Color.Empty Then
+            MyBase.BackColor = _SelectedItem.BackColor
+        ElseIf _UnselectedBackColor <> Color.Empty Then
+            MyBase.BackColor = _UnselectedBackColor
+        Else
+            MyBase.BackColor = _ConfiguredBackColor
+        End If
     End Sub
     ''' <summary>
     ''' Resolves the effective background color for a status item.
