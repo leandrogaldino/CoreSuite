@@ -131,6 +131,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ActionTextBox", "ActionText
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TileView", "TileView\TileView.vbproj", "{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "StatusSelector", "StatusSelector\StatusSelector.vbproj", "{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -353,6 +355,10 @@ Global
 		{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -417,6 +423,7 @@ Global
 		{08F16169-0BE8-D3C8-4EA8-81EF8D88BDBF} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 		{133E9A8B-AD52-4ECA-9E6C-9882AEE06D41} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 		{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
+		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9D22103-398C-42E5-8401-284AD9ECDDC3}
