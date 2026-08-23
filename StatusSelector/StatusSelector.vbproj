@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>CoreSuite.Controls</RootNamespace>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -8,7 +8,8 @@
     <OptionInfer>On</OptionInfer>
     <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
     <PackageId>CoreSuite.StatusSelector</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
+	<PackageReleaseNotes>Fixed default image metadata, collection item naming conflicts, dropdown display override compatibility, and default selector rendering so the control now starts in text-only mode while preserving optional image support.</PackageReleaseNotes>	  
     <Authors>Leandro Galdino</Authors>
     <Company>CoreSuite</Company>
     <Title>CoreSuite StatusSelector</Title>
@@ -17,7 +18,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Initial release with arbitrary status values, per-item colors, customizable menu and hover appearance, selection indicators, images, tooltips and selected-value events.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
     <PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>
