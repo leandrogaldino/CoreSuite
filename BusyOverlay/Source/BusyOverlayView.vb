@@ -1,5 +1,6 @@
 Imports System.ComponentModel
 Imports System.Drawing.Drawing2D
+
 ''' <summary>
 ''' Represents the run-time surface used internally to block and paint over the configured target.
 ''' </summary>
@@ -7,16 +8,21 @@ Imports System.Drawing.Drawing2D
 <ToolboxItem(False)>
 Friend NotInheritable Class BusyOverlayView
     Inherits Control
+
     Private Const OuterMargin As Integer = 12
+    Private Const BaseAnimationInterval As Double = 75.0R
+
     Private ReadOnly _Owner As BusyOverlay
     Private ReadOnly _AnimationTimer As System.Windows.Forms.Timer
     Private ReadOnly _CancelButton As Button
     Private _Snapshot As Bitmap
-    Private _AnimationFrame As Integer
+    Private _AnimationFrame As Double
+
     ''' <summary>
     ''' Occurs when the internal cancellation button is selected.
     ''' </summary>
     Friend Event CancellationClick As EventHandler
+
     ''' <summary>
     ''' Initializes a new view owned by the specified component.
     ''' </summary>
@@ -26,15 +32,26 @@ Friend NotInheritable Class BusyOverlayView
         _Owner = Owner
         _AnimationTimer = New System.Windows.Forms.Timer()
         AddHandler _AnimationTimer.Tick, AddressOf AnimationTimer_Tick
-        _CancelButton = New Button With {.FlatStyle = FlatStyle.System, .TabStop = False, .UseVisualStyleBackColor = True, .Visible = False}
+        _CancelButton = New Button With {
+            .FlatStyle = FlatStyle.System,
+            .TabStop = False,
+            .UseVisualStyleBackColor = True,
+            .Visible = False
+        }
         AddHandler _CancelButton.Click, AddressOf CancelButton_Click
-        SetStyle(ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.SupportsTransparentBackColor Or ControlStyles.Selectable, True)
+        SetStyle(ControlStyles.UserPaint Or
+                 ControlStyles.AllPaintingInWmPaint Or
+                 ControlStyles.OptimizedDoubleBuffer Or
+                 ControlStyles.ResizeRedraw Or
+                 ControlStyles.SupportsTransparentBackColor Or
+                 ControlStyles.Selectable, True)
         BackColor = Color.Transparent
         TabStop = False
         AccessibleRole = AccessibleRole.Pane
         Controls.Add(_CancelButton)
         Visible = False
     End Sub
+
     ''' <summary>
     ''' Applies the owner's current settings and refreshes layout and animation.
     ''' </summary>
@@ -52,6 +69,7 @@ Friend NotInheritable Class BusyOverlayView
         PerformLayout()
         Invalidate()
     End Sub
+
     ''' <summary>
     ''' Replaces the visual snapshot drawn beneath the overlay tint.
     ''' </summary>
@@ -61,6 +79,7 @@ Friend NotInheritable Class BusyOverlayView
         _Snapshot = Snapshot
         Invalidate()
     End Sub
+
     ''' <summary>
     ''' Releases the current target snapshot.
     ''' </summary>
@@ -70,6 +89,7 @@ Friend NotInheritable Class BusyOverlayView
         _Snapshot = Nothing
         Invalidate()
     End Sub
+
     ''' <summary>
     ''' Releases the timer, button subscriptions, and captured target image.
     ''' </summary>
@@ -84,6 +104,7 @@ Friend NotInheritable Class BusyOverlayView
         End If
         MyBase.Dispose(Disposing)
     End Sub
+
     ''' <summary>
     ''' Updates animation when the surface becomes visible or hidden.
     ''' </summary>
@@ -92,15 +113,17 @@ Friend NotInheritable Class BusyOverlayView
         MyBase.OnVisibleChanged(e)
         UpdateAnimationState()
     End Sub
+
     ''' <summary>
     ''' Positions the cancellation button in the calculated content layout.
     ''' </summary>
     ''' <param name="Levent">The layout event data.</param>
     Protected Overrides Sub OnLayout(Levent As LayoutEventArgs)
         MyBase.OnLayout(Levent)
-        Dim layout As OverlayLayout = CalculateLayout()
-        If layout.HasCancelButton Then _CancelButton.Bounds = layout.CancelButtonBounds
+        Dim Layout As OverlayLayout = CalculateLayout()
+        If Layout.HasCancelButton Then _CancelButton.Bounds = Layout.CancelButtonBounds
     End Sub
+
     ''' <summary>
     ''' Draws the target snapshot, overlay tint, centered content, and current indicator.
     ''' </summary>
@@ -109,23 +132,68 @@ Friend NotInheritable Class BusyOverlayView
         MyBase.OnPaint(e)
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
         e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality
-        If _Snapshot IsNot Nothing Then e.Graphics.DrawImage(_Snapshot, ClientRectangle)
-        Using overlayBrush As New SolidBrush(Color.FromArgb(_Owner.OverlayOpacity, _Owner.OverlayColor))
-            e.Graphics.FillRectangle(overlayBrush, ClientRectangle)
+
+        If _Snapshot IsNot Nothing Then
+            e.Graphics.DrawImage(_Snapshot, ClientRectangle)
+        End If
+
+        Using OverlayBrush As New SolidBrush(Color.FromArgb(_Owner.OverlayOpacity, _Owner.OverlayColor))
+            e.Graphics.FillRectangle(OverlayBrush, ClientRectangle)
         End Using
-        Dim layout As OverlayLayout = CalculateLayout()
-        If _Owner.ShowContentPanel AndAlso layout.ContentPanelBounds.Width > 0 AndAlso layout.ContentPanelBounds.Height > 0 Then DrawContentPanel(e.Graphics, layout.ContentPanelBounds)
-        DrawIndicator(e.Graphics, layout)
-        Dim textFlags As TextFormatFlags = TextFormatFlags.HorizontalCenter Or TextFormatFlags.VerticalCenter Or TextFormatFlags.WordBreak Or TextFormatFlags.NoPadding
-        If layout.HasMessage Then TextRenderer.DrawText(e.Graphics, _Owner.MessageText, _Owner.MessageFont, layout.MessageBounds, _Owner.MessageForeColor, textFlags)
-        If layout.HasDetail Then TextRenderer.DrawText(e.Graphics, _Owner.DetailText, _Owner.DetailFont, layout.DetailBounds, _Owner.DetailForeColor, textFlags)
-        If layout.HasPercentage Then TextRenderer.DrawText(e.Graphics, $"{_Owner.ProgressPercentage:0}%", _Owner.DetailFont, layout.PercentageBounds, _Owner.DetailForeColor, textFlags)
+
+        Dim Layout As OverlayLayout = CalculateLayout()
+
+        If _Owner.ShowContentPanel AndAlso
+           Layout.ContentPanelBounds.Width > 0 AndAlso
+           Layout.ContentPanelBounds.Height > 0 Then
+            DrawContentPanel(e.Graphics, Layout.ContentPanelBounds)
+        End If
+
+        DrawIndicator(e.Graphics, Layout)
+
+        Dim TextFlags As TextFormatFlags =
+            TextFormatFlags.HorizontalCenter Or
+            TextFormatFlags.VerticalCenter Or
+            TextFormatFlags.WordBreak Or
+            TextFormatFlags.NoPadding
+
+        If Layout.HasMessage Then
+            TextRenderer.DrawText(
+                e.Graphics,
+                _Owner.MessageText,
+                _Owner.MessageFont,
+                Layout.MessageBounds,
+                _Owner.MessageForeColor,
+                TextFlags)
+        End If
+
+        If Layout.HasDetail Then
+            TextRenderer.DrawText(
+                e.Graphics,
+                _Owner.DetailText,
+                _Owner.DetailFont,
+                Layout.DetailBounds,
+                _Owner.DetailForeColor,
+                TextFlags)
+        End If
+
+        If Layout.HasPercentage Then
+            TextRenderer.DrawText(
+                e.Graphics,
+                $"{_Owner.ProgressPercentage:0}%",
+                _Owner.DetailFont,
+                Layout.PercentageBounds,
+                _Owner.DetailForeColor,
+                TextFlags)
+        End If
     End Sub
+
     Private Sub DrawContentPanel(Graphics As Graphics, Bounds As Rectangle)
         Using Path As GraphicsPath = CreateRoundedRectangle(Bounds, _Owner.ContentCornerRadius)
             Using BackgroundBrush As New SolidBrush(Color.FromArgb(_Owner.ContentOpacity, _Owner.ContentBackColor))
                 Graphics.FillPath(BackgroundBrush, Path)
             End Using
+
             If _Owner.ContentBorderThickness > 0 Then
                 Using BorderPen As New Pen(_Owner.ContentBorderColor, _Owner.ContentBorderThickness)
                     BorderPen.Alignment = PenAlignment.Inset
@@ -134,157 +202,466 @@ Friend NotInheritable Class BusyOverlayView
             End If
         End Using
     End Sub
+
     Private Sub DrawIndicator(Graphics As Graphics, Layout As OverlayLayout)
         Select Case _Owner.IndicatorStyle
             Case BusyOverlayIndicatorStyle.Spinner
                 If Not Layout.HasIndicator Then Return
+
                 Dim Inset As Single = _Owner.IndicatorThickness / 2.0F
-                Dim SpinnerBounds As New RectangleF(Layout.IndicatorBounds.X + Inset, Layout.IndicatorBounds.Y + Inset, Layout.IndicatorBounds.Width - _Owner.IndicatorThickness, Layout.IndicatorBounds.Height - _Owner.IndicatorThickness)
+                Dim SpinnerBounds As New RectangleF(
+                    Layout.IndicatorBounds.X + Inset,
+                    Layout.IndicatorBounds.Y + Inset,
+                    Layout.IndicatorBounds.Width - _Owner.IndicatorThickness,
+                    Layout.IndicatorBounds.Height - _Owner.IndicatorThickness)
+
                 Using SpinnerPen As New Pen(_Owner.IndicatorColor, _Owner.IndicatorThickness)
                     SpinnerPen.StartCap = LineCap.Round
                     SpinnerPen.EndCap = LineCap.Round
-                    Graphics.DrawArc(SpinnerPen, SpinnerBounds, _AnimationFrame * 12.0F, 265.0F)
+                    Graphics.DrawArc(
+                        SpinnerPen,
+                        SpinnerBounds,
+                        CSng(_AnimationFrame * 12.0R),
+                        265.0F)
                 End Using
+
             Case BusyOverlayIndicatorStyle.MarqueeBar
                 If Not Layout.HasIndicator Then Return
+
                 DrawBarTrack(Graphics, Layout.IndicatorBounds)
-                Dim SegmentWidth As Integer = Math.Max(Layout.IndicatorBounds.Height, Layout.IndicatorBounds.Width \ 3)
-                Dim TravelWidth As Integer = Layout.IndicatorBounds.Width + SegmentWidth
-                Dim SegmentX As Integer = Layout.IndicatorBounds.X - SegmentWidth + CInt(TravelWidth * (_AnimationFrame / 100.0R))
-                Dim SegmentBounds As Rectangle = Rectangle.Intersect(Layout.IndicatorBounds, New Rectangle(SegmentX, Layout.IndicatorBounds.Y, SegmentWidth, Layout.IndicatorBounds.Height))
-                If SegmentBounds.Width > 0 Then FillRoundedBar(Graphics, SegmentBounds, _Owner.IndicatorColor)
+
+                Dim SegmentWidth As Integer =
+                    Math.Max(
+                        Layout.IndicatorBounds.Height,
+                        Layout.IndicatorBounds.Width \ 3)
+
+                Dim TravelWidth As Integer =
+                    Layout.IndicatorBounds.Width + SegmentWidth
+
+                Dim SegmentX As Integer =
+                    Layout.IndicatorBounds.X -
+                    SegmentWidth +
+                    CInt(TravelWidth * (_AnimationFrame / 100.0R))
+
+                Dim SegmentBounds As Rectangle =
+                    Rectangle.Intersect(
+                        Layout.IndicatorBounds,
+                        New Rectangle(
+                            SegmentX,
+                            Layout.IndicatorBounds.Y,
+                            SegmentWidth,
+                            Layout.IndicatorBounds.Height))
+
+                If SegmentBounds.Width > 0 Then
+                    FillRoundedBar(
+                        Graphics,
+                        SegmentBounds,
+                        _Owner.IndicatorColor)
+                End If
+
             Case BusyOverlayIndicatorStyle.ProgressBar
                 If Not Layout.HasIndicator Then Return
+
                 DrawBarTrack(Graphics, Layout.IndicatorBounds)
-                Dim ProgressWidth As Integer = CInt(Math.Round(Layout.IndicatorBounds.Width * _Owner.ProgressPercentage / 100.0R))
-                If ProgressWidth > 0 Then FillRoundedBar(Graphics, New Rectangle(Layout.IndicatorBounds.X, Layout.IndicatorBounds.Y, ProgressWidth, Layout.IndicatorBounds.Height), _Owner.IndicatorColor)
+
+                Dim ProgressWidth As Integer =
+                    CInt(
+                        Math.Round(
+                            Layout.IndicatorBounds.Width *
+                            _Owner.ProgressPercentage /
+                            100.0R))
+
+                If ProgressWidth > 0 Then
+                    FillRoundedBar(
+                        Graphics,
+                        New Rectangle(
+                            Layout.IndicatorBounds.X,
+                            Layout.IndicatorBounds.Y,
+                            ProgressWidth,
+                            Layout.IndicatorBounds.Height),
+                        _Owner.IndicatorColor)
+                End If
         End Select
     End Sub
+
     Private Sub DrawBarTrack(Graphics As Graphics, Bounds As Rectangle)
         FillRoundedBar(Graphics, Bounds, _Owner.IndicatorTrackColor)
     End Sub
+
     Private Shared Sub FillRoundedBar(Graphics As Graphics, Bounds As Rectangle, Color As Color)
         If Bounds.Width <= 0 OrElse Bounds.Height <= 0 Then Return
+
         Using Path As GraphicsPath = CreateRoundedRectangle(Bounds, Bounds.Height \ 2)
-            Using brush As New SolidBrush(Color)
-                Graphics.FillPath(brush, Path)
+            Using Brush As New SolidBrush(Color)
+                Graphics.FillPath(Brush, Path)
             End Using
         End Using
     End Sub
+
     Private Function CalculateLayout() As OverlayLayout
         Dim Result As New OverlayLayout()
         If ClientSize.Width <= 0 OrElse ClientSize.Height <= 0 Then Return Result
-        Dim EffectivePadding As Integer = If(_Owner.ShowContentPanel, _Owner.ContentPadding, 0)
-        Dim AvailablePanelWidth As Integer = Math.Max(1, ClientSize.Width - OuterMargin * 2)
-        Dim PanelMaximumWidth As Integer = Math.Min(_Owner.ContentMaximumWidth, AvailablePanelWidth)
-        Dim InnerMaximumWidth As Integer = Math.Max(1, PanelMaximumWidth - EffectivePadding * 2)
-        Dim TextMeasureFlags As TextFormatFlags = TextFormatFlags.SingleLine Or TextFormatFlags.NoPadding
-        Dim MessagePreferredWidth As Integer = If(String.IsNullOrWhiteSpace(_Owner.MessageText), 0, TextRenderer.MeasureText(_Owner.MessageText, _Owner.MessageFont, New Size(100000, 100000), TextMeasureFlags).Width)
-        Dim DetailPreferredWidth As Integer = If(String.IsNullOrWhiteSpace(_Owner.DetailText), 0, TextRenderer.MeasureText(_Owner.DetailText, _Owner.DetailFont, New Size(100000, 100000), TextMeasureFlags).Width)
-        Dim IndicatorPreferredWidth As Integer = 0
+
+        Dim EffectivePadding As Integer =
+            If(_Owner.ShowContentPanel, _Owner.ContentPadding, 0)
+
+        Dim AvailablePanelWidth As Integer =
+            Math.Max(1, ClientSize.Width - OuterMargin * 2)
+
+        Dim PanelMaximumWidth As Integer =
+            Math.Min(_Owner.ContentMaximumWidth, AvailablePanelWidth)
+
+        Dim InnerMaximumWidth As Integer =
+            Math.Max(1, PanelMaximumWidth - EffectivePadding * 2)
+
+        Dim TextMeasureFlags As TextFormatFlags =
+            TextFormatFlags.SingleLine Or
+            TextFormatFlags.NoPadding
+
+        Dim MessagePreferredWidth As Integer =
+            If(
+                String.IsNullOrWhiteSpace(_Owner.MessageText),
+                0,
+                TextRenderer.MeasureText(
+                    _Owner.MessageText,
+                    _Owner.MessageFont,
+                    New Size(100000, 100000),
+                    TextMeasureFlags).Width)
+
+        Dim DetailPreferredWidth As Integer =
+            If(
+                String.IsNullOrWhiteSpace(_Owner.DetailText),
+                0,
+                TextRenderer.MeasureText(
+                    _Owner.DetailText,
+                    _Owner.DetailFont,
+                    New Size(100000, 100000),
+                    TextMeasureFlags).Width)
+
+        Dim IndicatorPreferredWidth As Integer
+
         Select Case _Owner.IndicatorStyle
             Case BusyOverlayIndicatorStyle.Spinner
                 IndicatorPreferredWidth = _Owner.IndicatorSize
-            Case BusyOverlayIndicatorStyle.MarqueeBar, BusyOverlayIndicatorStyle.ProgressBar
+
+            Case BusyOverlayIndicatorStyle.MarqueeBar,
+                 BusyOverlayIndicatorStyle.ProgressBar
                 IndicatorPreferredWidth = _Owner.ProgressBarWidth
         End Select
-        Dim CancelPreferredWidth As Integer = If(_Owner.CanCancel, _Owner.CancelButtonSize.Width, 0)
-        Dim DesiredInnerWidth As Integer = Math.Max(Math.Max(MessagePreferredWidth, DetailPreferredWidth), Math.Max(IndicatorPreferredWidth, CancelPreferredWidth))
-        DesiredInnerWidth = Math.Max(Math.Min(160, InnerMaximumWidth), DesiredInnerWidth)
-        Dim InnerWidth As Integer = Math.Min(InnerMaximumWidth, DesiredInnerWidth)
-        Dim WrappedTextFlags As TextFormatFlags = TextFormatFlags.HorizontalCenter Or TextFormatFlags.WordBreak Or TextFormatFlags.NoPadding
-        Dim MessageSize As Size = If(String.IsNullOrWhiteSpace(_Owner.MessageText), Size.Empty, TextRenderer.MeasureText(_Owner.MessageText, _Owner.MessageFont, New Size(InnerWidth, 100000), WrappedTextFlags))
-        Dim DetailSize As Size = If(String.IsNullOrWhiteSpace(_Owner.DetailText), Size.Empty, TextRenderer.MeasureText(_Owner.DetailText, _Owner.DetailFont, New Size(InnerWidth, 100000), WrappedTextFlags))
-        Dim PercentageSize As Size = If(_Owner.IndicatorStyle = BusyOverlayIndicatorStyle.ProgressBar AndAlso _Owner.ShowProgressPercentage, TextRenderer.MeasureText("100%", _Owner.DetailFont, New Size(InnerWidth, 100000), TextMeasureFlags), Size.Empty)
-        Dim IndicatorHeight As Integer = 0
+
+        Dim CancelPreferredWidth As Integer =
+            If(_Owner.CanCancel, _Owner.CancelButtonSize.Width, 0)
+
+        Dim DesiredInnerWidth As Integer =
+            Math.Max(
+                Math.Max(MessagePreferredWidth, DetailPreferredWidth),
+                Math.Max(IndicatorPreferredWidth, CancelPreferredWidth))
+
+        DesiredInnerWidth =
+            Math.Max(
+                Math.Min(160, InnerMaximumWidth),
+                DesiredInnerWidth)
+
+        Dim InnerWidth As Integer =
+            Math.Min(InnerMaximumWidth, DesiredInnerWidth)
+
+        Dim WrappedTextFlags As TextFormatFlags =
+            TextFormatFlags.HorizontalCenter Or
+            TextFormatFlags.WordBreak Or
+            TextFormatFlags.NoPadding
+
+        Dim MessageSize As Size =
+            If(
+                String.IsNullOrWhiteSpace(_Owner.MessageText),
+                Size.Empty,
+                TextRenderer.MeasureText(
+                    _Owner.MessageText,
+                    _Owner.MessageFont,
+                    New Size(InnerWidth, 100000),
+                    WrappedTextFlags))
+
+        Dim DetailSize As Size =
+            If(
+                String.IsNullOrWhiteSpace(_Owner.DetailText),
+                Size.Empty,
+                TextRenderer.MeasureText(
+                    _Owner.DetailText,
+                    _Owner.DetailFont,
+                    New Size(InnerWidth, 100000),
+                    WrappedTextFlags))
+
+        Dim PercentageSize As Size =
+            If(
+                _Owner.IndicatorStyle = BusyOverlayIndicatorStyle.ProgressBar AndAlso
+                _Owner.ShowProgressPercentage,
+                TextRenderer.MeasureText(
+                    "100%",
+                    _Owner.DetailFont,
+                    New Size(InnerWidth, 100000),
+                    TextMeasureFlags),
+                Size.Empty)
+
+        Dim IndicatorHeight As Integer
+
         Select Case _Owner.IndicatorStyle
             Case BusyOverlayIndicatorStyle.Spinner
                 IndicatorHeight = _Owner.IndicatorSize
-            Case BusyOverlayIndicatorStyle.MarqueeBar, BusyOverlayIndicatorStyle.ProgressBar
+
+            Case BusyOverlayIndicatorStyle.MarqueeBar,
+                 BusyOverlayIndicatorStyle.ProgressBar
                 IndicatorHeight = _Owner.ProgressBarHeight
         End Select
+
         Dim ItemHeights As New List(Of Integer)
-        If IndicatorHeight > 0 Then ItemHeights.Add(IndicatorHeight)
-        If MessageSize.Height > 0 Then ItemHeights.Add(MessageSize.Height)
-        If DetailSize.Height > 0 Then ItemHeights.Add(DetailSize.Height)
-        If PercentageSize.Height > 0 Then ItemHeights.Add(PercentageSize.Height)
-        If _Owner.CanCancel Then ItemHeights.Add(_Owner.CancelButtonSize.Height)
-        Dim ContentHeight As Integer = ItemHeights.Sum()
-        If ItemHeights.Count > 1 Then ContentHeight += (ItemHeights.Count - 1) * _Owner.ContentSpacing
-        Dim PanelWidth As Integer = InnerWidth + EffectivePadding * 2
-        Dim PanelHeight As Integer = ContentHeight + EffectivePadding * 2
-        Dim PanelX As Integer = Math.Max(0, (ClientSize.Width - PanelWidth) \ 2)
-        Dim PanelY As Integer = Math.Max(0, (ClientSize.Height - PanelHeight) \ 2)
-        Result.ContentPanelBounds = New Rectangle(PanelX, PanelY, Math.Min(PanelWidth, ClientSize.Width), Math.Min(PanelHeight, ClientSize.Height))
-        Dim ContentX As Integer = PanelX + EffectivePadding
-        Dim CurrentY As Integer = PanelY + EffectivePadding
-        Dim ItemsRemaining As Integer = ItemHeights.Count
+
         If IndicatorHeight > 0 Then
-            Dim IndicatorWidth As Integer = If(_Owner.IndicatorStyle = BusyOverlayIndicatorStyle.Spinner, _Owner.IndicatorSize, Math.Min(_Owner.ProgressBarWidth, InnerWidth))
-            Result.IndicatorBounds = New Rectangle(ContentX + (InnerWidth - IndicatorWidth) \ 2, CurrentY, IndicatorWidth, IndicatorHeight)
+            ItemHeights.Add(IndicatorHeight)
+        End If
+
+        If MessageSize.Height > 0 Then
+            ItemHeights.Add(MessageSize.Height)
+        End If
+
+        If DetailSize.Height > 0 Then
+            ItemHeights.Add(DetailSize.Height)
+        End If
+
+        If PercentageSize.Height > 0 Then
+            ItemHeights.Add(PercentageSize.Height)
+        End If
+
+        If _Owner.CanCancel Then
+            ItemHeights.Add(_Owner.CancelButtonSize.Height)
+        End If
+
+        Dim ContentHeight As Integer = ItemHeights.Sum()
+
+        If ItemHeights.Count > 1 Then
+            ContentHeight +=
+                (ItemHeights.Count - 1) *
+                _Owner.ContentSpacing
+        End If
+
+        Dim PanelWidth As Integer =
+            InnerWidth + EffectivePadding * 2
+
+        Dim PanelHeight As Integer =
+            ContentHeight + EffectivePadding * 2
+
+        Dim PanelX As Integer =
+            Math.Max(0, (ClientSize.Width - PanelWidth) \ 2)
+
+        Dim PanelY As Integer =
+            Math.Max(0, (ClientSize.Height - PanelHeight) \ 2)
+
+        Result.ContentPanelBounds =
+            New Rectangle(
+                PanelX,
+                PanelY,
+                Math.Min(PanelWidth, ClientSize.Width),
+                Math.Min(PanelHeight, ClientSize.Height))
+
+        Dim ContentX As Integer =
+            PanelX + EffectivePadding
+
+        Dim CurrentY As Integer =
+            PanelY + EffectivePadding
+
+        Dim ItemsRemaining As Integer =
+            ItemHeights.Count
+
+        If IndicatorHeight > 0 Then
+            Dim IndicatorWidth As Integer =
+                If(
+                    _Owner.IndicatorStyle = BusyOverlayIndicatorStyle.Spinner,
+                    _Owner.IndicatorSize,
+                    Math.Min(_Owner.ProgressBarWidth, InnerWidth))
+
+            Result.IndicatorBounds =
+                New Rectangle(
+                    ContentX + (InnerWidth - IndicatorWidth) \ 2,
+                    CurrentY,
+                    IndicatorWidth,
+                    IndicatorHeight)
+
             Result.HasIndicator = True
             CurrentY += IndicatorHeight
             ItemsRemaining -= 1
-            If ItemsRemaining > 0 Then CurrentY += _Owner.ContentSpacing
+
+            If ItemsRemaining > 0 Then
+                CurrentY += _Owner.ContentSpacing
+            End If
         End If
+
         If MessageSize.Height > 0 Then
-            Result.MessageBounds = New Rectangle(ContentX, CurrentY, InnerWidth, MessageSize.Height)
+            Result.MessageBounds =
+                New Rectangle(
+                    ContentX,
+                    CurrentY,
+                    InnerWidth,
+                    MessageSize.Height)
+
             Result.HasMessage = True
             CurrentY += MessageSize.Height
             ItemsRemaining -= 1
-            If ItemsRemaining > 0 Then CurrentY += _Owner.ContentSpacing
+
+            If ItemsRemaining > 0 Then
+                CurrentY += _Owner.ContentSpacing
+            End If
         End If
+
         If DetailSize.Height > 0 Then
-            Result.DetailBounds = New Rectangle(ContentX, CurrentY, InnerWidth, DetailSize.Height)
+            Result.DetailBounds =
+                New Rectangle(
+                    ContentX,
+                    CurrentY,
+                    InnerWidth,
+                    DetailSize.Height)
+
             Result.HasDetail = True
             CurrentY += DetailSize.Height
             ItemsRemaining -= 1
-            If ItemsRemaining > 0 Then CurrentY += _Owner.ContentSpacing
+
+            If ItemsRemaining > 0 Then
+                CurrentY += _Owner.ContentSpacing
+            End If
         End If
+
         If PercentageSize.Height > 0 Then
-            Result.PercentageBounds = New Rectangle(ContentX, CurrentY, InnerWidth, PercentageSize.Height)
+            Result.PercentageBounds =
+                New Rectangle(
+                    ContentX,
+                    CurrentY,
+                    InnerWidth,
+                    PercentageSize.Height)
+
             Result.HasPercentage = True
             CurrentY += PercentageSize.Height
             ItemsRemaining -= 1
-            If ItemsRemaining > 0 Then CurrentY += _Owner.ContentSpacing
+
+            If ItemsRemaining > 0 Then
+                CurrentY += _Owner.ContentSpacing
+            End If
         End If
+
         If _Owner.CanCancel Then
-            Result.CancelButtonBounds = New Rectangle(ContentX + (InnerWidth - _Owner.CancelButtonSize.Width) \ 2, CurrentY, _Owner.CancelButtonSize.Width, _Owner.CancelButtonSize.Height)
+            Result.CancelButtonBounds =
+                New Rectangle(
+                    ContentX +
+                    (InnerWidth - _Owner.CancelButtonSize.Width) \ 2,
+                    CurrentY,
+                    _Owner.CancelButtonSize.Width,
+                    _Owner.CancelButtonSize.Height)
+
             Result.HasCancelButton = True
         End If
+
         Return Result
     End Function
+
     Private Shared Function CreateRoundedRectangle(Bounds As Rectangle, Radius As Integer) As GraphicsPath
         Dim Path As New GraphicsPath()
-        If Bounds.Width <= 0 OrElse Bounds.Height <= 0 Then Return Path
-        Dim EffectiveRadius As Integer = Math.Max(0, Math.Min(Radius, Math.Min(Bounds.Width, Bounds.Height) \ 2))
+
+        If Bounds.Width <= 0 OrElse Bounds.Height <= 0 Then
+            Return Path
+        End If
+
+        Dim EffectiveRadius As Integer =
+            Math.Max(
+                0,
+                Math.Min(
+                    Radius,
+                    Math.Min(Bounds.Width, Bounds.Height) \ 2))
+
         If EffectiveRadius = 0 Then
             Path.AddRectangle(Bounds)
             Return Path
         End If
-        Dim Diameter As Integer = EffectiveRadius * 2
-        Path.AddArc(Bounds.Left, Bounds.Top, Diameter, Diameter, 180, 90)
-        Path.AddArc(Bounds.Right - Diameter, Bounds.Top, Diameter, Diameter, 270, 90)
-        Path.AddArc(Bounds.Right - Diameter, Bounds.Bottom - Diameter, Diameter, Diameter, 0, 90)
-        Path.AddArc(Bounds.Left, Bounds.Bottom - Diameter, Diameter, Diameter, 90, 90)
+
+        Dim Diameter As Integer =
+            EffectiveRadius * 2
+
+        Path.AddArc(
+            Bounds.Left,
+            Bounds.Top,
+            Diameter,
+            Diameter,
+            180,
+            90)
+
+        Path.AddArc(
+            Bounds.Right - Diameter,
+            Bounds.Top,
+            Diameter,
+            Diameter,
+            270,
+            90)
+
+        Path.AddArc(
+            Bounds.Right - Diameter,
+            Bounds.Bottom - Diameter,
+            Diameter,
+            Diameter,
+            0,
+            90)
+
+        Path.AddArc(
+            Bounds.Left,
+            Bounds.Bottom - Diameter,
+            Diameter,
+            Diameter,
+            90,
+            90)
+
         Path.CloseFigure()
+
         Return Path
     End Function
+
     Private Sub UpdateAnimationState()
-        If _AnimationTimer Is Nothing OrElse _Owner Is Nothing OrElse IsDisposed OrElse Disposing Then Return
-        _AnimationTimer.Enabled = Visible AndAlso (_Owner.IndicatorStyle = BusyOverlayIndicatorStyle.Spinner OrElse _Owner.IndicatorStyle = BusyOverlayIndicatorStyle.MarqueeBar)
-    End Sub
-    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
-        If _Owner.IndicatorStyle = BusyOverlayIndicatorStyle.Spinner Then
-            _AnimationFrame = (_AnimationFrame + 1) Mod 30
-        Else
-            _AnimationFrame = (_AnimationFrame + 4) Mod 101
+        If _AnimationTimer Is Nothing OrElse
+           _Owner Is Nothing OrElse
+           IsDisposed OrElse
+           Disposing Then
+            Return
         End If
+
+        Dim ShouldAnimate As Boolean =
+            Visible AndAlso
+            (_Owner.IndicatorStyle = BusyOverlayIndicatorStyle.Spinner OrElse
+             _Owner.IndicatorStyle = BusyOverlayIndicatorStyle.MarqueeBar)
+
+        If ShouldAnimate AndAlso Not _AnimationTimer.Enabled Then
+            _AnimationFrame = 0.0R
+        End If
+
+        _AnimationTimer.Enabled = ShouldAnimate
+    End Sub
+
+    Private Sub AnimationTimer_Tick(sender As Object, e As EventArgs)
+        Dim Scale As Double =
+            _Owner.AnimationInterval / BaseAnimationInterval
+
+        Select Case _Owner.IndicatorStyle
+            Case BusyOverlayIndicatorStyle.Spinner
+                _AnimationFrame =
+                    (_AnimationFrame + Scale) Mod 30.0R
+
+            Case BusyOverlayIndicatorStyle.MarqueeBar
+                _AnimationFrame =
+                    (_AnimationFrame + (4.0R * Scale)) Mod 101.0R
+
+            Case Else
+                Return
+        End Select
+
         Invalidate()
     End Sub
+
     Private Sub CancelButton_Click(sender As Object, e As EventArgs)
         RaiseEvent CancellationClick(Me, EventArgs.Empty)
     End Sub
+
     Private Structure OverlayLayout
         Public ContentPanelBounds As Rectangle
         Public IndicatorBounds As Rectangle

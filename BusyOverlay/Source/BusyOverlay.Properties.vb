@@ -436,7 +436,7 @@ Partial Public Class BusyOverlay
     ''' </summary>
     <Category(CategoryName)>
     <Description("Specifies animation interval from 15 through 1000 milliseconds.")>
-    <DefaultValue(75)>
+    <DefaultValue(20)>
     Public Property AnimationInterval As Integer
         Get
             Return _AnimationInterval

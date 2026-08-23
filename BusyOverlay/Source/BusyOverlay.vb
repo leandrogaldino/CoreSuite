@@ -48,7 +48,7 @@ Partial Public Class BusyOverlay
     Private _IndicatorTrackColor As Color = SystemColors.ControlDark
     Private _IndicatorSize As Integer = 32
     Private _IndicatorThickness As Integer = 4
-    Private _AnimationInterval As Integer = 75
+    Private _AnimationInterval As Integer = 20
     Private _ProgressBarWidth As Integer = 220
     Private _ProgressBarHeight As Integer = 8
     Private _ProgressMinimum As Integer

@@ -10,7 +10,7 @@
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.BusyOverlay</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite BusyOverlay</Title>
@@ -18,7 +18,7 @@
 		<PackageTags>coresuite;winforms;busy;overlay;loading;progress;async;cancellation;component;vbnet;dotnet</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>Code Adaptation.</PackageReleaseNotes>
+		<PackageReleaseNotes>Improved marquee and spinner animation smoothness by increasing the default refresh rate while preserving the original animation speed, with consistent animation reset when a new overlay operation starts.</PackageReleaseNotes>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/BusyOverlay</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
