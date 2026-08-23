@@ -9,7 +9,7 @@ Public NotInheritable Class ValidationValueRequestedEventArgs
     ''' <param name="TargetControl">The control whose value is being resolved.</param>
     ''' <param name="Value">The value resolved automatically by the provider.</param>
     Public Sub New(TargetControl As Control, Value As Object)
-        If TargetControl Is Nothing Then Throw New ArgumentNullException(NameOf(TargetControl))
+        ArgumentNullException.ThrowIfNull(TargetControl)
         Me.TargetControl = TargetControl
         Me.Value = Value
     End Sub

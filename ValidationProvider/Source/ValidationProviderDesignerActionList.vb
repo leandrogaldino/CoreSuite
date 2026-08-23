@@ -1,4 +1,4 @@
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
 Imports Microsoft.DotNet.DesignTools.Designers.Actions
 ''' <summary>
 ''' Provides smart-tag actions and design-time property access for the <see cref="ValidationProvider"/> component.
@@ -20,6 +20,8 @@ Public Class ValidationProviderDesignerActionList
     ''' <returns>A collection containing the most frequently used validation settings.</returns>
     Public Overrides Function GetSortedActionItems() As DesignerActionItemCollection
         Return New DesignerActionItemCollection From {
+            New DesignerActionHeaderItem("Appearance"),
+            New DesignerActionPropertyItem(NameOf(Icon), "Icon", "Appearance", "Defines the icon displayed for validation errors."),
             New DesignerActionHeaderItem("Automatic validation"),
             New DesignerActionPropertyItem(NameOf(AutomaticValidation), "AutomaticValidation", "Automatic validation", "Validates configured controls during their Validating event."),
             New DesignerActionPropertyItem(NameOf(CancelValidationOnError), "CancelValidationOnError", "Automatic validation", "Cancels the Validating event when automatic validation fails."),
@@ -33,6 +35,17 @@ Public Class ValidationProviderDesignerActionList
             New DesignerActionPropertyItem(NameOf(CaseSensitiveComparison), "CaseSensitiveComparison", "Comparison", "Uses case-sensitive CompareWith rules.")
         }
     End Function
+    ''' <summary>
+    ''' Gets or sets the icon displayed for validation errors.
+    ''' </summary>
+    Public Property Icon As Icon
+        Get
+            Return _Provider.Icon
+        End Get
+        Set(value As Icon)
+            SetProperty(NameOf(Icon), value)
+        End Set
+    End Property
     ''' <summary>
     ''' Gets or sets whether controls validate during their Validating event.
     ''' </summary>

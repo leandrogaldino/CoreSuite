@@ -1,2 +1,15 @@
-# Auto detect text files and perform LF normalization
+# Auto detect text files
 * text=auto
+
+# Windows / Visual Studio files
+*.vb text eol=crlf
+*.vbproj text eol=crlf
+*.sln text eol=crlf
+*.resx text eol=crlf
+*.config text eol=crlf
+*.xml text eol=crlf
+*.md text eol=crlf
+
+# GitHub Actions / YAML
+*.yml text eol=lf
+*.yaml text eol=lf

@@ -1,4 +1,4 @@
-# ValidationProvider
+﻿# ValidationProvider
 
 **Centralized, designer-friendly validation for .NET 8 Windows Forms, included in CoreSuite.**
 
@@ -7,11 +7,11 @@
 
 ## Overview
 
-`ValidationProvider` centralizes form validation in one non-visual component. After the component is added to a form, every Windows Forms control receives validation properties in the designer, including `Required`, `MinimumLength`, `MaximumLength`, `RegularExpression`, `CompareWith`, and `ValidationGroup`.
+`ValidationProvider` centralizes form validation in one non-visual component. After the component is added to a form, every Windows Forms control receives validation properties in the designer, including `Required`, `MinimumLength`, `MaximumLength`, `RegularExpression`, `CompareWith`, `ValidationGroup`, and validation-indicator placement.
 
 The provider evaluates the configured rules, displays errors through the familiar `ErrorProvider` icon, and returns a single Boolean result. This removes repeated `If` blocks from Save and Confirm buttons while keeping each field's rules close to that field in the designer.
 
-Because `ValidationProvider` inherits from `ErrorProvider`, inherited settings such as `Icon`, `BlinkStyle`, `IconAlignment`, `IconPadding`, and `ContainerControl` remain available.
+Because `ValidationProvider` inherits from `ErrorProvider`, inherited settings such as `Icon`, `BlinkStyle`, `IconAlignment`, `IconPadding`, and `ContainerControl` remain available. The provider also adds per-field indicator placement so feedback can be displayed relative to a different control.
 
 ## Key features
 
@@ -32,6 +32,8 @@ Because `ValidationProvider` inherits from `ErrorProvider`, inherited settings s
 - Explicit inclusion of controls that use custom-only validation rules.
 - Nested value paths for custom controls, such as `Frozen.IsFrozen`.
 - Per-control validation results and complete batch results.
+- Designer-configurable validation indicator control, alignment, and padding per validated field.
+- Configurable validation icon through the inherited `Icon` property and the provider smart tag.
 - Smart-tag actions for the most common provider settings.
 - XML documentation and NuGet symbol generation.
 
@@ -96,6 +98,9 @@ These properties appear under the `ValidationProvider` category of every control
 | `RegularExpression` | Empty | Requires the represented text to match a regular expression. |
 | `CompareWith` | `Nothing` | Requires this control's value to match another control's value. |
 | `ValuePropertyName` | Empty | Uses a specific property or nested property path as the value. |
+| `ValidationIndicatorControl` | `Nothing` | Redirects the error icon and tooltip to another control while validation remains associated with the original control. |
+| `ValidationIndicatorAlignment` | `MiddleRight` | Defines the icon alignment on the effective indicator control. |
+| `ValidationIndicatorPadding` | `0` | Defines the spacing, in pixels, between the effective indicator control and its validation icon. |
 
 The designer serializes these settings through methods such as:
 
@@ -103,6 +108,26 @@ The designer serializes these settings through methods such as:
 ValidationProvider1.SetRequired(NameTextBox, True)
 ValidationProvider1.SetValidationGroup(NameTextBox, "Customer")
 ```
+
+## Validation indicator placement
+
+Validation rules, focus behavior, events, and `ValidationResult.TargetControl` always remain associated with the validated control. The visual feedback can be redirected to another control through `ValidationIndicatorControl`.
+
+This is useful for layouts where an input reaches the edge of the form and the error icon should appear beside a label instead:
+
+```vb
+ValidationProvider1.SetRequired(NameTextBox, True)
+ValidationProvider1.SetValidationDisplayName(NameTextBox, "Name")
+ValidationProvider1.SetValidationIndicatorControl(NameTextBox, NameLabel)
+ValidationProvider1.SetValidationIndicatorAlignment(NameTextBox, ErrorIconAlignment.MiddleRight)
+ValidationProvider1.SetValidationIndicatorPadding(NameTextBox, 5)
+```
+
+All three indicator properties are extender properties and can be configured directly from the Windows Forms designer by selecting the validated control. In the example above, `NameTextBox` is still the field that is validated and receives focus when invalid, while the icon and tooltip are displayed relative to `NameLabel`.
+
+Use a different indicator control for each field when multiple validation errors must remain visible at the same time.
+
+The provider inherits the standard `ErrorProvider.Icon` property, so a custom `.ico` can be selected from the Properties window. `Icon` is also exposed in the provider smart tag for faster design-time access.
 
 ## Validation groups
 

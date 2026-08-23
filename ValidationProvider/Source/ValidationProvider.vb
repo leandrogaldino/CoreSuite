@@ -1,4 +1,4 @@
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
 Imports System.Globalization
 Imports System.Text.RegularExpressions
 ''' <summary>
@@ -23,6 +23,9 @@ Imports System.Text.RegularExpressions
 <ProvideProperty("RegularExpression", GetType(Control))>
 <ProvideProperty("CompareWith", GetType(Control))>
 <ProvideProperty("ValuePropertyName", GetType(Control))>
+<ProvideProperty("ValidationIndicatorControl", GetType(Control))>
+<ProvideProperty("ValidationIndicatorAlignment", GetType(Control))>
+<ProvideProperty("ValidationIndicatorPadding", GetType(Control))>
 Public Class ValidationProvider
     Inherits ErrorProvider
     Private Const DefaultRequiredMessage As String = "{0} is required."
@@ -527,6 +530,77 @@ Public Class ValidationProvider
         UpdateControlRegistration(TargetControl, Settings)
     End Sub
     ''' <summary>
+    ''' Gets the control used to display validation feedback for the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The control whose validation indicator target is returned.</param>
+    ''' <returns>The configured indicator control, or <see langword="Nothing"/> to display feedback on the validated control itself.</returns>
+    <Category("ValidationProvider")>
+    <DefaultValue(GetType(Control), Nothing)>
+    <Description("Defines another control that displays the validation icon and message while validation still belongs to this control.")>
+    Public Function GetValidationIndicatorControl(TargetControl As Control) As Control
+        Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
+        Return Settings?.ValidationIndicatorControl
+    End Function
+    ''' <summary>
+    ''' Sets the control used to display validation feedback for the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The control whose validation feedback is being redirected.</param>
+    ''' <param name="Value">The control that should display the validation icon and message, or <see langword="Nothing"/> to use the validated control itself.</param>
+    Public Sub SetValidationIndicatorControl(TargetControl As Control, Value As Control)
+        EnsureTargetControl(TargetControl)
+        Dim Settings As ControlValidationSettings = GetOrCreateSettings(TargetControl)
+        ClearValidationFeedback(TargetControl, Settings)
+        Settings.ValidationIndicatorControl = Value
+        ApplyValidationIndicatorAppearance(TargetControl, Settings)
+        UpdateControlRegistration(TargetControl, Settings)
+    End Sub
+    ''' <summary>
+    ''' Gets the icon alignment used by the validation indicator associated with the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The validated control whose indicator alignment is returned.</param>
+    ''' <returns>The configured validation indicator alignment.</returns>
+    <Category("ValidationProvider")>
+    <DefaultValue(ErrorIconAlignment.MiddleRight)>
+    <Description("Defines the icon alignment on the validation indicator control.")>
+    Public Function GetValidationIndicatorAlignment(TargetControl As Control) As ErrorIconAlignment
+        Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
+        Return If(Settings Is Nothing, ErrorIconAlignment.MiddleRight, Settings.ValidationIndicatorAlignment)
+    End Function
+    ''' <summary>
+    ''' Sets the icon alignment used by the validation indicator associated with the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The validated control whose indicator alignment is being configured.</param>
+    ''' <param name="Value">The desired icon alignment.</param>
+    Public Sub SetValidationIndicatorAlignment(TargetControl As Control, Value As ErrorIconAlignment)
+        Dim Settings As ControlValidationSettings = GetOrCreateSettings(TargetControl)
+        Settings.ValidationIndicatorAlignment = Value
+        ApplyValidationIndicatorAppearance(TargetControl, Settings)
+        UpdateControlRegistration(TargetControl, Settings)
+    End Sub
+    ''' <summary>
+    ''' Gets the icon padding used by the validation indicator associated with the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The validated control whose indicator padding is returned.</param>
+    ''' <returns>The configured validation indicator padding.</returns>
+    <Category("ValidationProvider")>
+    <DefaultValue(0)>
+    <Description("Defines the spacing, in pixels, between the validation indicator control and its icon.")>
+    Public Function GetValidationIndicatorPadding(TargetControl As Control) As Integer
+        Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
+        Return If(Settings Is Nothing, 0, Settings.ValidationIndicatorPadding)
+    End Function
+    ''' <summary>
+    ''' Sets the icon padding used by the validation indicator associated with the specified control.
+    ''' </summary>
+    ''' <param name="TargetControl">The validated control whose indicator padding is being configured.</param>
+    ''' <param name="Value">The desired icon padding in pixels.</param>
+    Public Sub SetValidationIndicatorPadding(TargetControl As Control, Value As Integer)
+        Dim Settings As ControlValidationSettings = GetOrCreateSettings(TargetControl)
+        Settings.ValidationIndicatorPadding = Value
+        ApplyValidationIndicatorAppearance(TargetControl, Settings)
+        UpdateControlRegistration(TargetControl, Settings)
+    End Sub
+    ''' <summary>
     ''' Validates every configured control that is eligible under the current provider settings.
     ''' </summary>
     ''' <returns><see langword="True"/> when every evaluated control is valid; otherwise, <see langword="False"/>.</returns>
@@ -552,7 +626,7 @@ Public Class ValidationProvider
         Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
         If Settings Is Nothing Then Return True
         If Not ShouldValidateControl(TargetControl) Then
-            SetError(TargetControl, String.Empty)
+            ClearValidationFeedback(TargetControl, Settings)
             Return True
         End If
         Return ValidateSingleControl(TargetControl, Settings).IsValid
@@ -569,7 +643,12 @@ Public Class ValidationProvider
     ''' <param name="TargetControl">The control whose message is removed.</param>
     Public Sub ClearValidation(TargetControl As Control)
         EnsureTargetControl(TargetControl)
-        SetError(TargetControl, String.Empty)
+        Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
+        If Settings Is Nothing Then
+            If Not TargetControl.IsDisposed Then SetError(TargetControl, String.Empty)
+            Return
+        End If
+        ClearValidationFeedback(TargetControl, Settings)
     End Sub
     ''' <summary>
     ''' Clears validation messages for controls assigned to the specified group.
@@ -579,7 +658,7 @@ Public Class ValidationProvider
         ArgumentNullException.ThrowIfNull(GroupName)
         Dim NormalizedGroup As String = GroupName.Trim()
         For Each Pair As KeyValuePair(Of Control, ControlValidationSettings) In New Dictionary(Of Control, ControlValidationSettings)(_Settings)
-            If String.Equals(Pair.Value.ValidationGroup, NormalizedGroup, StringComparison.OrdinalIgnoreCase) AndAlso Not Pair.Key.IsDisposed Then SetError(Pair.Key, String.Empty)
+            If String.Equals(Pair.Value.ValidationGroup, NormalizedGroup, StringComparison.OrdinalIgnoreCase) Then ClearValidationFeedback(Pair.Key, Pair.Value)
         Next
     End Sub
     ''' <summary>
@@ -630,7 +709,7 @@ Public Class ValidationProvider
             If Settings Is Nothing OrElse TargetControl.IsDisposed Then Continue For
             If FilterByGroup AndAlso Not String.Equals(Settings.ValidationGroup, GroupName, StringComparison.OrdinalIgnoreCase) Then Continue For
             If Not ShouldValidateControl(TargetControl) Then
-                SetError(TargetControl, String.Empty)
+                ClearValidationFeedback(TargetControl, Settings)
                 Continue For
             End If
             Results.Add(ValidateSingleControl(TargetControl, Settings))
@@ -683,7 +762,7 @@ Public Class ValidationProvider
             If EventArgs.FailureReason = ValidationFailureReason.None Then EventArgs.FailureReason = ValidationFailureReason.Custom
             If String.IsNullOrWhiteSpace(EventArgs.ErrorMessage) Then EventArgs.ErrorMessage = ResolveErrorMessage(Settings, ValidationFailureReason.Custom, DisplayName, Nothing)
         End If
-        SetError(TargetControl, EventArgs.ErrorMessage)
+        SetValidationFeedback(TargetControl, Settings, EventArgs.ErrorMessage)
         Dim Result As New ValidationResult(TargetControl, Settings.ValidationGroup, EventArgs.IsValid, EventArgs.ErrorMessage, EventArgs.FailureReason)
         OnControlValidated(New ControlValidatedEventArgs(Result))
         Return Result
@@ -821,6 +900,28 @@ Public Class ValidationProvider
         If Not ValidateHiddenControls AndAlso Not TargetControl.Visible Then Return False
         Return True
     End Function
+    Private Function ResolveValidationIndicatorControl(TargetControl As Control, Settings As ControlValidationSettings) As Control
+        Dim IndicatorControl As Control = Settings.ValidationIndicatorControl
+        If IndicatorControl Is Nothing OrElse IndicatorControl.IsDisposed OrElse IndicatorControl.Disposing Then Return TargetControl
+        Return IndicatorControl
+    End Function
+    Private Sub ApplyValidationIndicatorAppearance(TargetControl As Control, Settings As ControlValidationSettings)
+        Dim IndicatorControl As Control = ResolveValidationIndicatorControl(TargetControl, Settings)
+        If IndicatorControl.IsDisposed OrElse IndicatorControl.Disposing Then Return
+        SetIconAlignment(IndicatorControl, Settings.ValidationIndicatorAlignment)
+        SetIconPadding(IndicatorControl, Settings.ValidationIndicatorPadding)
+    End Sub
+    Private Sub SetValidationFeedback(TargetControl As Control, Settings As ControlValidationSettings, ErrorMessage As String)
+        Dim IndicatorControl As Control = ResolveValidationIndicatorControl(TargetControl, Settings)
+        If Not TargetControl.IsDisposed AndAlso Not ReferenceEquals(IndicatorControl, TargetControl) Then SetError(TargetControl, String.Empty)
+        ApplyValidationIndicatorAppearance(TargetControl, Settings)
+        If Not IndicatorControl.IsDisposed AndAlso Not IndicatorControl.Disposing Then SetError(IndicatorControl, ErrorMessage)
+    End Sub
+    Private Sub ClearValidationFeedback(TargetControl As Control, Settings As ControlValidationSettings)
+        If Not TargetControl.IsDisposed AndAlso Not TargetControl.Disposing Then SetError(TargetControl, String.Empty)
+        Dim IndicatorControl As Control = Settings.ValidationIndicatorControl
+        If IndicatorControl IsNot Nothing AndAlso Not ReferenceEquals(IndicatorControl, TargetControl) AndAlso Not IndicatorControl.IsDisposed AndAlso Not IndicatorControl.Disposing Then SetError(IndicatorControl, String.Empty)
+    End Sub
     Private Shared Sub FocusFirstInvalidResult(Results As IEnumerable(Of ValidationResult))
         For Each Result As ValidationResult In Results
             If Not Result.IsValid AndAlso Result.TargetControl.CanSelect Then
@@ -874,7 +975,7 @@ Public Class ValidationProvider
             If TypeOf TargetControl Is NumericUpDown Then RemoveHandler DirectCast(TargetControl, NumericUpDown).ValueChanged, AddressOf TargetControl_ValueChanged
             If TypeOf TargetControl Is CheckedListBox Then RemoveHandler DirectCast(TargetControl, CheckedListBox).ItemCheck, AddressOf TargetControl_ItemCheck
         End If
-        If Not TargetControl.IsDisposed Then SetError(TargetControl, String.Empty)
+        ClearValidationFeedback(TargetControl, Settings)
         _Settings.Remove(TargetControl)
     End Sub
     Private Sub TargetControl_Validating(Sender As Object, E As CancelEventArgs)
@@ -889,7 +990,10 @@ Public Class ValidationProvider
     Private Sub TargetControl_ValueChanged(Sender As Object, E As EventArgs)
         If Not ClearErrorOnValueChanged Then Return
         Dim TargetControl As Control = TryCast(Sender, Control)
-        If TargetControl IsNot Nothing AndAlso Not TargetControl.IsDisposed Then SetError(TargetControl, String.Empty)
+        If TargetControl Is Nothing Then Return
+        Dim Settings As ControlValidationSettings = GetSettings(TargetControl)
+        If Settings Is Nothing Then Return
+        ClearValidationFeedback(TargetControl, Settings)
     End Sub
     Private Sub TargetControl_ItemCheck(Sender As Object, E As ItemCheckEventArgs)
         TargetControl_ValueChanged(Sender, EventArgs.Empty)

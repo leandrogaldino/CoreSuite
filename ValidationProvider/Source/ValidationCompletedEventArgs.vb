@@ -10,7 +10,7 @@ Public NotInheritable Class ValidationCompletedEventArgs
     ''' </summary>
     ''' <param name="Results">The results produced by the validation operation.</param>
     Public Sub New(Results As IEnumerable(Of ValidationResult))
-        If Results Is Nothing Then Throw New ArgumentNullException(NameOf(Results))
+        ArgumentNullException.ThrowIfNull(Results)
         _Results = New List(Of ValidationResult)(Results).AsReadOnly()
     End Sub
     ''' <summary>
