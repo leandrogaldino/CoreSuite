@@ -24,7 +24,7 @@ Public Class StatusSelector
     Private _ShowSelectedCheckMark As Boolean = True
     Private _UseSelectedItemForeColor As Boolean = True
     Private _UseSelectedItemBackColor As Boolean
-    Private _UnselectedText As String = "Selecione..."
+    Private _UnselectedText As String = "Select..."
     Private _UnselectedForeColor As Color = SystemColors.ControlText
     Private _UnselectedBackColor As Color = Color.Empty
     Private _MenuItemPadding As New Padding(6, 4, 6, 4)
@@ -33,6 +33,55 @@ Public Class StatusSelector
     Private _AutoSizeDropDownWidth As Boolean = True
     Private _MenuRoundedEdges As Boolean
     Private _ItemsUpdateCount As Integer
+    Private _IgnoreInitialDesignerImageDisplayStyle As Boolean = True
+    ''' <summary>
+    ''' Gets the default display style used by the selector.
+    ''' </summary>
+    ''' <value>
+    ''' <see cref="ToolStripItemDisplayStyle.Text"/>, causing newly created selectors to display text only by default.
+    ''' </value>
+    Protected Overrides ReadOnly Property DefaultDisplayStyle As ToolStripItemDisplayStyle
+        Get
+            Return ToolStripItemDisplayStyle.Text
+        End Get
+    End Property
+    ''' <summary>
+    ''' Gets or sets how the selector displays its text and image.
+    ''' </summary>
+    ''' <remarks>
+    ''' Image-only display is normalized to text-only display because a status selector must keep its current state visible. Images can still be displayed together with text by using <see cref="ToolStripItemDisplayStyle.ImageAndText"/>.
+    ''' </remarks>
+    <Category("Appearance"), Description("Specifies whether the selector displays text only or text together with an image."), DefaultValue(ToolStripItemDisplayStyle.Text)>
+    Public Overrides Property DisplayStyle As ToolStripItemDisplayStyle
+        Get
+            Return MyBase.DisplayStyle
+        End Get
+        Set(value As ToolStripItemDisplayStyle)
+            If value = ToolStripItemDisplayStyle.Image AndAlso
+               _IgnoreInitialDesignerImageDisplayStyle AndAlso
+               IsDesignTime AndAlso
+               MyBase.Image IsNot Nothing AndAlso
+               MyBase.ImageTransparentColor <> Color.Magenta Then
+
+                _IgnoreInitialDesignerImageDisplayStyle = False
+                MyBase.DisplayStyle = ToolStripItemDisplayStyle.Text
+                Return
+            End If
+
+            _IgnoreInitialDesignerImageDisplayStyle = False
+            MyBase.DisplayStyle = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' Gets a value indicating whether the selector is currently running inside a designer.
+    ''' </summary>
+    Private ReadOnly Property IsDesignTime As Boolean
+        Get
+            Return DesignMode OrElse
+               (Site IsNot Nothing AndAlso Site.DesignMode) OrElse
+               LicenseManager.UsageMode = LicenseUsageMode.Designtime
+        End Get
+    End Property
     ''' <summary>
     ''' Occurs when the selected item changes.
     ''' </summary>
@@ -56,9 +105,6 @@ Public Class StatusSelector
     ''' <summary>
     ''' Initializes a new instance of the <see cref="StatusSelector"/> class.
     ''' </summary>
-    ''' <remarks>
-    ''' The selector uses text-only display by default. Images assigned to status items remain available and can be displayed by changing <see cref="DisplayStyle"/> to <see cref="ToolStripItemDisplayStyle.ImageAndText"/>.
-    ''' </remarks>
     Public Sub New()
         _Items = New StatusSelectorItemCollection(Me)
         MyBase.DisplayStyle = ToolStripItemDisplayStyle.Text
@@ -68,22 +114,7 @@ Public Class StatusSelector
         DropDown.BackColor = _MenuBackColor
         ApplyMenuAppearance()
     End Sub
-    ''' <summary>
-    ''' Gets or sets how text and images are displayed by the selector button.
-    ''' </summary>
-    ''' <remarks>
-    ''' The default value is <see cref="ToolStripItemDisplayStyle.Text"/>. Use <see cref="ToolStripItemDisplayStyle.ImageAndText"/> to display the selected status item image beside its text.
-    ''' </remarks>
-    <Category("Appearance"), Description("Specifies whether the selector displays text, images, or both."), DefaultValue(ToolStripItemDisplayStyle.Text)>
-    Public Shadows Property DisplayStyle As ToolStripItemDisplayStyle
-        Get
-            Return MyBase.DisplayStyle
-        End Get
-        Set(value As ToolStripItemDisplayStyle)
-            If MyBase.DisplayStyle = value Then Return
-            MyBase.DisplayStyle = value
-        End Set
-    End Property
+
     ''' <summary>
     ''' Gets the collection of status items displayed by the selector.
     ''' </summary>
@@ -195,7 +226,7 @@ Public Class StatusSelector
     ''' Gets or sets the default item foreground color while the pointer is over an item.
     ''' </summary>
     ''' <remarks>
-    ''' <see cref="Color.Empty"/> preserves the foreground color assigned to each individual status item.
+    ''' <see cref="Color.Empty"/> preserves each item's individual foreground color.
     ''' </remarks>
     <Category("StatusSelector Appearance"), Description("Specifies the default hover foreground color. Color.Empty preserves each item foreground color.")>
     Public Property HoverForeColor As Color
@@ -283,7 +314,7 @@ Public Class StatusSelector
         End Set
     End Property
     ''' <summary>
-    ''' Gets or sets a value indicating whether the button adopts the selected item foreground color.
+    ''' Gets or sets a value indicating whether the selector button adopts the selected item foreground color.
     ''' </summary>
     <Category("StatusSelector Appearance"), Description("Specifies whether the selector button uses the selected item foreground color."), DefaultValue(True)>
     Public Property UseSelectedItemForeColor As Boolean
@@ -297,7 +328,7 @@ Public Class StatusSelector
         End Set
     End Property
     ''' <summary>
-    ''' Gets or sets a value indicating whether the button adopts the selected item background color.
+    ''' Gets or sets a value indicating whether the selector button adopts the selected item background color.
     ''' </summary>
     <Category("StatusSelector Appearance"), Description("Specifies whether the selector button uses the selected item background color."), DefaultValue(False)>
     Public Property UseSelectedItemBackColor As Boolean
@@ -313,7 +344,7 @@ Public Class StatusSelector
     ''' <summary>
     ''' Gets or sets the text displayed when no item is selected.
     ''' </summary>
-    <Category("StatusSelector Appearance"), Description("Specifies the text displayed when no status is selected."), DefaultValue("Selecione...")>
+    <Category("StatusSelector Appearance"), Description("Specifies the text displayed when no status is selected."), DefaultValue("Select...")>
     Public Property UnselectedText As String
         Get
             Return _UnselectedText
@@ -326,7 +357,7 @@ Public Class StatusSelector
         End Set
     End Property
     ''' <summary>
-    ''' Gets or sets the button foreground color used when no item is selected.
+    ''' Gets or sets the selector foreground color used when no item is selected.
     ''' </summary>
     <Category("StatusSelector Appearance"), Description("Specifies the selector foreground color when no status is selected.")>
     Public Property UnselectedForeColor As Color
@@ -340,10 +371,10 @@ Public Class StatusSelector
         End Set
     End Property
     ''' <summary>
-    ''' Gets or sets the button background color used when no item is selected.
+    ''' Gets or sets the selector background color used when no item is selected.
     ''' </summary>
     ''' <remarks>
-    ''' <see cref="Color.Empty"/> leaves the inherited ToolStrip background color unchanged.
+    ''' <see cref="Color.Empty"/> leaves the inherited ToolStrip background unchanged.
     ''' </remarks>
     <Category("StatusSelector Appearance"), Description("Specifies the selector background color when no status is selected. Color.Empty leaves the inherited ToolStrip color unchanged.")>
     Public Property UnselectedBackColor As Color
@@ -444,7 +475,7 @@ Public Class StatusSelector
     ''' </summary>
     ''' <param name="text">The text displayed for the status.</param>
     ''' <param name="value">The application value associated with the status.</param>
-    ''' <param name="foreColor">The status foreground color.</param>
+    ''' <param name="foreColor">The foreground color used by the item.</param>
     ''' <returns>The created status item.</returns>
     Public Function Add(text As String, value As Object, foreColor As Color) As StatusSelectorItem
         Return Items.Add(text, value, foreColor)
@@ -454,8 +485,8 @@ Public Class StatusSelector
     ''' </summary>
     ''' <param name="text">The text displayed for the status.</param>
     ''' <param name="value">The application value associated with the status.</param>
-    ''' <param name="foreColor">The status foreground color.</param>
-    ''' <param name="backColor">The status background color.</param>
+    ''' <param name="foreColor">The foreground color used by the item.</param>
+    ''' <param name="backColor">The background color used by the item.</param>
     ''' <returns>The created status item.</returns>
     Public Function Add(text As String, value As Object, foreColor As Color, backColor As Color) As StatusSelectorItem
         Return Items.Add(text, value, foreColor, backColor)
@@ -469,7 +500,7 @@ Public Class StatusSelector
     ''' <summary>
     ''' Finds the first item whose value equals the supplied value.
     ''' </summary>
-    ''' <param name="value">The application value to locate.</param>
+    ''' <param name="value">The value to locate.</param>
     ''' <returns>The matching status item, or <see langword="Nothing"/> when no match exists.</returns>
     Public Function FindByValue(value As Object) As StatusSelectorItem
         For Each StatusItem As StatusSelectorItem In _Items
@@ -480,7 +511,7 @@ Public Class StatusSelector
     ''' <summary>
     ''' Selects the item whose value equals the supplied value.
     ''' </summary>
-    ''' <param name="value">The application value to select.</param>
+    ''' <param name="value">The value to select.</param>
     ''' <returns><see langword="True"/> when a matching item was found and selected; otherwise, <see langword="False"/>.</returns>
     Public Function SelectValue(value As Object) As Boolean
         Dim StatusItem = FindByValue(value)
@@ -489,27 +520,27 @@ Public Class StatusSelector
         Return True
     End Function
     ''' <summary>
-    ''' Attaches a status item to the selector.
+    ''' Attaches an item to the selector and begins monitoring its property changes.
     ''' </summary>
     ''' <param name="item">The item to attach.</param>
     Friend Sub AttachItem(item As StatusSelectorItem)
         AddHandler item.PropertyChanged, AddressOf StatusItem_PropertyChanged
     End Sub
     ''' <summary>
-    ''' Detaches a status item from the selector.
+    ''' Detaches an item from the selector and stops monitoring its property changes.
     ''' </summary>
     ''' <param name="item">The item to detach.</param>
     Friend Sub DetachItem(item As StatusSelectorItem)
         RemoveHandler item.PropertyChanged, AddressOf StatusItem_PropertyChanged
     End Sub
     ''' <summary>
-    ''' Suspends dropdown rebuilding while multiple item changes are performed.
+    ''' Begins a grouped item update.
     ''' </summary>
     Friend Sub BeginItemsUpdate()
         _ItemsUpdateCount += 1
     End Sub
     ''' <summary>
-    ''' Resumes dropdown rebuilding after a grouped item update.
+    ''' Ends a grouped item update and rebuilds the dropdown when necessary.
     ''' </summary>
     Friend Sub EndItemsUpdate()
         If _ItemsUpdateCount = 0 Then Return
@@ -535,7 +566,7 @@ Public Class StatusSelector
         MyBase.OnDropDownShow(e)
     End Sub
     ''' <summary>
-    ''' Rebuilds the underlying ToolStrip menu items from the status item collection.
+    ''' Rebuilds the underlying dropdown menu from the current status item collection.
     ''' </summary>
     Private Sub RebuildDropDown()
         If IsDisposed Then Return
@@ -560,7 +591,7 @@ Public Class StatusSelector
         UpdateButtonDisplay()
     End Sub
     ''' <summary>
-    ''' Applies the configured dropdown appearance and renderer.
+    ''' Applies the configured appearance to the dropdown menu.
     ''' </summary>
     Private Sub ApplyMenuAppearance()
         If IsDisposed Then Return
@@ -576,7 +607,7 @@ Public Class StatusSelector
         DropDown.Invalidate()
     End Sub
     ''' <summary>
-    ''' Updates the dropdown width according to its configured layout settings.
+    ''' Updates the dropdown width according to its current items and layout configuration.
     ''' </summary>
     Private Sub UpdateDropDownSize()
         If IsDisposed OrElse DropDownItems.Count = 0 Then Return
@@ -595,9 +626,9 @@ Public Class StatusSelector
         End If
     End Sub
     ''' <summary>
-    ''' Changes the currently selected status item and raises the appropriate selection events.
+    ''' Changes the currently selected status item and raises the corresponding selection events.
     ''' </summary>
-    ''' <param name="value">The new selected item.</param>
+    ''' <param name="value">The item to select.</param>
     Private Sub SetSelectedItem(value As StatusSelectorItem)
         If ReferenceEquals(_SelectedItem, value) Then Return
         Dim OldValue = _SelectedItem?.Value
@@ -610,7 +641,7 @@ Public Class StatusSelector
         If Not Object.Equals(OldValue, _SelectedItem?.Value) Then RaiseEvent SelectedValueChanged(Me, EventArgs.Empty)
     End Sub
     ''' <summary>
-    ''' Updates the checked state of the dropdown menu items.
+    ''' Updates the checked state of the generated dropdown menu items.
     ''' </summary>
     Private Sub UpdateMenuSelection()
         For Each ToolItem As ToolStripItem In DropDownItems
@@ -622,7 +653,7 @@ Public Class StatusSelector
         DropDown.Invalidate()
     End Sub
     ''' <summary>
-    ''' Updates the selector button to reflect the current status selection.
+    ''' Updates the selector button to reflect the currently selected status item.
     ''' </summary>
     Private Sub UpdateButtonDisplay()
         If _SelectedItem Is Nothing Then
@@ -640,10 +671,10 @@ Public Class StatusSelector
         ToolTipText = _SelectedItem.ToolTipText
     End Sub
     ''' <summary>
-    ''' Resolves the effective background color for a status menu item.
+    ''' Resolves the effective background color for a status item.
     ''' </summary>
-    ''' <param name="item">The status item whose background color is being resolved.</param>
-    ''' <returns>The item's custom background color, or the menu background color when none is specified.</returns>
+    ''' <param name="item">The status item.</param>
+    ''' <returns>The item's background color or the menu background color when no custom color is specified.</returns>
     Private Function ResolveItemBackColor(item As StatusSelectorItem) As Color
         Return If(item.BackColor = Color.Empty, _MenuBackColor, item.BackColor)
     End Function
@@ -660,7 +691,7 @@ Public Class StatusSelector
         RaiseEvent StatusItemClick(Me, New StatusSelectorItemEventArgs(StatusItem))
     End Sub
     ''' <summary>
-    ''' Handles changes to a status item and rebuilds the dropdown to reflect the new configuration.
+    ''' Handles changes to a status item and rebuilds the dropdown menu.
     ''' </summary>
     ''' <param name="sender">The status item that changed.</param>
     ''' <param name="e">The property change event data.</param>

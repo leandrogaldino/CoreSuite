@@ -1,33 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>CoreSuite.Controls</RootNamespace>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <OptionStrict>On</OptionStrict>
-    <OptionExplicit>On</OptionExplicit>
-    <OptionInfer>On</OptionInfer>
-    <AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
-    <PackageId>CoreSuite.StatusSelector</PackageId>
-    <Version>1.0.1</Version>
-	<PackageReleaseNotes>Fixed default image metadata, collection item naming conflicts, dropdown display override compatibility, and default selector rendering so the control now starts in text-only mode while preserving optional image support.</PackageReleaseNotes>	  
-    <Authors>Leandro Galdino</Authors>
-    <Company>CoreSuite</Company>
-    <Title>CoreSuite StatusSelector</Title>
-    <Description>Reusable WinForms ToolStrip status and state selector with strongly reusable values, per-item colors, customizable dropdown rendering, selection indicators and change events.</Description>
-    <PackageTags>coresuite;winforms;status;state;selector;toolstrip;dropdown;menu;control;vbnet;dotnet</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Update="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Controls</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
+		<PackageId>CoreSuite.StatusSelector</PackageId>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Fixed StatusSelector display style behavior so new controls default to text-only mode while still allowing Image and ImageAndText after creation, preserving the native ToolStrip default image when switching to image display mode.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite StatusSelector</Title>
+		<Description>Reusable WinForms ToolStrip status and state selector with strongly reusable values, per-item colors, customizable dropdown rendering, selection indicators and change events.</Description>
+		<PackageTags>coresuite;winforms;status;state;selector;toolstrip;dropdown;menu;control;vbnet;dotnet</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/LeandroGaldino/CoreSuite</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/LeandroGaldino/CoreSuite</PackageProjectUrl>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 </Project>

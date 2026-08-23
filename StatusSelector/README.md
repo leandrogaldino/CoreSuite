@@ -208,7 +208,7 @@ DdbStatusValue.UseSelectedItemBackColor = False
 The unselected state can also be customized:
 
 ```vb
-DdbStatusValue.UnselectedText = "Selecione..."
+DdbStatusValue.UnselectedText = "Select..."
 DdbStatusValue.UnselectedForeColor = SystemColors.ControlText
 DdbStatusValue.UnselectedBackColor = Color.Empty
 ```
