@@ -1,4 +1,4 @@
-# CoreSuite MySqlService
+﻿# CoreSuite MySqlService
 
 `CoreSuite.MySqlService` is a structured .NET 8 service for executing MySQL queries, commands, CRUD operations and stored procedures, with explicit connection ownership, local transaction support, cancellation, database creation, backup and restore.
 
@@ -212,7 +212,49 @@ Complex trusted expressions can be added explicitly:
 options.TrustedExpressions.Add("COUNT(*) AS total")
 ```
 
-Only application-controlled SQL should be added to `TrustedExpressions` or `Where`.
+Only application-controlled SQL should be added to `TrustedExpressions`, `Where`, `Having`, or JOIN conditions.
+
+### Structured JOINs
+
+`MySqlSelectOptions` supports aliases and structured `INNER`, `LEFT`, `RIGHT`, and `CROSS` joins while continuing to quote table and alias identifiers safely:
+
+```vbnet
+Dim options As New MySqlSelectOptions With {
+    .TableAlias = "u",
+    .Where = "u.id = @id",
+    .QueryArgs = New Dictionary(Of String, Object) From {
+        {"@id", userId}
+    }
+}
+options.Columns.Add("u.id")
+options.Columns.Add("u.username")
+options.TrustedExpressions.Add("IFNULL(p.shortname, '') AS personshortname")
+options.LeftJoin("person", "p", "p.id = u.personid")
+
+Dim response As MySqlResponse = mySqlService.Request.ExecuteSelect("user", options)
+```
+
+JOIN conditions are trusted SQL expressions, so dynamic values must be supplied through `QueryArgs` instead of concatenated into the condition.
+
+### GROUP BY and HAVING
+
+`MySqlSelectOptions` also supports safely quoted grouping columns and a trusted `HAVING` expression:
+
+```vbnet
+Dim options As New MySqlSelectOptions With {
+    .Having = "COUNT(*) > @minimum",
+    .QueryArgs = New Dictionary(Of String, Object) From {
+        {"@minimum", 10}
+    }
+}
+options.Columns.Add("companyid")
+options.TrustedExpressions.Add("COUNT(*) AS total")
+options.GroupBy.Add("companyid")
+
+Dim response As MySqlResponse = mySqlService.Request.ExecuteSelect("user", options)
+```
+
+Columns added to `GroupBy` are quoted as identifiers. `Having` is a trusted SQL expression, so dynamic values must be supplied through `QueryArgs`.
 
 ## Multiple result sets
 
@@ -388,7 +430,9 @@ Backup and restore receive an optional `IProgress(Of Integer)` directly in the o
 | `MySqlRequest` | Executes queries, commands, scalar operations, CRUD operations and stored procedures. |
 | `MySqlMaintenance` | Creates the database and performs backup and restore operations. |
 | `MySqlCommandOptions` | Defines an optional connection, transaction and command timeout. |
-| `MySqlSelectOptions` | Defines projection, filtering, sorting, distinct and paging behavior. |
+| `MySqlSelectOptions` | Defines projection, aliases, joins, filtering, grouping, sorting, distinct and paging behavior. |
+| `MySqlJoin` | Defines a structured join table, alias, type and trusted ON condition. |
+| `MySqlJoinType` | Defines INNER, LEFT, RIGHT and CROSS join types. |
 | `MySqlMutationOptions` | Defines mutation filtering and full-table safety behavior. |
 | `MySqlProcedureParameter` | Defines input, output, input/output and return-value procedure parameters. |
 | `MySqlResponse` | Contains result sets, rows affected, inserted ID and output parameter values. |

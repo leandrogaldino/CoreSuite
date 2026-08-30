@@ -182,10 +182,10 @@ Public NotInheritable Class MySqlRequest
         End Using
     End Function
     ''' <summary>
-    ''' Selects rows from a safely quoted table using structured projection, ordering, and paging options.
+    ''' Selects rows from a safely quoted table using structured projection, aliases, joins, grouping, ordering, and paging options.
     ''' </summary>
     ''' <param name="Table">The table name, optionally qualified by a schema or database.</param>
-    ''' <param name="Options">Optional projection, filter, ordering, paging, connection, transaction, and timeout settings.</param>
+    ''' <param name="Options">Optional projection, alias, join, filter, grouping, ordering, paging, connection, transaction, and timeout settings.</param>
     ''' <returns>A response containing the selected rows.</returns>
     Public Function ExecuteSelect(Table As String, Optional Options As MySqlSelectOptions = Nothing) As MySqlResponse
         Dim ActualOptions As MySqlSelectOptions = If(Options, New MySqlSelectOptions())
@@ -193,10 +193,10 @@ Public NotInheritable Class MySqlRequest
         Return ExecuteQuery(Sql, ActualOptions.QueryArgs, ActualOptions)
     End Function
     ''' <summary>
-    ''' Asynchronously selects rows from a safely quoted table using structured projection, ordering, and paging options.
+    ''' Asynchronously selects rows from a safely quoted table using structured projection, aliases, joins, grouping, ordering, and paging options.
     ''' </summary>
     ''' <param name="Table">The table name, optionally qualified by a schema or database.</param>
-    ''' <param name="Options">Optional projection, filter, ordering, paging, connection, transaction, and timeout settings.</param>
+    ''' <param name="Options">Optional projection, alias, join, filter, grouping, ordering, paging, connection, transaction, and timeout settings.</param>
     ''' <param name="CancellationToken">The token used to cancel connection opening, execution, or result reading.</param>
     ''' <returns>A response containing the selected rows.</returns>
     Public Function ExecuteSelectAsync(Table As String, Optional Options As MySqlSelectOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task(Of MySqlResponse)
@@ -441,7 +441,17 @@ Public NotInheritable Class MySqlRequest
         Dim Builder As New StringBuilder("SELECT ")
         If Options.Distinct Then Builder.Append("DISTINCT ")
         Builder.Append(String.Join(", ", Projections)).Append(" FROM ").Append(QuoteIdentifier(Table, NameOf(Table)))
+        If Not String.IsNullOrWhiteSpace(Options.TableAlias) Then Builder.Append(" "c).Append(QuoteSingleIdentifier(ValidateSqlToken(Options.TableAlias, NameOf(Options.TableAlias)), NameOf(Options.TableAlias)))
+        AppendJoins(Builder, Options)
         If Not String.IsNullOrWhiteSpace(Options.Where) Then Builder.Append(" WHERE ").Append(Options.Where.Trim())
+        If Options.GroupBy.Count > 0 Then
+            Dim Grouping As New List(Of String)(Options.GroupBy.Count)
+            For Each Column As String In Options.GroupBy
+                Grouping.Add(QuoteIdentifier(Column, NameOf(Options.GroupBy)))
+            Next Column
+            Builder.Append(" GROUP BY ").Append(String.Join(", ", Grouping))
+        End If
+        If Not String.IsNullOrWhiteSpace(Options.Having) Then Builder.Append(" HAVING ").Append(Options.Having.Trim())
         If Options.OrderBy.Count > 0 Then
             Dim Ordering As New List(Of String)(Options.OrderBy.Count)
             For Each Item As MySqlOrderBy In Options.OrderBy
@@ -455,6 +465,42 @@ Public NotInheritable Class MySqlRequest
         If Options.Offset.GetValueOrDefault() > 0 Then Builder.Append(" OFFSET ").Append(Options.Offset.Value)
         Return Builder.ToString()
     End Function
+    Private Shared Sub AppendJoins(Builder As StringBuilder, Options As MySqlSelectOptions)
+        For Each JoinDefinition As MySqlJoin In Options.Joins
+            ArgumentNullException.ThrowIfNull(JoinDefinition)
+
+            If Not [Enum].IsDefined(GetType(MySqlJoinType), JoinDefinition.JoinType) Then
+                Throw New ArgumentOutOfRangeException(NameOf(Options), JoinDefinition.JoinType, "The join type is not valid.")
+            End If
+
+            Dim JoinKeyword As String
+
+            Select Case JoinDefinition.JoinType
+                Case MySqlJoinType.Inner
+                    JoinKeyword = " INNER JOIN "
+                Case MySqlJoinType.Left
+                    JoinKeyword = " LEFT JOIN "
+                Case MySqlJoinType.Right
+                    JoinKeyword = " RIGHT JOIN "
+                Case MySqlJoinType.Cross
+                    JoinKeyword = " CROSS JOIN "
+                Case Else
+                    Throw New ArgumentOutOfRangeException(NameOf(Options), JoinDefinition.JoinType, "The join type is not valid.")
+            End Select
+
+            Builder.Append(JoinKeyword).Append(QuoteIdentifier(JoinDefinition.Table, NameOf(Options.Joins)))
+
+            If Not String.IsNullOrWhiteSpace(JoinDefinition.Alias) Then
+                Builder.Append(" "c).Append(QuoteSingleIdentifier(ValidateSqlToken(JoinDefinition.Alias, NameOf(Options.Joins)), NameOf(Options.Joins)))
+            End If
+
+            If JoinDefinition.JoinType = MySqlJoinType.Cross Then
+                If Not String.IsNullOrWhiteSpace(JoinDefinition.Condition) Then Throw New InvalidOperationException("A CROSS JOIN cannot define an ON condition.")
+            Else
+                Builder.Append(" ON ").Append(RequireValue(JoinDefinition.Condition, NameOf(Options.Joins)))
+            End If
+        Next JoinDefinition
+    End Sub
     Private Shared Function BuildInsertSql(Table As String, Values As IDictionary(Of String, Object)) As CommandBuildResult
         Dim Columns As New List(Of String)(Values.Count)
         Dim ParameterNames As New List(Of String)(Values.Count)

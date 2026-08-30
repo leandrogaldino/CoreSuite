@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>CoreSuite.Services</RootNamespace>
 		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>CoreSuite.MySqlService</AssemblyName>
 		<PackageId>CoreSuite.MySqlService</PackageId>
-		<Version>2.0.0</Version>
-		<PackageReleaseNotes>Breaking change: replaced backup and restore progress events with IProgress(Of Integer) parameters. Progress is now scoped directly to each backup or restore operation, simplifying progress handling and preventing persistent event subscriptions. Updated backup and restore APIs and documentation accordingly.</PackageReleaseNotes>
+		<Version>2.2.0</Version>
+		<PackageReleaseNotes>Added structured JOIN, GROUP BY, and HAVING support to MySqlSelectOptions, expanding relational and aggregate query capabilities while preserving compatibility with existing SELECT, CRUD, transaction, backup, and restore APIs.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite MySqlService</Title>
