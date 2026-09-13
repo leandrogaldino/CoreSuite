@@ -56,6 +56,7 @@ These projects target `.NET 8 for Windows` and provide Windows-specific storage,
 | [CoreSuite.Cryptography.Windows](./Cryptography.Windows/) | Protects JSON objects and binary files through Windows DPAPI with user or machine scope and atomic persistence. |
 | [CoreSuite.Extensions.Windows](./Extensions.Windows/) | Converts collections to `DataTable` instances and fills `DataGridView` controls while preserving relevant visual state. |
 | [CoreSuite.Helpers.Windows](./Helpers.Windows/) | Provides Windows Forms helpers for control traversal, visibility, double buffering, and common image operations. |
+| [CoreSuite.OutlookEmail](./OutlookEmail/) | Opens pre-filled e-mail messages in Microsoft Outlook Classic with recipients, attachments, HTML or plain-text content, and optional default signature preservation. |
 
 ### Windows Forms controls and components
 

@@ -133,6 +133,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TileView", "TileView\TileVi
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "StatusSelector", "StatusSelector\StatusSelector.vbproj", "{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "OutlookEmail", "OutlookEmail\OutlookEmail.vbproj", "{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -359,6 +361,10 @@ Global
 		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -424,6 +430,7 @@ Global
 		{133E9A8B-AD52-4ECA-9E6C-9882AEE06D41} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 		{1A0A83BE-5D3E-4D46-B130-B0F0B32B181E} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
 		{B08F64F7-32B7-40E9-824D-D4E16BBBCF59} = {C867F33D-08B3-4D3B-88E2-2CC899F6E571}
+		{AD8F6FB5-8963-4DB7-8D16-8333ABB18EC8} = {222757F2-0D37-4E4B-A95B-7048BCFFA03C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9D22103-398C-42E5-8401-284AD9ECDDC3}

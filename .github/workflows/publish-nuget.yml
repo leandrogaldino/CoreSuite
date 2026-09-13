@@ -49,6 +49,7 @@ on:
           - NavigationView
           - NoFocusCueButton
           - NumericBoxBase
+          - OutlookEmail
           - PasswordBox
           - PercentageBox
           - PictureViewer

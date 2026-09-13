@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>CoreSuite.Services</RootNamespace>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<AssemblyName>CoreSuite.OutlookEmail</AssemblyName>
+		<PackageId>CoreSuite.OutlookEmail</PackageId>
+		<Version>1.0.0</Version>
+		<PackageReleaseNotes>Initial release of Outlook e-mail composition support with recipients, attachments, HTML or plain-text body, default signature preservation, and Microsoft Outlook Classic availability detection.</PackageReleaseNotes>
+		<Authors>Leandro Galdino</Authors>
+		<Company>CoreSuite</Company>
+		<Title>CoreSuite OutlookEmail</Title>
+		<Description>.NET 8 Windows service for composing pre-filled e-mail messages in Microsoft Outlook Classic with recipients, attachments, HTML or plain-text content, and default signature preservation.</Description>
+		<PackageTags>coresuite;outlook;email;mail;office;automation;vbnet;dotnet;net8;windows</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/OutlookEmail</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageOutputPath>..\artifacts\packages</PackageOutputPath>
+		<OptionStrict>On</OptionStrict>
+		<OptionExplicit>On</OptionExplicit>
+		<OptionInfer>On</OptionInfer>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>true</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>
