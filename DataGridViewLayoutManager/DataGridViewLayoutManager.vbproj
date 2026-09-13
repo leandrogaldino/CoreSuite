@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.DataGridViewLayoutManager</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Improved DataGridViewLayoutManager resilience when loading and saving layouts with empty grids or mismatched column counts. Added validation for column indexes, display indexes, sorting state, and missing layout columns.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Improved DataGridViewLayoutManager resilience when loading and saving layouts with empty grids or mismatched column counts. Added validation for column indexes, display indexes, sorting state, and missing layout columns. Added DataGridViewLayoutColumnCollection to automatically assign DisplayIndex values based on column insertion order.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite DataGridViewLayoutManager</Title>

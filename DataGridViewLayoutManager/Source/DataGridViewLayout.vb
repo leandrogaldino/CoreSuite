@@ -30,7 +30,7 @@ Public Class DataGridViewLayout
     ''' <summary>
     ''' Gets the list of column configurations that define the layout structure.
     ''' </summary>
-    Public Property Columns As New List(Of DataGridViewLayoutColumn)
+    Public Property Columns As New DataGridViewLayoutColumnCollection
     ''' <summary>
     ''' Initializes a new instance of the DataGridViewLayout class.
     ''' </summary>
