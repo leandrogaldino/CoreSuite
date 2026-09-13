@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.ActionTextBox</PackageId>
-		<Version>1.0.0</Version>
-		<PackageReleaseNotes>Initial release of ActionTextBox with an integrated configurable action button.</PackageReleaseNotes>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Fixed ActionTextBox action button layout to preserve the control border when using FixedSingle or Fixed3D border styles.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite ActionTextBox</Title>

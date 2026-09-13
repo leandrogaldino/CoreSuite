@@ -335,13 +335,21 @@ Public Class ActionTextBox
     ''' </summary>
     Private Sub UpdateActionButtonLayout()
         If ActionButton Is Nothing Then Return
-        Dim buttonWidth As Integer = GetScaledValue(ActionButtonWidth)
-        Dim overlap As Integer = If(BorderStyle = BorderStyle.None, 0, 1)
-        ActionButton.Size = New Size(buttonWidth, Math.Max(1, ClientSize.Height + overlap * 2))
+        Dim ButtonWidth As Integer = GetScaledValue(ActionButtonWidth)
+        Dim BorderInset As Integer
+        Select Case BorderStyle
+            Case BorderStyle.FixedSingle
+                BorderInset = 1
+            Case BorderStyle.Fixed3D
+                BorderInset = 2
+            Case Else
+                BorderInset = 0
+        End Select
+        ActionButton.Size = New Size(ButtonWidth, Math.Max(1, ClientSize.Height - BorderInset * 2))
         If ActionButtonPosition = ActionButtonPosition.Left Then
-            ActionButton.Location = New Point(-overlap, -overlap)
+            ActionButton.Location = New Point(BorderInset, BorderInset)
         Else
-            ActionButton.Location = New Point(ClientSize.Width - ActionButton.Width + overlap, -overlap)
+            ActionButton.Location = New Point(ClientSize.Width - ActionButton.Width - BorderInset, BorderInset)
         End If
         ActionButton.Visible = ActionButtonVisible
         ActionButton.BringToFront()
