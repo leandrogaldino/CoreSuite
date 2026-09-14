@@ -1,17 +1,15 @@
 ﻿Imports System.Reflection
 Imports System.Runtime.InteropServices
 
-Namespace CoreSuite.OutlookEmail
-
-    ''' <summary>
-    ''' Provides methods for composing e-mail messages in Microsoft Outlook Classic.
-    ''' </summary>
-    ''' <remarks>
-    ''' This class uses Outlook COM automation at runtime and does not require a compile-time reference to
-    ''' Microsoft.Office.Interop.Outlook. It is intended for Microsoft Outlook Classic on Windows.
-    ''' The new Outlook for Windows does not expose the same COM automation model.
-    ''' </remarks>
-    Public NotInheritable Class OutlookEmail
+''' <summary>
+''' Provides methods for composing e-mail messages in Microsoft Outlook Classic.
+''' </summary>
+''' <remarks>
+''' This class uses Outlook COM automation at runtime and does not require a compile-time reference to
+''' Microsoft.Office.Interop.Outlook. It is intended for Microsoft Outlook Classic on Windows.
+''' The new Outlook for Windows does not expose the same COM automation model.
+''' </remarks>
+Public NotInheritable Class OutlookEmail
         Private Const OutlookProgId As String = "Outlook.Application"
         Private Const MailItemType As Integer = 0
 
@@ -151,6 +149,4 @@ Namespace CoreSuite.OutlookEmail
             Catch
             End Try
         End Sub
-    End Class
-
-End Namespace
+End Class

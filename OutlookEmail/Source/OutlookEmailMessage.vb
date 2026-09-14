@@ -1,12 +1,8 @@
 ﻿Imports System.ComponentModel
-Imports System.Diagnostics
-
-Namespace CoreSuite.OutlookEmail
-
-    ''' <summary>
-    ''' Represents an e-mail message to be composed in Microsoft Outlook Classic.
-    ''' </summary>
-    <DebuggerDisplay("{Subject,nq}")>
+''' <summary>
+''' Represents an e-mail message to be composed in Microsoft Outlook Classic.
+''' </summary>
+<DebuggerDisplay("{Subject,nq}")>
     Public Class OutlookEmailMessage
         ''' <summary>
         ''' Initializes a new instance of the <see cref="OutlookEmailMessage"/> class.
@@ -82,49 +78,46 @@ Namespace CoreSuite.OutlookEmail
         <DefaultValue(True)>
         Public Property IncludeDefaultSignature As Boolean = True
 
-        ''' <summary>
-        ''' Adds a recipient to the To field.
-        ''' </summary>
-        ''' <param name="address">E-mail address to add.</param>
-        ''' <returns>The current message instance.</returns>
-        Public Function AddTo(address As String) As OutlookEmailMessage
-            AddRecipient(ToRecipients, address)
-            Return Me
+    ''' <summary>
+    ''' Adds a recipient to the To field.
+    ''' </summary>
+    ''' <param name="Address">E-mail address to add.</param>
+    ''' <returns>The current message instance.</returns>
+    Public Function AddTo(Address As String) As OutlookEmailMessage
+        AddRecipient(ToRecipients, Address)
+        Return Me
         End Function
 
-        ''' <summary>
-        ''' Adds a recipient to the Cc field.
-        ''' </summary>
-        ''' <param name="address">E-mail address to add.</param>
-        ''' <returns>The current message instance.</returns>
-        Public Function AddCc(address As String) As OutlookEmailMessage
-            AddRecipient(CcRecipients, address)
-            Return Me
+    ''' <summary>
+    ''' Adds a recipient to the Cc field.
+    ''' </summary>
+    ''' <param name="Address">E-mail address to add.</param>
+    ''' <returns>The current message instance.</returns>
+    Public Function AddCc(Address As String) As OutlookEmailMessage
+        AddRecipient(CcRecipients, Address)
+        Return Me
         End Function
 
-        ''' <summary>
-        ''' Adds a recipient to the Bcc field.
-        ''' </summary>
-        ''' <param name="address">E-mail address to add.</param>
-        ''' <returns>The current message instance.</returns>
-        Public Function AddBcc(address As String) As OutlookEmailMessage
-            AddRecipient(BccRecipients, address)
-            Return Me
+    ''' <summary>
+    ''' Adds a recipient to the Bcc field.
+    ''' </summary>
+    ''' <param name="Address">E-mail address to add.</param>
+    ''' <returns>The current message instance.</returns>
+    Public Function AddBcc(Address As String) As OutlookEmailMessage
+        AddRecipient(BccRecipients, Address)
+        Return Me
         End Function
 
-        ''' <summary>
-        ''' Adds a file to the attachment collection.
-        ''' </summary>
-        ''' <param name="filePath">Full path of the file to attach.</param>
-        ''' <returns>The current message instance.</returns>
-        Public Function AddAttachment(filePath As String) As OutlookEmailMessage
-            If Not String.IsNullOrWhiteSpace(filePath) Then Attachments.Add(filePath)
-            Return Me
+    ''' <summary>
+    ''' Adds a file to the attachment collection.
+    ''' </summary>
+    ''' <param name="FilePath">Full path of the file to attach.</param>
+    ''' <returns>The current message instance.</returns>
+    Public Function AddAttachment(FilePath As String) As OutlookEmailMessage
+        If Not String.IsNullOrWhiteSpace(FilePath) Then Attachments.Add(FilePath)
+        Return Me
         End Function
-
-        Private Shared Sub AddRecipient(recipients As ICollection(Of String), address As String)
-            If Not String.IsNullOrWhiteSpace(address) Then recipients.Add(address.Trim())
-        End Sub
-    End Class
-
-End Namespace
+    Private Shared Sub AddRecipient(Recipients As List(Of String), Address As String)
+        If Not String.IsNullOrWhiteSpace(Address) Then Recipients.Add(Address.Trim())
+    End Sub
+End Class

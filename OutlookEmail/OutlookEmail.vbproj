@@ -4,8 +4,8 @@
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<AssemblyName>CoreSuite.OutlookEmail</AssemblyName>
 		<PackageId>CoreSuite.OutlookEmail</PackageId>
-		<Version>1.0.0</Version>
-		<PackageReleaseNotes>Initial release of Outlook e-mail composition support with recipients, attachments, HTML or plain-text body, default signature preservation, and Microsoft Outlook Classic availability detection.</PackageReleaseNotes>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Updated the public namespace used by OutlookEmail types to align with the CoreSuite project structure. No functional behavior changes.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite OutlookEmail</Title>

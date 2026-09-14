@@ -1,11 +1,8 @@
 ﻿Imports System.ComponentModel
-
-Namespace CoreSuite.OutlookEmail
-
-    ''' <summary>
-    ''' Represents the result of an attempt to open an e-mail message in Microsoft Outlook Classic.
-    ''' </summary>
-    <DebuggerDisplay("{Status}")>
+''' <summary>
+''' Represents the result of an attempt to open an e-mail message in Microsoft Outlook Classic.
+''' </summary>
+<DebuggerDisplay("{Status}")>
     Public NotInheritable Class OutlookEmailResult
         Friend Sub New(status As OutlookEmailStatus, message As String, exception As Exception)
             Me.Status = status
@@ -43,6 +40,4 @@ Namespace CoreSuite.OutlookEmail
         ''' </summary>
         <Browsable(False)>
         Public ReadOnly Property Exception As Exception
-    End Class
-
-End Namespace
+End Class
