@@ -68,6 +68,7 @@ These projects target `.NET 8 for Windows` and can be installed separately accor
 | [CoreSuite.AnimatedBox](./AnimatedBox/) | Displays frame-based animations loaded from image collections or GIF files with configurable scaling. |
 | [CoreSuite.AsyncLookupBox](./AsyncLookupBox/) | Performs asynchronous lookups and presents selectable results while retaining the selected value and related data. |
 | [CoreSuite.CentralizedComboBox](./CentralizedComboBox/) | Centralizes and synchronizes reusable data sources and selection behavior across Windows Forms combo boxes. |
+| [CoreSuite.ChangeTracker](./ChangeTracker/) | Tracks designer-configurable control properties against an accepted baseline, with centralized change-state events, automatic or manual observation, and nested tracking suspension. |
 | [CoreSuite.CMessageBox](./CMessageBox/) | Provides customizable message dialogs with standard message types, exception details, localization, and error-reporting integration. |
 | [CoreSuite.ColoredProgressBar](./ColoredProgressBar/) | Displays progress through a configurable range using customizable gradient colors. |
 | [CoreSuite.ColorPicker](./ColorPicker/) | Embeds a Windows color-selection interface with palette, common, system, and custom color support. |
