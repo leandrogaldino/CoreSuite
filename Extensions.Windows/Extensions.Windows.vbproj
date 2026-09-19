@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<RootNamespace>CoreSuite.Extensions</RootNamespace>
+		<RootNamespace>CoreSuite</RootNamespace>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.Extensions.Windows</AssemblyName>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.Extensions.Windows</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Added ToTable extension support for IReadOnlyList(Of IReadOnlyDictionary(Of String, Object)).</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Updated the namespace organization for collection and DataGridView extensions.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Extensions.Windows</Title>
