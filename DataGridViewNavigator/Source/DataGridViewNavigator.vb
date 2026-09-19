@@ -89,6 +89,20 @@ Public Class DataGridViewNavigator
     End Property
 
     ''' <summary>
+    ''' Gets or sets the format used to display the current navigation position.
+    ''' </summary>
+    ''' <remarks>
+    ''' Use <c>{0}</c> for the current position and <c>{1}</c> for the total number of navigable rows.
+    ''' The default value is <c>"{0} of {1}"</c>.
+    ''' </remarks>
+    Public Property PositionFormat As String = "{0} of {1}"
+
+    ''' <summary>
+    ''' Gets or sets the <see cref="ToolStripLabel"/> used to display the current navigation position.
+    ''' </summary>
+    Public Property PositionLabel As ToolStripLabel
+
+    ''' <summary>
     ''' Gets or sets the button used to navigate to the first row.
     ''' </summary>
     Public Property FirstButton As ToolStripButton
@@ -375,10 +389,6 @@ Public Class DataGridViewNavigator
         Return Not Row.IsNewRow AndAlso Row.Visible
     End Function
 
-    Private Function IsDefinedButtons() As Boolean
-        Return _FirstButton IsNot Nothing AndAlso _PreviousButton IsNot Nothing AndAlso _NextButton IsNot Nothing AndAlso _LastButton IsNot Nothing
-    End Function
-
     Private Sub EnsureSynchronousNavigation()
         If ActionBeforeMoveAsync IsNot Nothing OrElse ActionAfterMoveAsync IsNot Nothing Then Throw New InvalidOperationException("Synchronous navigation cannot be used when asynchronous callbacks are configured. Use the corresponding asynchronous navigation method.")
     End Sub
@@ -405,19 +415,29 @@ Public Class DataGridViewNavigator
     End Sub
 
     ''' <summary>
-    ''' Updates the enabled state of the navigation buttons according to the currently selected row.
+    ''' Updates the enabled state of the navigation buttons and the current position.
     ''' </summary>
     Public Sub RefreshButtons()
-        If Not IsDefinedButtons() Then Return
-
-        If _DataGridView Is Nothing OrElse _IsNavigating Then
+        If _DataGridView Is Nothing Then
             SetButtonsEnabled(False)
+            If PositionLabel IsNot Nothing Then PositionLabel.Text = String.Format(PositionFormat, 0, 0)
             Return
         End If
 
         Dim CurrentIndex = GetSelectedRowIndex()
+        Dim Total = 0
+        Dim Position = 0
 
-        If CurrentIndex < 0 Then
+        For Index = 0 To _DataGridView.Rows.Count - 1
+            If Not CanNavigateToRow(Index) Then Continue For
+
+            Total += 1
+            If Index = CurrentIndex Then Position = Total
+        Next
+
+        If PositionLabel IsNot Nothing Then PositionLabel.Text = String.Format(PositionFormat, Position, Total)
+
+        If _IsNavigating OrElse CurrentIndex < 0 Then
             SetButtonsEnabled(False)
             Return
         End If
@@ -425,10 +445,10 @@ Public Class DataGridViewNavigator
         Dim FirstIndex = GetFirstRowIndex()
         Dim LastIndex = GetLastRowIndex()
 
-        _FirstButton.Enabled = FirstIndex >= 0 AndAlso CurrentIndex <> FirstIndex
-        _PreviousButton.Enabled = GetPreviousRowIndex(CurrentIndex) >= 0
-        _NextButton.Enabled = GetNextRowIndex(CurrentIndex) >= 0
-        _LastButton.Enabled = LastIndex >= 0 AndAlso CurrentIndex <> LastIndex
+        If _FirstButton IsNot Nothing Then _FirstButton.Enabled = FirstIndex >= 0 AndAlso CurrentIndex <> FirstIndex
+        If _PreviousButton IsNot Nothing Then _PreviousButton.Enabled = GetPreviousRowIndex(CurrentIndex) >= 0
+        If _NextButton IsNot Nothing Then _NextButton.Enabled = GetNextRowIndex(CurrentIndex) >= 0
+        If _LastButton IsNot Nothing Then _LastButton.Enabled = LastIndex >= 0 AndAlso CurrentIndex <> LastIndex
     End Sub
 
     Private Sub SetButtonsEnabled(Enabled As Boolean)
