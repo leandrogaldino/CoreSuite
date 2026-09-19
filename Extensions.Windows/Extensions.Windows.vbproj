@@ -7,7 +7,8 @@
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>CoreSuite.Extensions.Windows</PackageId>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Added ToTable extension support for IReadOnlyList(Of IReadOnlyDictionary(Of String, Object)).</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite Extensions.Windows</Title>
@@ -19,7 +20,6 @@
 		<PackageProjectUrl>https://github.com/leandrogaldino/CoreSuite/tree/main/Extensions.Windows</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/leandrogaldino/CoreSuite</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageReleaseNotes>Initial release of collection-to-DataTable and DataGridView extensions for Windows Forms.</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>

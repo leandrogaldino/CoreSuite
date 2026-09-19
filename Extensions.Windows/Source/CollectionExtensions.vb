@@ -65,7 +65,37 @@ Namespace Extensions
             Return Table
         End Function
 
+        ''' <summary>
+        ''' Converts a read-only collection of read-only dictionaries to a <see cref="DataTable"/>.
+        ''' </summary>
+        ''' <param name="Source">The collection of dictionaries to convert.</param>
+        ''' <returns>A <see cref="DataTable"/> representing the dictionary data.</returns>
+        ''' <remarks>
+        ''' Each key from the first dictionary becomes a column and each dictionary becomes a row.
+        ''' Null values are represented as <see cref="DBNull.Value"/>.
+        ''' </remarks>
+        <Extension>
+        Public Function ToTable(Source As IReadOnlyList(Of IReadOnlyDictionary(Of String, Object))) As DataTable
+            Dim Table As New DataTable
 
+            If Source Is Nothing OrElse Source.Count = 0 Then Return Table
+
+            For Each Key In Source(0).Keys
+                Table.Columns.Add(Key, GetType(Object))
+            Next
+
+            For Each Item In Source
+                Dim Row As DataRow = Table.NewRow()
+
+                For Each Key In Item.Keys
+                    Row(Key) = If(Item(Key), DBNull.Value)
+                Next
+
+                Table.Rows.Add(Row)
+            Next
+
+            Return Table
+        End Function
 
         ''' <summary>
         ''' Converts a collection of dictionaries to a <see cref="DataTable"/>.
