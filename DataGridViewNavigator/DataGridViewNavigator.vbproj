@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.DataGridViewNavigator</PackageId>
-		<Version>1.2.0</Version>
-		<PackageReleaseNotes>Added navigation position display support with customizable formatting through PositionLabel and PositionFormat. Includes automatic position updates based on navigable rows while preserving existing synchronous and asynchronous navigation behavior.</PackageReleaseNotes>
+		<Version>1.2.1</Version>
+		<PackageReleaseNotes>Improved documentation and usage examples for navigation position display, customizable PositionFormat, synchronous and asynchronous navigation callbacks, cancellable navigation, and programmatic navigation methods.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite DataGridViewNavigator</Title>
