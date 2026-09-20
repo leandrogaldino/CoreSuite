@@ -2,7 +2,6 @@ Imports System.IO
 Imports System.Text
 Imports System.Text.Encodings.Web
 Imports System.Text.Json
-Imports System.Text.Unicode
 Imports System.Threading
 Imports MailKit.Net.Smtp
 Imports MailKit.Security
@@ -17,7 +16,7 @@ Public Class ExceptionReporter
     ''' Initializes a new reporter with the default indented JSON configuration.
     ''' </summary>
     Public Sub New()
-        Me.New(New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)})
+        Me.New(New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping})
     End Sub
     ''' <summary>
     ''' Initializes a new reporter with custom JSON serialization options.

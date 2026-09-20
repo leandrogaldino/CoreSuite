@@ -7,8 +7,8 @@
 		<OptionExplicit>On</OptionExplicit>
 		<OptionInfer>On</OptionInfer>
 		<PackageId>CoreSuite.ExceptionReporter</PackageId>
-		<Version>1.0.3</Version>
-		<PackageReleaseNotes>Updated MailKit dependency to the latest supported version.</PackageReleaseNotes>
+		<Version>1.0.4</Version>
+		<PackageReleaseNotes>Updated JSON serialization to use UnsafeRelaxedJsonEscaping, improving readability by preserving characters such as apostrophes instead of Unicode escaping them.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite ExceptionReporter</Title>
