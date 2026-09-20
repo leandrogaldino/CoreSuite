@@ -7,8 +7,8 @@
 		<OptionExplicit>On</OptionExplicit>
 		<OptionInfer>On</OptionInfer>
 		<PackageId>CoreSuite.ExceptionReporter</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>README Updated.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Updated JSON serialization encoder to preserve Unicode characters such as accents and special characters.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite ExceptionReporter</Title>
