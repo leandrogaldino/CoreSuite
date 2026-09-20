@@ -27,22 +27,22 @@ Partial Class FrmMessageBox
         TlpTopBar = New TableLayoutPanel()
         BtnClose = New NoFocusCueButton()
         LblTitle = New Label()
-        PnlBottomArea = New Panel()
-        TlpBottomBar = New TableLayoutPanel()
-        PnlBottomSeparator = New Panel()
         TlpBody = New TableLayoutPanel()
         PbxIcon = New PictureBox()
         LblErrorCode = New Label()
         PnlMessage = New Panel()
         LblMessage = New Label()
+        PnlBottomArea = New Panel()
+        PnlBottomSeparator = New Panel()
+        TlpBottomBar = New TableLayoutPanel()
         CcException = New ControlContainer()
         PnlBorder.SuspendLayout()
         TlpContainer.SuspendLayout()
         TlpTopBar.SuspendLayout()
-        PnlBottomArea.SuspendLayout()
         TlpBody.SuspendLayout()
         CType(PbxIcon, ComponentModel.ISupportInitialize).BeginInit()
         PnlMessage.SuspendLayout()
+        PnlBottomArea.SuspendLayout()
         SuspendLayout()
         ' 
         ' PnlBorder
@@ -58,7 +58,7 @@ Partial Class FrmMessageBox
         ' TlpContainer
         ' 
         TlpContainer.ColumnCount = 1
-        TlpContainer.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
+        TlpContainer.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
         TlpContainer.Controls.Add(TlpTopBar, 0, 0)
         TlpContainer.Controls.Add(TlpBody, 0, 1)
         TlpContainer.Controls.Add(PnlBottomArea, 0, 2)
@@ -66,18 +66,18 @@ Partial Class FrmMessageBox
         TlpContainer.Location = New Point(0, 0)
         TlpContainer.Name = "TlpContainer"
         TlpContainer.RowCount = 3
-        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 35.0F))
-        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 55.0F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 35F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 55F))
         TlpContainer.Size = New Size(428, 238)
         TlpContainer.TabIndex = 1
         ' 
         ' TlpTopBar
         ' 
-        TlpTopBar.BackColor = Color.FromArgb(248, 249, 250)
+        TlpTopBar.BackColor = Color.FromArgb(CByte(248), CByte(249), CByte(250))
         TlpTopBar.ColumnCount = 2
-        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
-        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 50.0F))
+        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
+        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 50F))
         TlpTopBar.Controls.Add(BtnClose, 1, 0)
         TlpTopBar.Controls.Add(LblTitle, 0, 0)
         TlpTopBar.Dock = DockStyle.Fill
@@ -85,18 +85,18 @@ Partial Class FrmMessageBox
         TlpTopBar.Margin = New Padding(0)
         TlpTopBar.Name = "TlpTopBar"
         TlpTopBar.RowCount = 1
-        TlpTopBar.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+        TlpTopBar.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
         TlpTopBar.Size = New Size(428, 35)
         TlpTopBar.TabIndex = 0
         ' 
         ' BtnClose
         ' 
-        BtnClose.BackColor = Color.FromArgb(248, 249, 250)
+        BtnClose.BackColor = Color.FromArgb(CByte(248), CByte(249), CByte(250))
         BtnClose.DialogResult = DialogResult.Cancel
         BtnClose.Dock = DockStyle.Fill
         BtnClose.FlatAppearance.BorderSize = 0
-        BtnClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(200, 15, 30)
-        BtnClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(232, 17, 35)
+        BtnClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(CByte(200), CByte(15), CByte(30))
+        BtnClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(CByte(232), CByte(17), CByte(35))
         BtnClose.FlatStyle = FlatStyle.Flat
         BtnClose.Image = My.Resources.ImageResources.Close
         BtnClose.Location = New Point(378, 0)
@@ -110,7 +110,7 @@ Partial Class FrmMessageBox
         ' 
         LblTitle.Dock = DockStyle.Fill
         LblTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        LblTitle.ForeColor = Color.FromArgb(45, 45, 48)
+        LblTitle.ForeColor = Color.FromArgb(CByte(45), CByte(45), CByte(48))
         LblTitle.Location = New Point(3, 0)
         LblTitle.Name = "LblTitle"
         LblTitle.Size = New Size(372, 35)
@@ -118,50 +118,11 @@ Partial Class FrmMessageBox
         LblTitle.Text = "Erro"
         LblTitle.TextAlign = ContentAlignment.MiddleLeft
         ' 
-        ' PnlBottomArea
-        ' 
-        PnlBottomArea.BackColor = Color.White
-        PnlBottomArea.Controls.Add(PnlBottomSeparator)
-        PnlBottomArea.Controls.Add(TlpBottomBar)
-        PnlBottomArea.Dock = DockStyle.Fill
-        PnlBottomArea.Location = New Point(0, 183)
-        PnlBottomArea.Margin = New Padding(0)
-        PnlBottomArea.Name = "PnlBottomArea"
-        PnlBottomArea.Size = New Size(428, 55)
-        PnlBottomArea.TabIndex = 1
-        ' 
-        ' TlpBottomBar
-        ' 
-        TlpBottomBar.BackColor = Color.White
-        TlpBottomBar.ColumnCount = 4
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120.0F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120.0F))
-        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 8.0F))
-        TlpBottomBar.Dock = DockStyle.Fill
-        TlpBottomBar.Location = New Point(0, 0)
-        TlpBottomBar.Margin = New Padding(0)
-        TlpBottomBar.Name = "TlpBottomBar"
-        TlpBottomBar.RowCount = 1
-        TlpBottomBar.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-        TlpBottomBar.Size = New Size(428, 55)
-        TlpBottomBar.TabIndex = 1
-        ' 
-        ' PnlBottomSeparator
-        ' 
-        PnlBottomSeparator.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        PnlBottomSeparator.BackColor = Color.FromArgb(220, 223, 227)
-        PnlBottomSeparator.Location = New Point(16, 0)
-        PnlBottomSeparator.Margin = New Padding(0)
-        PnlBottomSeparator.Name = "PnlBottomSeparator"
-        PnlBottomSeparator.Size = New Size(396, 1)
-        PnlBottomSeparator.TabIndex = 0
-        ' 
         ' TlpBody
         ' 
         TlpBody.ColumnCount = 2
-        TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100.0F))
-        TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
+        TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 100F))
+        TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
         TlpBody.Controls.Add(PbxIcon, 0, 1)
         TlpBody.Controls.Add(LblErrorCode, 0, 0)
         TlpBody.Controls.Add(PnlMessage, 1, 1)
@@ -169,8 +130,8 @@ Partial Class FrmMessageBox
         TlpBody.Location = New Point(3, 38)
         TlpBody.Name = "TlpBody"
         TlpBody.RowCount = 2
-        TlpBody.RowStyles.Add(New RowStyle(SizeType.Absolute, 30.0F))
-        TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
+        TlpBody.RowStyles.Add(New RowStyle(SizeType.Absolute, 30F))
+        TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
         TlpBody.Size = New Size(422, 142)
         TlpBody.TabIndex = 2
         ' 
@@ -221,6 +182,45 @@ Partial Class FrmMessageBox
         LblMessage.Text = "Body"
         LblMessage.TextAlign = ContentAlignment.MiddleLeft
         ' 
+        ' PnlBottomArea
+        ' 
+        PnlBottomArea.BackColor = Color.White
+        PnlBottomArea.Controls.Add(PnlBottomSeparator)
+        PnlBottomArea.Controls.Add(TlpBottomBar)
+        PnlBottomArea.Dock = DockStyle.Fill
+        PnlBottomArea.Location = New Point(0, 183)
+        PnlBottomArea.Margin = New Padding(0)
+        PnlBottomArea.Name = "PnlBottomArea"
+        PnlBottomArea.Size = New Size(428, 55)
+        PnlBottomArea.TabIndex = 1
+        ' 
+        ' PnlBottomSeparator
+        ' 
+        PnlBottomSeparator.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        PnlBottomSeparator.BackColor = Color.FromArgb(CByte(220), CByte(223), CByte(227))
+        PnlBottomSeparator.Location = New Point(16, 0)
+        PnlBottomSeparator.Margin = New Padding(0)
+        PnlBottomSeparator.Name = "PnlBottomSeparator"
+        PnlBottomSeparator.Size = New Size(396, 1)
+        PnlBottomSeparator.TabIndex = 0
+        ' 
+        ' TlpBottomBar
+        ' 
+        TlpBottomBar.BackColor = Color.White
+        TlpBottomBar.ColumnCount = 4
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 120F))
+        TlpBottomBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 8F))
+        TlpBottomBar.Dock = DockStyle.Fill
+        TlpBottomBar.Location = New Point(0, 0)
+        TlpBottomBar.Margin = New Padding(0)
+        TlpBottomBar.Name = "TlpBottomBar"
+        TlpBottomBar.RowCount = 1
+        TlpBottomBar.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
+        TlpBottomBar.Size = New Size(428, 55)
+        TlpBottomBar.TabIndex = 1
+        ' 
         ' CcException
         ' 
         CcException.DropDownBorderColor = SystemColors.HotTrack
@@ -231,6 +231,7 @@ Partial Class FrmMessageBox
         ' 
         AutoScaleMode = AutoScaleMode.None
         BackColor = Color.White
+        CancelButton = BtnClose
         ClientSize = New Size(430, 240)
         Controls.Add(PnlBorder)
         FormBorderStyle = FormBorderStyle.None
@@ -241,11 +242,11 @@ Partial Class FrmMessageBox
         PnlBorder.ResumeLayout(False)
         TlpContainer.ResumeLayout(False)
         TlpTopBar.ResumeLayout(False)
-        PnlBottomArea.ResumeLayout(False)
         TlpBody.ResumeLayout(False)
         CType(PbxIcon, ComponentModel.ISupportInitialize).EndInit()
         PnlMessage.ResumeLayout(False)
         PnlMessage.PerformLayout()
+        PnlBottomArea.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 

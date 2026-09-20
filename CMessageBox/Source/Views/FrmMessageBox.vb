@@ -113,7 +113,8 @@ Public Class FrmMessageBox
         Dim Button As New NoFocusCueButton With {
             .UseVisualStyleBackColor = False,
             .Anchor = AnchorStyles.Left,
-            .BackColor = Color.White,
+            .BackColor = Color.FromArgb(248, 248, 248),
+            .ForeColor = Color.FromArgb(45, 45, 48),
             .Font = New Font("Segoe UI", 9.75F),
             .Margin = New Padding(3),
             .Size = New Size(110, 34),
@@ -121,10 +122,10 @@ Public Class FrmMessageBox
             .FlatStyle = FlatStyle.Flat
         }
 
-        Button.FlatAppearance.BorderColor = Color.Gainsboro
+        Button.FlatAppearance.BorderColor = Color.FromArgb(190, 193, 197)
         Button.FlatAppearance.BorderSize = 1
-        Button.FlatAppearance.MouseOverBackColor = Color.FromArgb(244, 245, 246)
-        Button.FlatAppearance.MouseDownBackColor = Color.FromArgb(230, 232, 234)
+        Button.FlatAppearance.MouseOverBackColor = Color.FromArgb(225, 228, 232)
+        Button.FlatAppearance.MouseDownBackColor = Color.FromArgb(205, 209, 214)
 
         Return Button
     End Function
