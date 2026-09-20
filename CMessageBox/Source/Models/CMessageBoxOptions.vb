@@ -23,7 +23,7 @@ Public Class CMessageBoxOptions
     ''' <summary>
     ''' Gets or sets the font used for the message box title.
     ''' </summary>
-    Public Property TitleFont As Font = New Font("Segoe UI", 11.25, FontStyle.Bold)
+    Public Property TitleFont As Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
 
     ''' <summary>
     ''' Gets or sets the foreground color used for the message box title.

@@ -9,6 +9,7 @@ Public Class CMessageBox
     ''' message box, including exception handling and email notifications.
     ''' </remarks>
     Public Shared Property Options As CMessageBoxOptions = New CMessageBoxOptions()
+
     ''' <summary>
     ''' Displays a message box with the specified message using the default information type.
     ''' </summary>
@@ -21,6 +22,7 @@ Public Class CMessageBox
     Public Shared Function Show(Message As String) As DialogResult
         Return Show(Message, Nothing, CMessageBoxType.Information)
     End Function
+
     ''' <summary>
     ''' Displays a message box with the specified message and custom title using the default information type.
     ''' </summary>
@@ -36,6 +38,7 @@ Public Class CMessageBox
     Public Shared Function Show(Message As String, Title As String) As DialogResult
         Return Show(Message, Title, CMessageBoxType.Information)
     End Function
+
     ''' <summary>
     ''' Displays a message box with the specified message type.
     ''' </summary>
@@ -54,6 +57,7 @@ Public Class CMessageBox
     Public Shared Function Show(Message As String, MessageType As CMessageBoxType) As DialogResult
         Return Show(Message, Nothing, MessageType)
     End Function
+
     ''' <summary>
     ''' Displays an error message box associated with the specified exception.
     ''' </summary>
@@ -73,6 +77,7 @@ Public Class CMessageBox
     Public Shared Function Show(Message As String, Exception As Exception) As DialogResult
         Return Show(Message, Nothing, CMessageBoxType.Error, Exception)
     End Function
+
     ''' <summary>
     ''' Displays an error message box with a custom title and an associated exception.
     ''' </summary>
@@ -95,6 +100,29 @@ Public Class CMessageBox
     Public Shared Function Show(Message As String, Title As String, Exception As Exception) As DialogResult
         Return Show(Message, Title, CMessageBoxType.Error, Exception)
     End Function
+
+    ''' <summary>
+    ''' Displays an error message box with a custom title, error code and associated exception.
+    ''' </summary>
+    ''' <param name="Message">
+    ''' The message displayed to the user describing the error.
+    ''' </param>
+    ''' <param name="Title">
+    ''' The text displayed in the message box title bar.
+    ''' </param>
+    ''' <param name="ErrorCode">
+    ''' The error code displayed above the message body.
+    ''' </param>
+    ''' <param name="Exception">
+    ''' The exception associated with the error.
+    ''' </param>
+    ''' <returns>
+    ''' Returns the result of the user's interaction with the message box.
+    ''' </returns>
+    Public Shared Function Show(Message As String, Title As String, ErrorCode As String, Exception As Exception) As DialogResult
+        Return Show(Message, Title, CMessageBoxType.Error, Exception, ErrorCode)
+    End Function
+
     ''' <summary>
     ''' Displays a customized message box with the specified message type, title and optional exception details.
     ''' </summary>
@@ -103,9 +131,8 @@ Public Class CMessageBox
     '''
     ''' The specified message type controls the visual appearance, icon and behavior of the message box.
     '''
-    ''' When an exception is provided, the message type must be set to
-    ''' <see cref="CMessageBoxType.Error"/>. The exception details can be displayed to the user
-    ''' and optionally sent by email according to the configured options.
+    ''' When an exception or error code is provided, the message type must be set to
+    ''' <see cref="CMessageBoxType.Error"/>.
     ''' </remarks>
     ''' <param name="Message">
     ''' The text to display in the message box body.
@@ -120,36 +147,49 @@ Public Class CMessageBox
     ''' The exception associated with the error message. This parameter can only be specified
     ''' when <paramref name="MessageType"/> is <see cref="CMessageBoxType.Error"/>.
     ''' </param>
+    ''' <param name="ErrorCode">
+    ''' The error code displayed above the message body. This parameter can only be specified
+    ''' when <paramref name="MessageType"/> is <see cref="CMessageBoxType.Error"/>.
+    ''' </param>
     ''' <returns>
     ''' Returns the result of the user's interaction with the message box.
     ''' </returns>
     ''' <exception cref="ArgumentException">
-    ''' Thrown when an exception is provided while the message type is different from
+    ''' Thrown when an exception or error code is provided while the message type is different from
     ''' <see cref="CMessageBoxType.Error"/>.
     ''' </exception>
-    Public Shared Function Show(Message As String, Title As String, MessageType As CMessageBoxType, Optional Exception As Exception = Nothing) As DialogResult
+    Public Shared Function Show(Message As String, Title As String, MessageType As CMessageBoxType, Optional Exception As Exception = Nothing, Optional ErrorCode As String = Nothing) As DialogResult
         If Exception IsNot Nothing AndAlso MessageType <> CMessageBoxType.Error Then
             Throw New ArgumentException("The 'Exception' parameter can only be specified when 'MessageType' is 'Error'.", NameOf(Exception))
         End If
+
+        If Not String.IsNullOrWhiteSpace(ErrorCode) AndAlso MessageType <> CMessageBoxType.Error Then
+            Throw New ArgumentException("The 'ErrorCode' parameter can only be specified when 'MessageType' is 'Error'.", NameOf(ErrorCode))
+        End If
+
         Using Frm As New FrmMessageBox(Options)
             Using Uc As New UcException()
                 If MessageType = CMessageBoxType.Error AndAlso Exception IsNot Nothing Then
                     Dim Reporter As New ExceptionReporter()
                     Dim Report As ExceptionReport = ExceptionReporter.Capture(Exception, Title, Message, Options.AdditionalInformations)
                     Dim Json As String = Reporter.Serialize(Report)
+
                     Uc.TxtExceptionBody.Font = Options.MessageFont
                     Uc.TxtExceptionBody.ForeColor = Options.MessageForeColor
                     Uc.LblExceptionTitle.Font = Options.TitleFont
                     Uc.LblExceptionTitle.ForeColor = Options.TitleForeColor
                     Uc.LblFooter.Text = Options.FooterMessageExceptionDetailsPopup
                     Uc.TxtExceptionBody.Text = Json
+
                     If Options.ExceptionEmail Is Nothing Then
                         Uc.TlpContainer.RowStyles(2).SizeType = SizeType.Absolute
                         Uc.TlpContainer.RowStyles(2).Height = 0
                     End If
+
                     If Options.ShowExceptionDetails Then
                         Frm.CcException.HostedControl = Uc
                     End If
+
                     If Options.ExceptionEmail IsNot Nothing Then
                         Task.Run(Async Function()
                                      Try
@@ -159,18 +199,29 @@ Public Class CMessageBox
                                  End Function)
                     End If
                 End If
+
                 Frm.LblTitle.Text = Title
-                If String.IsNullOrEmpty(Title) Then
+                Frm.LblMessage.Text = Message
+
+                If MessageType = CMessageBoxType.Error AndAlso Not String.IsNullOrWhiteSpace(ErrorCode) Then
+                    Frm.LblErrorCode.Text = ErrorCode
+                    Frm.LblErrorCode.Visible = True
+                    Frm.TlpBody.RowStyles(0).SizeType = SizeType.Absolute
+                    Frm.TlpBody.RowStyles(0).Height = 30
+                Else
+                    Frm.LblErrorCode.Visible = False
                     Frm.TlpBody.RowStyles(0).SizeType = SizeType.Absolute
                     Frm.TlpBody.RowStyles(0).Height = 0
                 End If
-                Frm.LblMessage.Text = Message
+
                 Frm.AllocateButtons(MessageType)
                 Frm.SetMessageIcon(MessageType)
+
                 Return Frm.ShowDialog()
             End Using
         End Using
     End Function
+
     ''' <summary>
     ''' Sends exception details by email using the configured SMTP settings.
     ''' </summary>
@@ -199,22 +250,5 @@ Public Class CMessageBox
             Await ExceptionReporter.SendEmailAsync(Json, EmailOptions)
         Catch ex As Exception
         End Try
-    End Function
-
-    Private Shared Function ConvertSecureSocket(SecureSocket As CMessageBoxSecureSocket) As ExceptionReporterSecureSocket
-        Select Case SecureSocket
-            Case CMessageBoxSecureSocket.Auto
-                Return ExceptionReporterSecureSocket.Auto
-            Case CMessageBoxSecureSocket.StartTls
-                Return ExceptionReporterSecureSocket.StartTls
-            Case CMessageBoxSecureSocket.StartTlsWhenAvailable
-                Return ExceptionReporterSecureSocket.StartTlsWhenAvailable
-            Case CMessageBoxSecureSocket.SslOnConnect
-                Return ExceptionReporterSecureSocket.SslOnConnect
-            Case CMessageBoxSecureSocket.None
-                Return ExceptionReporterSecureSocket.None
-            Case Else
-                Throw New ArgumentOutOfRangeException(NameOf(SecureSocket))
-        End Select
     End Function
 End Class

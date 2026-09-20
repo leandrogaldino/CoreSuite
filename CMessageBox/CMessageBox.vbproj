@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.CMessageBox</PackageId>
-		<Version>2.0.1</Version>
-		<PackageReleaseNotes>Initialized AdditionalInformations by default to prevent null references and simplify usage.</PackageReleaseNotes>
+		<Version>2.1.0</Version>
+		<PackageReleaseNotes>Improved CMessageBox visual design and separated the message title from the error code, allowing error codes to be displayed independently for error messages.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite CMessageBox</Title>

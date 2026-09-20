@@ -1,20 +1,23 @@
 ﻿Imports System.Runtime.InteropServices
 
 Public Class FrmMessageBox
-    Private _Options As CMessageBoxOptions
-    Private _Container As UcException
+    Private Const WM_NCLBUTTONDOWN As Integer = &HA1
+    Private Const HTCAPTION As Integer = 2
+    Private ReadOnly _Options As CMessageBoxOptions
+
     Public Sub New(Options As CMessageBoxOptions)
+        ArgumentNullException.ThrowIfNull(Options)
+
         InitializeComponent()
+
         _Options = Options
+
         LblTitle.Font = _Options.TitleFont
         LblMessage.Font = _Options.MessageFont
         LblTitle.ForeColor = _Options.TitleForeColor
         LblMessage.ForeColor = _Options.MessageForeColor
-        If _Options.ShowExceptionDetails Then
-            _Container = New UcException
-            CcException.HostedControl = _Container
-        End If
     End Sub
+
     <DllImport("user32.dll")>
     Private Shared Function ReleaseCapture() As Boolean
     End Function
@@ -23,98 +26,113 @@ Public Class FrmMessageBox
     Private Shared Function SendMessage(hWnd As IntPtr, Msg As Integer, wParam As Integer, lParam As Integer) As IntPtr
     End Function
 
-    Private Const WM_NCLBUTTONDOWN As Integer = &HA1
-    Private Const HTCAPTION As Integer = 2
+    Private Sub DragForm(sender As Object, e As MouseEventArgs) Handles TlpTopBar.MouseDown, LblTitle.MouseDown
+        If e.Button <> MouseButtons.Left Then Return
 
-    Private Sub DragForm(sender As Object, e As MouseEventArgs) Handles TlpTopBar.MouseDown
-        If e.Button = MouseButtons.Left Then
-            ReleaseCapture()
-            SendMessage(Me.Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0)
-        End If
+        ReleaseCapture()
+        SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0)
     End Sub
-    Private Sub AdjustMessagePosition()
-        LblMessage.MaximumSize = New Size(PnMessage.Width - 10, 0)
-        Dim TextHeight As Integer = LblMessage.PreferredHeight
-        If TextHeight < PnMessage.Height Then
-            LblMessage.Top = (PnMessage.Height - TextHeight) \ 2
-            LblMessage.Left = 5
-        Else
-            LblMessage.Top = 0
-            LblMessage.Left = 5
-        End If
-    End Sub
-    Private Sub PanelMessage_Resize(sender As Object, e As EventArgs) Handles PnMessage.Resize
+
+    Private Sub PnlMessage_Resize(sender As Object, e As EventArgs) Handles PnlMessage.Resize
         AdjustMessagePosition()
     End Sub
+
+    Private Sub AdjustMessagePosition()
+        LblMessage.MaximumSize = New Size(Math.Max(0, PnlMessage.ClientSize.Width - 20), 0)
+
+        Dim TextHeight As Integer = LblMessage.PreferredHeight
+
+        LblMessage.Left = 10
+        LblMessage.Top = If(TextHeight < PnlMessage.ClientSize.Height, (PnlMessage.ClientSize.Height - TextHeight) \ 2, 10)
+    End Sub
+
+
     Friend Sub AllocateButtons(MessageType As CMessageBoxType)
-        Dim Button As Button
+        ClearButtons()
+
         Select Case MessageType
             Case CMessageBoxType.Information, CMessageBoxType.Success, CMessageBoxType.Warning
-                Button = CreateButton()
-                Button.Text = "OK"
-                Button.DialogResult = DialogResult.OK
-                Button.TabIndex = 0
-                TlpBottomBar.Controls.Add(Button, 4, 1)
+                AddButton("OK", DialogResult.OK, 2, 0)
+
             Case CMessageBoxType.Question
-                Button = CreateButton()
-                Button.Text = "Não"
-                Button.DialogResult = DialogResult.No
-                Button.TabIndex = 0
-                TlpBottomBar.Controls.Add(Button, 4, 1)
-                Button = CreateButton()
-                Button.Text = "Sim"
-                Button.DialogResult = DialogResult.Yes
-                Button.TabIndex = 1
-                TlpBottomBar.Controls.Add(Button, 3, 1)
+                AddButton("Não", DialogResult.No, 1, 1)
+                AddButton("Sim", DialogResult.Yes, 2, 0)
+
             Case CMessageBoxType.Error
-                Button = CreateButton()
-                Button.Text = "OK"
-                Button.DialogResult = DialogResult.OK
-                Button.TabIndex = 1
-                TlpBottomBar.Controls.Add(Button, 4, 1)
                 If _Options.ShowExceptionDetails Then
-                    Button = CreateButton()
-                    Button.Text = "Detalhes"
-                    Button.TabIndex = 0
-                    TlpBottomBar.Controls.Add(Button, 3, 1)
-                    CcException.HostControl = Button
+                    Dim DetailsButton As Button = AddButton("Detalhes", DialogResult.None, 1, 1)
+                    CcException.HostControl = DetailsButton
                 End If
+
+                AddButton("OK", DialogResult.OK, 2, 0)
         End Select
     End Sub
-    Private Function CreateButton() As Button
-        Dim Btn As New NoFocusCueButton With {
-            .UseVisualStyleBackColor = True,
-            .Anchor = AnchorStyles.None,
-            .BackColor = Color.White,
-            .Font = New Font("Segoe UI", 9.75F),
-            .Margin = New Padding(3, 6, 3, 3),
-            .Size = New Size(94, 35),
-            .TextAlign = ContentAlignment.MiddleCenter,
-                    .FlatStyle = FlatStyle.Flat
-        }
-        Btn.FlatAppearance.BorderColor = Color.Gainsboro
-        Btn.FlatAppearance.BorderSize = 1
-        Btn.FlatAppearance.MouseOverBackColor = Color.LightGray
-        Btn.FlatAppearance.MouseDownBackColor = Color.Silver
-        Return Btn
-    End Function
     Friend Sub SetMessageIcon(MessageType As CMessageBoxType)
         Select Case MessageType
             Case CMessageBoxType.Error
                 PbxIcon.Image = _Options.ErrorImage
+
             Case CMessageBoxType.Question
                 PbxIcon.Image = _Options.QuestionImage
+
             Case CMessageBoxType.Success
                 PbxIcon.Image = _Options.SuccessImage
+
             Case CMessageBoxType.Warning
                 PbxIcon.Image = _Options.WarningImage
+
             Case Else
                 PbxIcon.Image = _Options.InformationImage
         End Select
     End Sub
 
+    Friend Sub SetErrorCode(ErrorCode As String)
+        If String.IsNullOrWhiteSpace(ErrorCode) Then
+            LblErrorCode.Visible = False
+            TlpBody.RowStyles(0).Height = 0
+        Else
+            LblErrorCode.Text = ErrorCode
+            LblErrorCode.Visible = True
+            TlpBody.RowStyles(0).Height = 30
+        End If
+    End Sub
+
+    Private Function AddButton(Text As String, Result As DialogResult, Column As Integer, TabIndex As Integer) As Button
+        Dim Button As Button = CreateButton()
+
+        Button.Text = Text
+        Button.DialogResult = Result
+        Button.TabIndex = TabIndex
+
+        TlpBottomBar.Controls.Add(Button, Column, 0)
+
+        Return Button
+    End Function
+
+    Private Function CreateButton() As Button
+        Dim Button As New NoFocusCueButton With {
+            .UseVisualStyleBackColor = False,
+            .Anchor = AnchorStyles.Left,
+            .BackColor = Color.White,
+            .Font = New Font("Segoe UI", 9.75F),
+            .Margin = New Padding(3),
+            .Size = New Size(110, 34),
+            .TextAlign = ContentAlignment.MiddleCenter,
+            .FlatStyle = FlatStyle.Flat
+        }
+
+        Button.FlatAppearance.BorderColor = Color.Gainsboro
+        Button.FlatAppearance.BorderSize = 1
+        Button.FlatAppearance.MouseOverBackColor = Color.FromArgb(244, 245, 246)
+        Button.FlatAppearance.MouseDownBackColor = Color.FromArgb(230, 232, 234)
+
+        Return Button
+    End Function
+
+    Private Sub ClearButtons()
+        For Each Button In TlpBottomBar.Controls.OfType(Of Button).ToArray()
+            TlpBottomBar.Controls.Remove(Button)
+            Button.Dispose()
+        Next
+    End Sub
 End Class
-
-
-
-
