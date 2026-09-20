@@ -5,7 +5,7 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.CMessageBox</PackageId>
-		<Version>2.1.1</Version>
+		<Version>2.1.2</Version>
 		<PackageReleaseNotes>Added automatic inclusion of the error code in exception additional information when available.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
