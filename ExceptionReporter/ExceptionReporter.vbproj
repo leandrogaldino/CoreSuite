@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>CoreSuite.Services</RootNamespace>
 		<TargetFramework>net8.0</TargetFramework>
@@ -7,8 +7,8 @@
 		<OptionExplicit>On</OptionExplicit>
 		<OptionInfer>On</OptionInfer>
 		<PackageId>CoreSuite.ExceptionReporter</PackageId>
-		<Version>1.0.2</Version>
-		<PackageReleaseNotes>Updated JSON serialization encoder to preserve Unicode characters such as accents and special characters.</PackageReleaseNotes>
+		<Version>1.0.3</Version>
+		<PackageReleaseNotes>Updated MailKit dependency to the latest supported version.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite ExceptionReporter</Title>
@@ -31,7 +31,7 @@
 		<None Update="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="MailKit" Version="4.17.0" />
+		<PackageReference Include="MailKit" Version="4.18.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Connectivity\Connectivity.vbproj" />
