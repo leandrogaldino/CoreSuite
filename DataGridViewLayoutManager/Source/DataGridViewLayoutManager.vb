@@ -1,7 +1,9 @@
 ﻿Imports System.ComponentModel
 Imports System.IO
 Imports System.Text
+Imports System.Text.Encodings.Web
 Imports System.Text.Json
+Imports System.Text.Unicode
 
 ''' <summary>
 ''' Manages DataGridView layout persistence, including column visibility, order,
@@ -25,7 +27,7 @@ Public Class DataGridViewLayoutManager
     <Description("Occurs when the grid layout and column settings have been fully loaded and applied.")>
     Public Event Loaded(sender As Object, e As EventArgs)
 
-    Private Shared ReadOnly JsonOptions As New JsonSerializerOptions With {.WriteIndented = True}
+    Private Shared ReadOnly JsonOptions As New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)}
 
     Private _SaveLayout As Boolean
     Private _LoadLayout As Boolean
