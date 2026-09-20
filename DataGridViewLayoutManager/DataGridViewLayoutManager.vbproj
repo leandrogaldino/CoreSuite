@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.DataGridViewLayoutManager</PackageId>
-		<Version>1.0.3</Version>
-		<PackageReleaseNotes>Updated JSON serialization encoder to preserve Unicode characters such as accents and special characters.</PackageReleaseNotes>
+		<Version>1.0.4</Version>
+		<PackageReleaseNotes>Updated JSON serialization to use UnsafeRelaxedJsonEscaping, improving readability by preserving characters such as apostrophes instead of Unicode escaping them.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite DataGridViewLayoutManager</Title>

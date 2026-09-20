@@ -27,7 +27,7 @@ Public Class DataGridViewLayoutManager
     <Description("Occurs when the grid layout and column settings have been fully loaded and applied.")>
     Public Event Loaded(sender As Object, e As EventArgs)
 
-    Private Shared ReadOnly JsonOptions As New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)}
+    Private Shared ReadOnly JsonOptions As New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping}
 
     Private _SaveLayout As Boolean
     Private _LoadLayout As Boolean
