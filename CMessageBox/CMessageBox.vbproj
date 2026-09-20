@@ -6,7 +6,7 @@
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.CMessageBox</PackageId>
 		<Version>2.1.1</Version>
-		<PackageReleaseNotes>Improved CMessageBox button styling with enhanced neutral colors for normal, hover, and pressed states. Added Escape key support for closing the message box and Enter key support for activating the default action button.</PackageReleaseNotes>
+		<PackageReleaseNotes>Added automatic inclusion of the error code in exception additional information when available.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite CMessageBox</Title>

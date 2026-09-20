@@ -171,7 +171,13 @@ Public Class CMessageBox
             Using Uc As New UcException()
                 If MessageType = CMessageBoxType.Error AndAlso Exception IsNot Nothing Then
                     Dim Reporter As New ExceptionReporter()
-                    Dim Report As ExceptionReport = ExceptionReporter.Capture(Exception, Title, Message, Options.AdditionalInformations)
+                    Dim AdditionalInformations As New Dictionary(Of String, Object)(Options.AdditionalInformations)
+
+                    If Not String.IsNullOrWhiteSpace(ErrorCode) Then
+                        AdditionalInformations("ErrorCode") = ErrorCode
+                    End If
+
+                    Dim Report As ExceptionReport = ExceptionReporter.Capture(Exception, Title, Message, AdditionalInformations)
                     Dim Json As String = Reporter.Serialize(Report)
 
                     Uc.TxtExceptionBody.Font = Options.MessageFont
