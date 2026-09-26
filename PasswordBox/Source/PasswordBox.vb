@@ -568,6 +568,16 @@ Public Class PasswordBox
     End Sub
 
     ''' <summary>
+    ''' Repositions the embedded action button when the border style changes.
+    ''' </summary>
+    ''' <param name="e">The event data.</param>
+    Protected Overrides Sub OnBorderStyleChanged(e As EventArgs)
+        MyBase.OnBorderStyleChanged(e)
+        UpdateActionButtonBounds()
+        UpdateTextMargin()
+    End Sub
+
+    ''' <summary>
     ''' Raises the <see cref="Control.FontChanged"/> event and recalculates the embedded action button layout.
     ''' </summary>
     ''' <param name="e">The event data.</param>
@@ -760,17 +770,28 @@ Public Class PasswordBox
     ''' </summary>
     Private Sub UpdateActionButtonBounds()
         If _ActionButton Is Nothing Then Return
-        Dim ButtonWidth As Integer = If(_ShowActionButton, Math.Min(_ButtonWidth, ClientSize.Width), 0)
-        Dim ButtonLeft As Integer = Math.Max(0, ClientSize.Width - ButtonWidth)
-        _ActionButton.Bounds = New Rectangle(ButtonLeft, 0, ButtonWidth, ClientSize.Height)
+        Dim BorderInset As Integer
+        Select Case BorderStyle
+            Case BorderStyle.FixedSingle
+                BorderInset = 1
+            Case BorderStyle.Fixed3D
+                BorderInset = 2
+            Case Else
+                BorderInset = 0
+        End Select
+        Dim ButtonWidth As Integer = If(_ShowActionButton, Math.Min(_ButtonWidth, Math.Max(0, ClientSize.Width - BorderInset * 2)), 0)
+        Dim ButtonLeft As Integer = Math.Max(BorderInset, ClientSize.Width - ButtonWidth - BorderInset)
+        _ActionButton.Bounds = New Rectangle(ButtonLeft, BorderInset, ButtonWidth, Math.Max(1, ClientSize.Height - BorderInset * 2))
+        _ActionButton.BringToFront()
+        _ActionButton.Invalidate()
     End Sub
 
     ''' <summary>
     ''' Updates the native right text margin so entered text does not overlap the embedded action button.
     ''' </summary>
     Private Sub UpdateTextMargin()
-        If Not IsHandleCreated Then Return
-        Dim RightMargin As Integer = If(_ShowActionButton, _ButtonWidth + ButtonMargin, 0)
+        If Not IsHandleCreated OrElse _ActionButton Is Nothing Then Return
+        Dim RightMargin As Integer = If(_ShowActionButton, _ActionButton.Width + ButtonMargin, 0)
         Dim MarginValue As Integer = (RightMargin And &HFFFF) << 16
         SendMessage(Handle, EmSetMargins, New IntPtr(EcRightMargin), New IntPtr(MarginValue))
     End Sub
