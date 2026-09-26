@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.DataGridViewContentCopy</PackageId>
-		<Version>1.0.0</Version>
-		<PackageReleaseNotes>Initial release of the DataGridViewContentCopy component.</PackageReleaseNotes>
+		<Version>1.0.1</Version>
+		<PackageReleaseNotes>Fixed design-time text customization for CopyCellButtonText and CopyRowButtonText so PropertyGrid values are correctly reflected in the runtime context menu. Added Microsoft.WinForms.Designer.SDK support for proper Windows Forms design-time behavior.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite DataGridViewContentCopy</Title>

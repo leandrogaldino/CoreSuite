@@ -1,9 +1,11 @@
 ﻿Imports System.ComponentModel
+
 ''' <summary>
 ''' Provides copy commands for <see cref="DataGridView"/> cells and rows through a context menu.
 ''' </summary>
 Public Class DataGridViewContentCopy
     Inherits Component
+
     Private ReadOnly _ToolStripMenuItemCopyCell As ToolStripMenuItem
     Private ReadOnly _ToolStripMenuItemCopyRow As ToolStripMenuItem
     Private _ContextMenuStrip As ContextMenuStrip
@@ -12,6 +14,9 @@ Public Class DataGridViewContentCopy
     Private _ContextPoint As Point
     Private _ClickedColumnIndex As Integer
     Private _ClickedRowIndex As Integer
+    Private _CopyCellButtonText As String = "Copy Cell"
+    Private _CopyRowButtonText As String = "Copy Row"
+
     ''' <summary>
     ''' Gets or sets a value indicating whether icons are displayed alongside text in the context menu items.
     ''' </summary>
@@ -34,6 +39,7 @@ Public Class DataGridViewContentCopy
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Gets or sets the context menu displayed when right-clicking a grid cell.
     ''' </summary>
@@ -58,6 +64,7 @@ Public Class DataGridViewContentCopy
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Gets or sets the <see cref="DataGridView"/> control associated with this copy component.
     ''' </summary>
@@ -82,6 +89,7 @@ Public Class DataGridViewContentCopy
             End If
         End Set
     End Property
+
     ''' <summary>
     ''' Gets or sets a value indicating whether column header text is included when copying an entire row.
     ''' </summary>
@@ -91,6 +99,7 @@ Public Class DataGridViewContentCopy
     <Category("DataGridViewContentCopy")>
     <Description("Determines whether column header titles are included when copying an entire row.")>
     Public Property IncludeHeaderTextInRowCopy As Boolean
+
     ''' <summary>
     ''' Gets or sets a value indicating whether the column header text is included when copying an individual cell.
     ''' </summary>
@@ -100,6 +109,7 @@ Public Class DataGridViewContentCopy
     <Category("DataGridViewContentCopy")>
     <Description("Determines whether the column header title is included when copying a cell.")>
     Public Property IncludeHeaderTextInCellCopy As Boolean
+
     ''' <summary>
     ''' Gets or sets the text displayed by the context menu command that copies the selected cell's content.
     ''' </summary>
@@ -109,7 +119,16 @@ Public Class DataGridViewContentCopy
     <Category("DataGridViewContentCopy")>
     <DefaultValue("Copy Cell")>
     <Description("Gets or sets the text displayed by the command that copies the selected cell's content.")>
-    Public Property CopyCellButtonText As String = "Copy Cell"
+    Public Property CopyCellButtonText As String
+        Get
+            Return _CopyCellButtonText
+        End Get
+        Set(value As String)
+            _CopyCellButtonText = value
+            If _ToolStripMenuItemCopyCell IsNot Nothing Then _ToolStripMenuItemCopyCell.Text = value
+        End Set
+    End Property
+
     ''' <summary>
     ''' Gets or sets the text displayed by the context menu command that copies the selected row's content.
     ''' </summary>
@@ -119,7 +138,16 @@ Public Class DataGridViewContentCopy
     <Category("DataGridViewContentCopy")>
     <DefaultValue("Copy Row")>
     <Description("Gets or sets the text displayed by the command that copies the selected row's content.")>
-    Public Property CopyRowButtonText As String = "Copy Row"
+    Public Property CopyRowButtonText As String
+        Get
+            Return _CopyRowButtonText
+        End Get
+        Set(value As String)
+            _CopyRowButtonText = value
+            If _ToolStripMenuItemCopyRow IsNot Nothing Then _ToolStripMenuItemCopyRow.Text = value
+        End Set
+    End Property
+
     ''' <summary>
     ''' Initializes a new instance of the <see cref="DataGridViewContentCopy"/> class.
     ''' </summary>
@@ -130,6 +158,7 @@ Public Class DataGridViewContentCopy
         AddHandler _ToolStripMenuItemCopyRow.Click, AddressOf CopyRowClick
         CreateDefaultCms()
     End Sub
+
     ''' <summary>
     ''' Creates the default context menu used by the component.
     ''' </summary>
@@ -145,7 +174,7 @@ Public Class DataGridViewContentCopy
     ''' <param name="e">Mouse event data.</param>
     Private Sub Dgv_MouseDown(sender As Object, e As MouseEventArgs)
         Dim Click As DataGridView.HitTestInfo = _DataGridView.HitTest(e.X, e.Y)
-        If Click.Type = DataGridViewHitTestType.Cell And e.Button = MouseButtons.Right Then
+        If Click.Type = DataGridViewHitTestType.Cell AndAlso e.Button = MouseButtons.Right Then
             _DataGridView.Rows(Click.RowIndex).Selected = True
             _ShowContext = True
             _ContextPoint = e.Location
@@ -153,6 +182,7 @@ Public Class DataGridViewContentCopy
             _ClickedRowIndex = Click.RowIndex
         End If
     End Sub
+
     ''' <summary>
     ''' Displays the context menu after a valid right-click operation.
     ''' </summary>
@@ -164,6 +194,7 @@ Public Class DataGridViewContentCopy
             _ShowContext = False
         End If
     End Sub
+
     ''' <summary>
     ''' Copies the selected cell content to the clipboard.
     ''' </summary>
@@ -179,6 +210,7 @@ Public Class DataGridViewContentCopy
         End If
         Clipboard.SetText(Text)
     End Sub
+
     ''' <summary>
     ''' Copies the selected row content to the clipboard.
     ''' </summary>
@@ -200,17 +232,18 @@ Public Class DataGridViewContentCopy
         Text = String.Join(" | ", RowCellsText)
         Clipboard.SetText(Text)
     End Sub
+
     ''' <summary>
     ''' Ensures the copy commands are available in the context menu before it is displayed.
     ''' </summary>
     ''' <param name="sender">The event source.</param>
     ''' <param name="e">Provides data for the opening event.</param>
     Private Sub OnContextMenuOpening(sender As Object, e As CancelEventArgs)
-        Dim menu = DirectCast(sender, ContextMenuStrip)
-        If Not menu.Items.Contains(_ToolStripMenuItemCopyCell) And Not DesignMode Then
-            menu.Items.Add(New ToolStripSeparator())
-            menu.Items.Add(_ToolStripMenuItemCopyCell)
-            menu.Items.Add(_ToolStripMenuItemCopyRow)
+        Dim Menu = DirectCast(sender, ContextMenuStrip)
+        If Not Menu.Items.Contains(_ToolStripMenuItemCopyCell) AndAlso Not DesignMode Then
+            Menu.Items.Add(New ToolStripSeparator())
+            Menu.Items.Add(_ToolStripMenuItemCopyCell)
+            Menu.Items.Add(_ToolStripMenuItemCopyRow)
         End If
     End Sub
 End Class
