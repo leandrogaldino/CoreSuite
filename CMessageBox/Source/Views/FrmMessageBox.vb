@@ -52,11 +52,15 @@ Public Class FrmMessageBox
 
         Select Case MessageType
             Case CMessageBoxType.Information, CMessageBoxType.Success, CMessageBoxType.Warning
-                AddButton("OK", DialogResult.OK, 2, 0)
+                Dim OkButton As Button = AddButton("OK", DialogResult.OK, 2, 0)
+                AcceptButton = OkButton
+                OkButton.Select()
 
             Case CMessageBoxType.Question
-                AddButton("Não", DialogResult.No, 1, 1)
+                Dim NoButton As Button = AddButton("Não", DialogResult.No, 1, 1)
                 AddButton("Sim", DialogResult.Yes, 2, 0)
+                AcceptButton = NoButton
+                NoButton.Select()
 
             Case CMessageBoxType.Error
                 If _Options.ShowExceptionDetails AndAlso HasException Then
@@ -64,7 +68,9 @@ Public Class FrmMessageBox
                     CcException.HostControl = DetailsButton
                 End If
 
-                AddButton("OK", DialogResult.OK, 2, 0)
+                Dim OkButton As Button = AddButton("OK", DialogResult.OK, 2, 0)
+                AcceptButton = OkButton
+                OkButton.Select()
         End Select
     End Sub
     Friend Sub SetMessageIcon(MessageType As CMessageBoxType)
