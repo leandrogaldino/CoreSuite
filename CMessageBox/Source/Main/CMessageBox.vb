@@ -220,7 +220,7 @@ Public Class CMessageBox
                     Frm.TlpBody.RowStyles(0).Height = 0
                 End If
 
-                Frm.AllocateButtons(MessageType)
+                Frm.AllocateButtons(MessageType, Exception IsNot Nothing)
                 Frm.SetMessageIcon(MessageType)
 
                 Return Frm.ShowDialog()

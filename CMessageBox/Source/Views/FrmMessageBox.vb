@@ -47,7 +47,7 @@ Public Class FrmMessageBox
     End Sub
 
 
-    Friend Sub AllocateButtons(MessageType As CMessageBoxType)
+    Friend Sub AllocateButtons(MessageType As CMessageBoxType, HasException As Boolean)
         ClearButtons()
 
         Select Case MessageType
@@ -59,7 +59,7 @@ Public Class FrmMessageBox
                 AddButton("Sim", DialogResult.Yes, 2, 0)
 
             Case CMessageBoxType.Error
-                If _Options.ShowExceptionDetails Then
+                If _Options.ShowExceptionDetails AndAlso HasException Then
                     Dim DetailsButton As Button = AddButton("Detalhes", DialogResult.None, 1, 1)
                     CcException.HostControl = DetailsButton
                 End If
