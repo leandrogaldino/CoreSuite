@@ -152,5 +152,31 @@ Public Module SqlDialectExtensions
         End If
         Return String.Join(" ", Parts)
     End Function
+    ''' <summary>
+    ''' Quotes an SQL identifier using the syntax required by the specified SQL dialect.
+    ''' </summary>
+    ''' <param name="Dialect">The SQL dialect.</param>
+    ''' <param name="Identifier">The identifier to quote.</param>
+    ''' <returns>The quoted SQL identifier.</returns>
+    ''' <exception cref="ArgumentOutOfRangeException">
+    ''' Thrown when the specified dialect is not supported.
+    ''' </exception>
+    <Extension>
+    Public Function QuoteIdentifier(Dialect As SqlDialect, Identifier As String) As String
+        If String.IsNullOrWhiteSpace(Identifier) Then Return Identifier
 
+        Select Case Dialect
+            Case SqlDialect.MySql
+                Return $"`{Identifier.Replace("`", "``")}`"
+            Case SqlDialect.SqlServer
+                Return $"[{Identifier.Replace("]", "]]")}]"
+            Case SqlDialect.PostgreSql,
+                 SqlDialect.Sqlite,
+                 SqlDialect.Oracle,
+                 SqlDialect.Firebird
+                Return $"""{Identifier.Replace("""", """""")}"""
+            Case Else
+                Throw New ArgumentOutOfRangeException(NameOf(Dialect))
+        End Select
+    End Function
 End Module

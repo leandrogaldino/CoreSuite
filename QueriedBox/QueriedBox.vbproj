@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.QueriedBox</AssemblyName>
 		<PackageId>CoreSuite.QueriedBox</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Corrected XML documentation for query conditions, joins, and column configuration APIs.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Added dialect-specific quoting for column aliases, allowing aliases with spaces or reserved words to be generated correctly across supported SQL databases.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite QueriedBox</Title>

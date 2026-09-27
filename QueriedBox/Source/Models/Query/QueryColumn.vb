@@ -72,7 +72,7 @@ Public Class QueryColumn
             Text = Dialect.GetIfNull(Text, IfNull)
         End If
         If Not String.IsNullOrWhiteSpace(ColumnAlias) Then
-            Text &= $" AS {ColumnAlias}"
+            Text &= $" AS {Dialect.QuoteIdentifier(ColumnAlias)}"
         End If
         Return Text
     End Function
