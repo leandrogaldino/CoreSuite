@@ -6,7 +6,6 @@
 Public Class FluidResizer
     Private _OldSize As Size
     Private _TargetSize As Size
-    Private _IsResizing As Boolean = False
     Private ReadOnly _Control As Control
     Private ReadOnly _ResizeTimer As Timer
     ''' <summary>
@@ -32,11 +31,9 @@ Public Class FluidResizer
     ''' The resizing is performed gradually in steps, with increments calculated
     ''' to ensure a smooth transition.
     ''' </remarks>
-    Public Sub SetSize(TargetSize As Size)
-        If _IsResizing Then Return
+    Public Sub ResizeTo(TargetSize As Size)
         _OldSize = _Control.Size
         _TargetSize = TargetSize
-        _IsResizing = True
         If Not _ResizeTimer.Enabled Then
             _ResizeTimer.Start()
         End If
@@ -62,7 +59,6 @@ Public Class FluidResizer
         End If
         If _Control.Width = _TargetSize.Width AndAlso _Control.Height = _TargetSize.Height Then
             _ResizeTimer.Stop()
-            _IsResizing = False
             OnResizeEnd(New ResizeEndEventArgs(_OldSize, _TargetSize))
         End If
     End Sub
