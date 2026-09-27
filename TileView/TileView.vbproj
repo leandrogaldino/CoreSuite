@@ -8,8 +8,8 @@
 		<OptionInfer>On</OptionInfer>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.TileView</PackageId>
-		<Version>1.0.2</Version>
-		<PackageReleaseNotes>Fixed TileViewItem border rendering by preventing the native BorderStyle from overriding the control's custom normal and selected borders.</PackageReleaseNotes>
+		<Version>1.0.3</Version>
+		<PackageReleaseNotes>Added read-only support to TileView and TileViewItem, allowing hosted tiles to disable editing while preserving selection, navigation, focus, filtering and activation behavior.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite TileView</Title>

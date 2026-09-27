@@ -52,6 +52,10 @@ Public Class TileViewItem
     ''' </summary>
     Private _FocusOnClick As Boolean = True
     ''' <summary>
+    ''' Stores whether the item is read-only.
+    ''' </summary>
+    Private _ReadOnly As Boolean
+    ''' <summary>
     ''' Stores the <see cref="TileView"/> that currently owns the item.
     ''' </summary>
     Private _OwnerView As TileView
@@ -70,6 +74,11 @@ Public Class TileViewItem
     ''' </summary>
     <Category("Action"), Description("Occurs when the item is activated by the owning TileView.")>
     Public Event Activated As EventHandler
+    ''' <summary>
+    ''' Occurs when the read-only state of the item changes.
+    ''' </summary>
+    <Category("Property Changed"), Description("Occurs when the read-only state of the item changes.")>
+    Public Event ReadOnlyChanged As EventHandler
     ''' <summary>
     ''' Gets the native Windows Forms border style used by the control.
     ''' </summary>
@@ -201,6 +210,15 @@ Public Class TileViewItem
         End Get
     End Property
     ''' <summary>
+    ''' Gets a value indicating whether the item is read-only.
+    ''' </summary>
+    <Browsable(False), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
+    Public ReadOnly Property [ReadOnly] As Boolean
+        Get
+            Return _ReadOnly
+        End Get
+    End Property
+    ''' <summary>
     ''' Requests selection of this item through its owning <see cref="TileView"/>.
     ''' </summary>
     Public Sub SelectItem()
@@ -223,6 +241,22 @@ Public Class TileViewItem
     ''' <param name="owner">The new owner, or <see langword="Nothing"/> when the item is detached.</param>
     Friend Sub SetOwner(owner As TileView)
         _OwnerView = owner
+    End Sub
+    ''' <summary>
+    ''' Updates the read-only state without changing selection, focus, navigation, or activation behavior.
+    ''' </summary>
+    ''' <param name="value">The new read-only state.</param>
+    Friend Sub SetReadOnlyInternal(value As Boolean)
+        If _ReadOnly = value Then Return
+        _ReadOnly = value
+        OnReadOnlyChanged(EventArgs.Empty)
+    End Sub
+    ''' <summary>
+    ''' Raises the <see cref="ReadOnlyChanged"/> event.
+    ''' </summary>
+    ''' <param name="e">The event data.</param>
+    Protected Overridable Sub OnReadOnlyChanged(e As EventArgs)
+        RaiseEvent ReadOnlyChanged(Me, e)
     End Sub
     ''' <summary>
     ''' Updates the selection state without notifying the owning <see cref="TileView"/>.

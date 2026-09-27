@@ -1,7 +1,5 @@
-Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Drawing
-Imports System.Linq
 Imports System.Windows.Forms
 
 ''' <summary>
@@ -30,6 +28,10 @@ Public Class TileView
     ''' Stores whether keyboard navigation wraps from the final item to the first item and vice versa.
     ''' </summary>
     Private _WrapNavigation As Boolean
+    ''' <summary>
+    ''' Stores whether hosted items are read-only.
+    ''' </summary>
+    Private _ReadOnly As Boolean
     ''' <summary>
     ''' Stores the current layout suspension depth used by <see cref="BeginUpdate"/> and <see cref="EndUpdate"/>.
     ''' </summary>
@@ -182,6 +184,25 @@ Public Class TileView
         End Get
         Set(value As Boolean)
             _WrapNavigation = value
+        End Set
+    End Property
+    ''' <summary>
+    ''' Gets or sets a value indicating whether hosted items are read-only.
+    ''' </summary>
+    ''' <remarks>
+    ''' Read-only mode preserves selection, focus, navigation, scrolling, filtering, and activation. Derived <see cref="TileViewItem"/> controls can override <see cref="TileViewItem.OnReadOnlyChanged"/> to disable only their editing controls.
+    ''' </remarks>
+    <Category("Behavior"), Description("Specifies whether hosted items are read-only."), DefaultValue(False)>
+    Public Property [ReadOnly] As Boolean
+        Get
+            Return _ReadOnly
+        End Get
+        Set(value As Boolean)
+            If _ReadOnly = value Then Return
+            _ReadOnly = value
+            For Each Item In Items
+                Item.SetReadOnlyInternal(value)
+            Next
         End Set
     End Property
     ''' <summary>
@@ -522,6 +543,7 @@ Public Class TileView
         If item Is Nothing Then Return
         If item.OwnerView IsNot Nothing AndAlso item.OwnerView IsNot Me Then Throw New InvalidOperationException("A TileViewItem cannot belong to more than one TileView.")
         item.SetOwner(Me)
+        item.SetReadOnlyInternal(_ReadOnly)
         AddHandler item.Click, AddressOf HostedItem_Click
         AddHandler item.DoubleClick, AddressOf HostedItem_DoubleClick
         RaiseEvent ItemAdded(Me, New TileViewItemEventArgs(item))
@@ -536,6 +558,7 @@ Public Class TileView
             RemoveHandler Item.Click, AddressOf HostedItem_Click
             RemoveHandler Item.DoubleClick, AddressOf HostedItem_DoubleClick
             If ReferenceEquals(_SelectedItem, Item) Then ClearSelection()
+            Item.SetReadOnlyInternal(False)
             Item.SetOwner(Nothing)
         End If
         MyBase.OnControlRemoved(e)
