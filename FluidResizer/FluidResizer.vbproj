@@ -5,8 +5,8 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyName>CoreSuite.$(MSBuildProjectName)</AssemblyName>
 		<PackageId>CoreSuite.FluidResizer</PackageId>
-		<Version>1.0.1</Version>
-		<PackageReleaseNotes>Updated FluidResizer to allow changing the target size while an animation is already in progress and renamed SetSize to ResizeTo for clearer API semantics.</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageReleaseNotes>Changed FluidResizer animations to use a fixed duration with smooth easing, ensuring consistent completion time regardless of resize distance while preserving support for redirecting to a new target during an active animation.</PackageReleaseNotes>
 		<Authors>Leandro Galdino</Authors>
 		<Company>CoreSuite</Company>
 		<Title>CoreSuite FluidResizer</Title>

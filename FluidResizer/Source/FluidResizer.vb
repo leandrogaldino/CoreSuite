@@ -4,64 +4,75 @@
 ''' Class responsible for smoothly resizing controls or forms.
 ''' </summary>
 Public Class FluidResizer
+    Private Const AnimationDuration As Integer = 150
     Private _OldSize As Size
+    Private _StartSize As Size
     Private _TargetSize As Size
+    Private _AnimationStarted As Long
     Private ReadOnly _Control As Control
     Private ReadOnly _ResizeTimer As Timer
+
     ''' <summary>
     ''' Occurs when a fluid resizing operation reaches its target size and finishes animating.
     ''' </summary>
     <Category("FluidResizer")>
     <Description("Occurs when a fluid resizing operation reaches its target size and finishes animating.")>
     Public Event ResizeEnd As EventHandler(Of ResizeEndEventArgs)
+
     ''' <summary>
     ''' Initializes a new instance of the <see cref="FluidResizer"/> class for the specified control.
     ''' </summary>
     ''' <param name="Control">The control or form to be resized.</param>
     Public Sub New(Control As Control)
+        ArgumentNullException.ThrowIfNull(Control)
         _Control = Control
-        _ResizeTimer = New Timer With {.Interval = 1}
+        _ResizeTimer = New Timer With {.Interval = 15}
         AddHandler _ResizeTimer.Tick, AddressOf ResizeTimer_Tick
     End Sub
+
     ''' <summary>
-    ''' Sets the desired final size for the control and starts the smooth resizing process.
+    ''' Smoothly resizes the control to the specified target size.
     ''' </summary>
     ''' <param name="TargetSize">The target size the control should reach.</param>
     ''' <remarks>
-    ''' The resizing is performed gradually in steps, with increments calculated
-    ''' to ensure a smooth transition.
+    ''' The animation uses a fixed duration and automatically redirects from the current
+    ''' size when a new target is requested before the previous animation finishes.
     ''' </remarks>
     Public Sub ResizeTo(TargetSize As Size)
         _OldSize = _Control.Size
+        _StartSize = _Control.Size
         _TargetSize = TargetSize
-        If Not _ResizeTimer.Enabled Then
-            _ResizeTimer.Start()
+        _AnimationStarted = Environment.TickCount64
+
+        If _Control.Size = _TargetSize Then
+            _ResizeTimer.Stop()
+            OnResizeEnd(New ResizeEndEventArgs(_OldSize, _TargetSize))
+            Return
         End If
+
+        If Not _ResizeTimer.Enabled Then _ResizeTimer.Start()
     End Sub
+
     ''' <summary>
-    ''' Handles the resize timer's tick event, incrementally moving the control's
-    ''' width and height toward the target size until it is reached.
+    ''' Handles the resize timer's tick event and interpolates the control size toward the target size.
     ''' </summary>
     ''' <param name="sender">The source of the event.</param>
     ''' <param name="e">An <see cref="EventArgs"/> that contains no event data.</param>
     Private Sub ResizeTimer_Tick(sender As Object, e As EventArgs)
-        Dim StepWidth As Integer = Math.Max(1, Math.Abs(_TargetSize.Width - _Control.Width) / 5)
-        Dim StepHeight As Integer = Math.Max(1, Math.Abs(_TargetSize.Height - _Control.Height) / 5)
-        If _Control.Width < _TargetSize.Width Then
-            _Control.Width = Math.Min(_Control.Width + StepWidth, _TargetSize.Width)
-        ElseIf _Control.Width > _TargetSize.Width Then
-            _Control.Width = Math.Max(_Control.Width - StepWidth, _TargetSize.Width)
-        End If
-        If _Control.Height < _TargetSize.Height Then
-            _Control.Height = Math.Min(_Control.Height + StepHeight, _TargetSize.Height)
-        ElseIf _Control.Height > _TargetSize.Height Then
-            _Control.Height = Math.Max(_Control.Height - StepHeight, _TargetSize.Height)
-        End If
-        If _Control.Width = _TargetSize.Width AndAlso _Control.Height = _TargetSize.Height Then
+        Dim Progress = Math.Min(1.0, (Environment.TickCount64 - _AnimationStarted) / CDbl(AnimationDuration))
+        Dim EasedProgress = 1.0 - Math.Pow(1.0 - Progress, 3)
+        Dim Width = CInt(_StartSize.Width + (_TargetSize.Width - _StartSize.Width) * EasedProgress)
+        Dim Height = CInt(_StartSize.Height + (_TargetSize.Height - _StartSize.Height) * EasedProgress)
+
+        _Control.Size = New Size(Width, Height)
+
+        If Progress >= 1.0 Then
+            _Control.Size = _TargetSize
             _ResizeTimer.Stop()
             OnResizeEnd(New ResizeEndEventArgs(_OldSize, _TargetSize))
         End If
     End Sub
+
     ''' <summary>
     ''' Raises the <see cref="ResizeEnd"/> event when resizing completes.
     ''' </summary>
