@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0157F116-1BA5-44D4-8E5B-860AE8CC4F6C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Tests.My.MyApplication</StartupObject>
+    <RootNamespace>Tests</RootNamespace>
+    <AssemblyName>Tests</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Tests.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Tests.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Form1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.vb">
+      <DependentUpon>Form1.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ActionTextBox\ActionTextBox.vbproj">
+      <Project>{acb499c6-cd41-4f06-965d-6e9b21c6ea4b}</Project>
+      <Name>ActionTextBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnimatedBox\AnimatedBox.vbproj">
+      <Project>{36982107-beae-49af-8159-5e82797b74d9}</Project>
+      <Name>AnimatedBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BusyOverlay\BusyOverlay.vbproj">
+      <Project>{0c694c04-b762-4a27-b73b-48b57e70be8c}</Project>
+      <Name>BusyOverlay</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CentralizedComboBox\CentralizedComboBox.vbproj">
+      <Project>{aa425aaf-496e-4832-a898-a9285ed2ae92}</Project>
+      <Name>CentralizedComboBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ChangeTracker\ChangeTracker.vbproj">
+      <Project>{183cf634-56e2-4b59-846b-0f0ff82e75c0}</Project>
+      <Name>ChangeTracker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CMessageBox\CMessageBox.vbproj">
+      <Project>{e980f908-c501-4e6a-b848-e91548f5e60c}</Project>
+      <Name>CMessageBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeCompiler\CodeCompiler.vbproj">
+      <Project>{90c46253-5e0a-4ea8-8ad8-07303c960387}</Project>
+      <Name>CodeCompiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ColoredProgressBar\ColoredProgressBar.vbproj">
+      <Project>{bcdb7dee-8d4b-4028-96e5-a9236883799a}</Project>
+      <Name>ColoredProgressBar</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ColorPicker\ColorPicker.vbproj">
+      <Project>{e8dc3bc0-03d1-4347-a40a-e306c9ea981c}</Project>
+      <Name>ColorPicker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Connectivity\Connectivity.vbproj">
+      <Project>{32be4e1f-6aa0-4cd0-bb18-49800e8fb89d}</Project>
+      <Name>Connectivity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ControlContainer\ControlContainer.vbproj">
+      <Project>{f31e86d4-d899-4b6b-9589-cd725bb72226}</Project>
+      <Name>ControlContainer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ControlSlider\ControlSlider.vbproj">
+      <Project>{0158e430-fa6a-42b6-97b9-71a57a41563a}</Project>
+      <Name>ControlSlider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cryptography.Windows\Cryptography.Windows.vbproj">
+      <Project>{c7fda54e-3189-4074-9ff1-21409d9edee0}</Project>
+      <Name>Cryptography.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cryptography\Cryptography.vbproj">
+      <Project>{b8809f91-3bd3-4e1c-b055-26eb4dccbbe2}</Project>
+      <Name>Cryptography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CToolStripRenderer\CToolStripRenderer.vbproj">
+      <Project>{556f99be-d53b-429a-8456-e9a678dadb00}</Project>
+      <Name>CToolStripRenderer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CurrencyBox\CurrencyBox.vbproj">
+      <Project>{25f4227f-4fdb-415d-afb2-2971d5636489}</Project>
+      <Name>CurrencyBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGridViewContentCopy\DataGridViewContentCopy.vbproj">
+      <Project>{9288df66-b0a6-4c19-a879-1731d24276f3}</Project>
+      <Name>DataGridViewContentCopy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGridViewFilterBox\DataGridViewFilterBox.vbproj">
+      <Project>{e6be9f04-bfda-40ec-a007-57e9ee13c831}</Project>
+      <Name>DataGridViewFilterBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGridViewLayoutManager\DataGridViewLayoutManager.vbproj">
+      <Project>{b956463f-ab33-4e68-bede-c31e0b5af09e}</Project>
+      <Name>DataGridViewLayoutManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataGridViewNavigator\DataGridViewNavigator.vbproj">
+      <Project>{0b4beaa2-ef49-42ef-86f5-b1c41a77680e}</Project>
+      <Name>DataGridViewNavigator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DateBox\DateBox.vbproj">
+      <Project>{906e2c2f-eac7-4369-ae44-184181bdfb00}</Project>
+      <Name>DateBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DateTimeBoxBase\DateTimeBoxBase.vbproj">
+      <Project>{4d004b7e-5cf3-4722-a8f9-a174599dc538}</Project>
+      <Name>DateTimeBoxBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DateTimeBox\DateTimeBox.vbproj">
+      <Project>{e01e64df-7f4f-4aa9-98bf-7943590f4509}</Project>
+      <Name>DateTimeBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DecimalBox\DecimalBox.vbproj">
+      <Project>{bddbaa18-8162-4ad8-a62d-46aa1209a7f7}</Project>
+      <Name>DecimalBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExceptionReporter\ExceptionReporter.vbproj">
+      <Project>{7d571391-be9b-49d2-8a55-591e6d90fc8c}</Project>
+      <Name>ExceptionReporter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extensions.Windows\Extensions.Windows.vbproj">
+      <Project>{333401aa-eb3d-437b-8751-35440e538303}</Project>
+      <Name>Extensions.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extensions\Extensions.vbproj">
+      <Project>{f18f1a17-e4d2-494b-9cff-ff461fa15e21}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileManager\FileManager.vbproj">
+      <Project>{f90ba834-ef79-45c7-96d7-6e3c0cdfbbe5}</Project>
+      <Name>FileManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileMerger\FileMerger.vbproj">
+      <Project>{01fc010f-2117-441a-a889-498a74798e8c}</Project>
+      <Name>FileMerger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileStateManager\FileStateManager.vbproj">
+      <Project>{62dab6b1-ee62-43a2-9502-f77e1246b0ac}</Project>
+      <Name>FileStateManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FirebaseService\FirebaseService.vbproj">
+      <Project>{673ef88d-78a0-4bb9-97ea-8626c69d495e}</Project>
+      <Name>FirebaseService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FluidResizer\FluidResizer.vbproj">
+      <Project>{3453ce46-764c-417b-8ad1-d83ac8b4056a}</Project>
+      <Name>FluidResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
+      <Project>{99a014fc-f9d3-41d8-9035-197bcaefdda6}</Project>
+      <Name>Helpers.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.vbproj">
+      <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonFileStore\JsonFileStore.vbproj">
+      <Project>{f5271f58-bbed-4590-b823-07a55e1cc32e}</Project>
+      <Name>JsonFileStore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Locator\Locator.vbproj">
+      <Project>{eed4fd60-747b-408d-b356-daa9a681d364}</Project>
+      <Name>Locator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LookupBox\LookupBox.vbproj">
+      <Project>{1209b3cf-5d74-4cd1-b82f-ddc22538cd30}</Project>
+      <Name>LookupBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MySqlService\MySqlService.vbproj">
+      <Project>{eda9a058-47ab-4329-9ea0-f7e5a1f3dc78}</Project>
+      <Name>MySqlService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NavigationView\NavigationView.vbproj">
+      <Project>{e9e56a15-874a-443f-8a80-3770622a12d1}</Project>
+      <Name>NavigationView</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NoFocusCueButton\NoFocusCueButton.vbproj">
+      <Project>{3286b6b5-12e8-4a9a-89ed-7de0313100cf}</Project>
+      <Name>NoFocusCueButton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NumericBoxBase\NumericBoxBase.vbproj">
+      <Project>{2c23c65f-d2d0-4996-8ea0-2cde387563c4}</Project>
+      <Name>NumericBoxBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OutlookEmail\OutlookEmail.vbproj">
+      <Project>{22f0670d-42b1-4369-ae95-1e57e13a2e27}</Project>
+      <Name>OutlookEmail</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PasswordBox\PasswordBox.vbproj">
+      <Project>{e7536427-b0b0-46c4-8991-39f5a48b7360}</Project>
+      <Name>PasswordBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PercentageBox\PercentageBox.vbproj">
+      <Project>{e9e3685e-36d9-44af-89b2-121c29ad236a}</Project>
+      <Name>PercentageBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PictureViewer\PictureViewer.vbproj">
+      <Project>{dde40753-7859-48d8-a51d-8883fb683521}</Project>
+      <Name>PictureViewer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RichTextButton\RichTextButton.vbproj">
+      <Project>{c14598a2-2464-4563-92c9-1844c08684f6}</Project>
+      <Name>RichTextButton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Separator\Separator.vbproj">
+      <Project>{5aebb4ca-dd9d-4532-9d0e-9800fee4c0dd}</Project>
+      <Name>Separator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SplitButton\SplitButton.vbproj">
+      <Project>{1dc53765-d904-44da-90cd-dd1a8e446602}</Project>
+      <Name>SplitButton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StatusSelector\StatusSelector.vbproj">
+      <Project>{45a1fbf0-83fd-4330-bac1-2c76a94bb56a}</Project>
+      <Name>StatusSelector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TextBoxActionPanel\TextBoxActionPanel.vbproj">
+      <Project>{19f802d2-92de-44d3-9c0a-038e7e8f2cff}</Project>
+      <Name>TextBoxActionPanel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TileView\TileView.vbproj">
+      <Project>{d0121aa1-e7c9-4262-a7be-15a16566de7e}</Project>
+      <Name>TileView</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TimeBox\TimeBox.vbproj">
+      <Project>{1ad46b50-48a1-453c-8d65-1f7ffe314ded}</Project>
+      <Name>TimeBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ToggleButton\ToggleButton.vbproj">
+      <Project>{01ad2b40-b9cd-4a67-8b8f-aa62335e4461}</Project>
+      <Name>ToggleButton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ToolStripCheckBox\ToolStripCheckBox.vbproj">
+      <Project>{9462fe16-e6b4-47da-b7e7-b913250a2c02}</Project>
+      <Name>ToolStripCheckBox</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ValidationProvider\ValidationProvider.vbproj">
+      <Project>{226ba3c4-38b5-4c26-911e-6f4d96b34456}</Project>
+      <Name>ValidationProvider</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+</Project>

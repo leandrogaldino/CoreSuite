@@ -1,0 +1,70 @@
+<Solution>
+  <Folder Name="/Controls/">
+    <Project Path="ActionTextBox/ActionTextBox.vbproj" Id="acb499c6-cd41-4f06-965d-6e9b21c6ea4b" />
+    <Project Path="AnimatedBox/AnimatedBox.vbproj" Id="36982107-beae-49af-8159-5e82797b74d9" />
+    <Project Path="BusyOverlay/BusyOverlay.vbproj" Id="0c694c04-b762-4a27-b73b-48b57e70be8c" />
+    <Project Path="CentralizedComboBox/CentralizedComboBox.vbproj" Id="aa425aaf-496e-4832-a898-a9285ed2ae92" />
+    <Project Path="ChangeTracker/ChangeTracker.vbproj" Id="183cf634-56e2-4b59-846b-0f0ff82e75c0" />
+    <Project Path="CMessageBox/CMessageBox.vbproj" Id="e980f908-c501-4e6a-b848-e91548f5e60c" />
+    <Project Path="ColoredProgressBar/ColoredProgressBar.vbproj" Id="bcdb7dee-8d4b-4028-96e5-a9236883799a" />
+    <Project Path="ColorPicker/ColorPicker.vbproj" Id="e8dc3bc0-03d1-4347-a40a-e306c9ea981c" />
+    <Project Path="ControlContainer/ControlContainer.vbproj" Id="f31e86d4-d899-4b6b-9589-cd725bb72226" />
+    <Project Path="ControlSlider/ControlSlider.vbproj" Id="0158e430-fa6a-42b6-97b9-71a57a41563a" />
+    <Project Path="CurrencyBox/CurrencyBox.vbproj" Id="25f4227f-4fdb-415d-afb2-2971d5636489" />
+    <Project Path="DataGridViewContentCopy/DataGridViewContentCopy.vbproj" Id="9288df66-b0a6-4c19-a879-1731d24276f3" />
+    <Project Path="DataGridViewFilterBox/DataGridViewFilterBox.vbproj" Id="e6be9f04-bfda-40ec-a007-57e9ee13c831" />
+    <Project Path="DataGridViewLayoutManager/DataGridViewLayoutManager.vbproj" Id="b956463f-ab33-4e68-bede-c31e0b5af09e" />
+    <Project Path="DataGridViewNavigator/DataGridViewNavigator.vbproj" Id="0b4beaa2-ef49-42ef-86f5-b1c41a77680e" />
+    <Project Path="DateBox/DateBox.vbproj" Id="906e2c2f-eac7-4369-ae44-184181bdfb00" />
+    <Project Path="DateTimeBox/DateTimeBox.vbproj" Id="e01e64df-7f4f-4aa9-98bf-7943590f4509" />
+    <Project Path="DateTimeBoxBase/DateTimeBoxBase.vbproj" Id="4d004b7e-5cf3-4722-a8f9-a174599dc538" />
+    <Project Path="DecimalBox/DecimalBox.vbproj" Id="bddbaa18-8162-4ad8-a62d-46aa1209a7f7" />
+    <Project Path="LookupBox/LookupBox.vbproj" Id="1209b3cf-5d74-4cd1-b82f-ddc22538cd30" />
+    <Project Path="NavigationView/NavigationView.vbproj" Id="e9e56a15-874a-443f-8a80-3770622a12d1" />
+    <Project Path="NoFocusCueButton/NoFocusCueButton.vbproj" Id="3286b6b5-12e8-4a9a-89ed-7de0313100cf" />
+    <Project Path="NumericBoxBase/NumericBoxBase.vbproj" Id="2c23c65f-d2d0-4996-8ea0-2cde387563c4" />
+    <Project Path="PasswordBox/PasswordBox.vbproj" Id="e7536427-b0b0-46c4-8991-39f5a48b7360" />
+    <Project Path="PercentageBox/PercentageBox.vbproj" Id="e9e3685e-36d9-44af-89b2-121c29ad236a" />
+    <Project Path="PictureViewer/PictureViewer.vbproj" Id="dde40753-7859-48d8-a51d-8883fb683521" />
+    <Project Path="RichTextButton/RichTextButton.vbproj" Id="c14598a2-2464-4563-92c9-1844c08684f6" />
+    <Project Path="Separator/Separator.vbproj" Id="5aebb4ca-dd9d-4532-9d0e-9800fee4c0dd" />
+    <Project Path="SplitButton/SplitButton.vbproj" Id="1dc53765-d904-44da-90cd-dd1a8e446602" />
+    <Project Path="StatusSelector/StatusSelector.vbproj" Id="45a1fbf0-83fd-4330-bac1-2c76a94bb56a" />
+    <Project Path="TextBoxActionPanel/TextBoxActionPanel.vbproj" Id="19f802d2-92de-44d3-9c0a-038e7e8f2cff" />
+    <Project Path="TileView/TileView.vbproj" Id="d0121aa1-e7c9-4262-a7be-15a16566de7e" />
+    <Project Path="TimeBox/TimeBox.vbproj" Id="1ad46b50-48a1-453c-8d65-1f7ffe314ded" />
+    <Project Path="ToggleButton/ToggleButton.vbproj" Id="01ad2b40-b9cd-4a67-8b8f-aa62335e4461" />
+    <Project Path="ToolStripCheckBox/ToolStripCheckBox.vbproj" Id="9462fe16-e6b4-47da-b7e7-b913250a2c02" />
+    <Project Path="ValidationProvider/ValidationProvider.vbproj" Id="226ba3c4-38b5-4c26-911e-6f4d96b34456" />
+  </Folder>
+  <Folder Name="/Extensions/">
+    <Project Path="Extensions.Windows/Extensions.Windows.vbproj" Id="333401aa-eb3d-437b-8751-35440e538303" />
+    <Project Path="Extensions/Extensions.vbproj" Id="f18f1a17-e4d2-494b-9cff-ff461fa15e21" />
+  </Folder>
+  <Folder Name="/Helpers/">
+    <Project Path="Helpers.Windows/Helpers.Windows.vbproj" Id="99a014fc-f9d3-41d8-9035-197bcaefdda6" />
+    <Project Path="Helpers/Helpers.vbproj" Id="e425f9a8-c7b2-48da-9e22-c8ec4c56db35" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Locator/Locator.vbproj" Id="eed4fd60-747b-408d-b356-daa9a681d364" />
+  </Folder>
+  <Folder Name="/Rendering/">
+    <Project Path="CToolStripRenderer/CToolStripRenderer.vbproj" Id="556f99be-d53b-429a-8456-e9a678dadb00" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="CodeCompiler/CodeCompiler.vbproj" Id="90c46253-5e0a-4ea8-8ad8-07303c960387" />
+    <Project Path="Connectivity/Connectivity.vbproj" Id="32be4e1f-6aa0-4cd0-bb18-49800e8fb89d" />
+    <Project Path="Cryptography.Windows/Cryptography.Windows.vbproj" Id="c7fda54e-3189-4074-9ff1-21409d9edee0" />
+    <Project Path="Cryptography/Cryptography.vbproj" Id="b8809f91-3bd3-4e1c-b055-26eb4dccbbe2" />
+    <Project Path="ExceptionReporter/ExceptionReporter.vbproj" Id="7d571391-be9b-49d2-8a55-591e6d90fc8c" />
+    <Project Path="FileManager/FileManager.vbproj" Id="f90ba834-ef79-45c7-96d7-6e3c0cdfbbe5" />
+    <Project Path="FileMerger/FileMerger.vbproj" Id="01fc010f-2117-441a-a889-498a74798e8c" />
+    <Project Path="FileStateManager/FileStateManager.vbproj" Id="62dab6b1-ee62-43a2-9502-f77e1246b0ac" />
+    <Project Path="FirebaseService/FirebaseService.vbproj" Id="673ef88d-78a0-4bb9-97ea-8626c69d495e" />
+    <Project Path="FluidResizer/FluidResizer.vbproj" Id="3453ce46-764c-417b-8ad1-d83ac8b4056a" />
+    <Project Path="JsonFileStore/JsonFileStore.vbproj" Id="f5271f58-bbed-4590-b823-07a55e1cc32e" />
+    <Project Path="MySqlService/MySqlService.vbproj" Id="eda9a058-47ab-4329-9ea0-f7e5a1f3dc78" />
+    <Project Path="OutlookEmail/OutlookEmail.vbproj" Id="22f0670d-42b1-4369-ae95-1e57e13a2e27" />
+  </Folder>
+  <Project Path="Tests/Tests.vbproj" Id="0157f116-1ba5-44d4-8e5b-860ae8cc4f6c" />
+</Solution>
