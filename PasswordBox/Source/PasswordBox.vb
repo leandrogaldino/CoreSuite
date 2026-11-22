@@ -10,7 +10,7 @@ Imports System.Windows.Forms
 <DefaultEvent("PasswordValueChanged")>
 <DesignerCategory("Code")>
 Public Class PasswordBox
-    Inherits TextBox
+    Inherits PlaceHolderTextBox
 
     Private Const DefaultButtonWidth As Integer = 30
     Private Const DefaultMaskLength As Integer = 8

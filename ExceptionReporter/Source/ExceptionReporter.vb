@@ -80,7 +80,7 @@ Public Class ExceptionReporter
         Dim TemporaryPath As String = CreateTemporaryPath(FullPath)
         Try
             File.WriteAllText(TemporaryPath, Content, New UTF8Encoding(False))
-            WindowsFileHelper.MoveFile(TemporaryPath, FullPath, True)
+            FileHelper.MoveFile(TemporaryPath, FullPath, True)
         Finally
             DeleteTemporaryFile(TemporaryPath)
         End Try
@@ -99,7 +99,7 @@ Public Class ExceptionReporter
         Dim TemporaryPath As String = CreateTemporaryPath(FullPath)
         Try
             Await FileHelper.WriteAllTextAsync(TemporaryPath, Content, New UTF8Encoding(False), CancellationToken).ConfigureAwait(False)
-            WindowsFileHelper.MoveFile(TemporaryPath, FullPath, True)
+            FileHelper.MoveFile(TemporaryPath, FullPath, True)
         Finally
             DeleteTemporaryFile(TemporaryPath)
         End Try

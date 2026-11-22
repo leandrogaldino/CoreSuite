@@ -182,9 +182,9 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
-      <Project>{99a014fc-f9d3-41d8-9035-197bcaefdda6}</Project>
-      <Name>Helpers.Windows</Name>
+    <ProjectReference Include="..\Helpers\Helpers.vbproj">
+      <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
+      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

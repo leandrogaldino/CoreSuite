@@ -145,10 +145,6 @@
       <Project>{32be4e1f-6aa0-4cd0-bb18-49800e8fb89d}</Project>
       <Name>Connectivity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
-      <Project>{99a014fc-f9d3-41d8-9035-197bcaefdda6}</Project>
-      <Name>Helpers.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Helpers\Helpers.vbproj">
       <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
       <Name>Helpers</Name>

@@ -108,7 +108,7 @@ Public NotInheritable Class FirebaseStorage
                                 If TotalBytes.HasValue AndAlso DownloadedBytes <> TotalBytes.Value Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Storage, "Cloud Storage ended the download before the declared content length was received.")
                             End Using
                         End Using
-                        WindowsFileHelper.MoveFile(TemporaryPath, FullLocalPath, True)
+                        FileHelper.MoveFile(TemporaryPath, FullLocalPath, True)
                         RaiseEvent DownloadProgressChanged(Me, New FirebaseTransferProgressChangedEventArgs(DownloadedBytes, If(TotalBytes, DownloadedBytes), True))
                     End Using
                 End Using

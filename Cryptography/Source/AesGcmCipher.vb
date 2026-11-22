@@ -23,7 +23,7 @@ Friend NotInheritable Class AesGcmCipher
             Buffer.BlockCopy(Output, 0, Ciphertext, 0, Ciphertext.Length)
             Buffer.BlockCopy(Output, Ciphertext.Length, Tag, 0, Tag.Length)
         Finally
-            CryptographyHelper.ZeroMemory(Output)
+            Helper.ZeroMemory(Output)
         End Try
     End Sub
     Public Sub Decrypt(Nonce As Byte(), Ciphertext As Byte(), Tag As Byte(), Plaintext As Byte(), Header As Byte())
@@ -38,14 +38,14 @@ Friend NotInheritable Class AesGcmCipher
             Cipher.DoFinal(Output, Count)
             Buffer.BlockCopy(Output, 0, Plaintext, 0, Plaintext.Length)
         Catch Ex As InvalidCipherTextException
-            CryptographyHelper.ZeroMemory(Plaintext)
+            Helper.ZeroMemory(Plaintext)
             Throw New AuthenticationTagMismatchException("The authentication tag did not match.", Ex)
         Finally
-            CryptographyHelper.ZeroMemory(Output)
-            CryptographyHelper.ZeroMemory(Input)
+            Helper.ZeroMemory(Output)
+            Helper.ZeroMemory(Input)
         End Try
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        CryptographyHelper.ZeroMemory(_Key)
+        Helper.ZeroMemory(_Key)
     End Sub
 End Class

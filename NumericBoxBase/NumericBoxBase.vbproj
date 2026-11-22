@@ -81,9 +81,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Source\NumericBoxBase.Placeholder.vb">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Source\NumericBoxBase.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -97,6 +94,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -108,9 +106,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
-      <Project>{99A014FC-F9D3-41D8-9035-197BCAEFDDA6}</Project>
-      <Name>Helpers.Windows</Name>
+    <ProjectReference Include="..\Helpers\Helpers.vbproj">
+      <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
+      <Project>{b5b40210-fce5-4b10-8c1c-a5ce615c2073}</Project>
+      <Name>PlaceHolderTextBox</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

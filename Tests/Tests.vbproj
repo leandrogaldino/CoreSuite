@@ -169,10 +169,6 @@
       <Project>{0158e430-fa6a-42b6-97b9-71a57a41563a}</Project>
       <Name>ControlSlider</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cryptography.Windows\Cryptography.Windows.vbproj">
-      <Project>{c7fda54e-3189-4074-9ff1-21409d9edee0}</Project>
-      <Name>Cryptography.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cryptography\Cryptography.vbproj">
       <Project>{b8809f91-3bd3-4e1c-b055-26eb4dccbbe2}</Project>
       <Name>Cryptography</Name>
@@ -221,10 +217,6 @@
       <Project>{7d571391-be9b-49d2-8a55-591e6d90fc8c}</Project>
       <Name>ExceptionReporter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Extensions.Windows\Extensions.Windows.vbproj">
-      <Project>{333401aa-eb3d-437b-8751-35440e538303}</Project>
-      <Name>Extensions.Windows</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Extensions\Extensions.vbproj">
       <Project>{f18f1a17-e4d2-494b-9cff-ff461fa15e21}</Project>
       <Name>Extensions</Name>
@@ -248,10 +240,6 @@
     <ProjectReference Include="..\FluidResizer\FluidResizer.vbproj">
       <Project>{3453ce46-764c-417b-8ad1-d83ac8b4056a}</Project>
       <Name>FluidResizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
-      <Project>{99a014fc-f9d3-41d8-9035-197bcaefdda6}</Project>
-      <Name>Helpers.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\Helpers\Helpers.vbproj">
       <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
@@ -300,6 +288,10 @@
     <ProjectReference Include="..\PictureViewer\PictureViewer.vbproj">
       <Project>{dde40753-7859-48d8-a51d-8883fb683521}</Project>
       <Name>PictureViewer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
+      <Project>{b5b40210-fce5-4b10-8c1c-a5ce615c2073}</Project>
+      <Name>PlaceHolderTextBox</Name>
     </ProjectReference>
     <ProjectReference Include="..\RichTextButton\RichTextButton.vbproj">
       <Project>{c14598a2-2464-4563-92c9-1844c08684f6}</Project>

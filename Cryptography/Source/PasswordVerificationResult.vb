@@ -14,4 +14,4 @@ Public Enum PasswordVerificationResult
     ''' The password matched, but the stored hash should be replaced with a newly generated hash.
     ''' </summary>
     SuccessRehashNeeded = 2
-    End Enum
+End Enum

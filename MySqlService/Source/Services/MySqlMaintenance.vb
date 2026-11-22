@@ -1,5 +1,4 @@
 ﻿Imports CoreSuite.Helpers
-Imports System.Data
 Imports System.IO
 Imports System.Threading
 Imports MySql.Data.MySqlClient
@@ -262,7 +261,7 @@ Public NotInheritable Class MySqlMaintenance
         Return Path.Combine(DirectoryPath, $".{Path.GetFileName(TargetPath)}.{Guid.NewGuid():N}.tmp")
     End Function
     Private Shared Sub MoveBackupIntoPlace(SourcePath As String, TargetPath As String, Overwrite As Boolean)
-        WindowsFileHelper.MoveFile(SourcePath, TargetPath, Overwrite)
+        FileHelper.MoveFile(SourcePath, TargetPath, Overwrite)
     End Sub
     Private Shared Sub CancelOperation(Backup As MySqlBackup, Connection As MySqlConnection)
         Try

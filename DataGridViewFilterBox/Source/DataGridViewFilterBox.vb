@@ -4,6 +4,7 @@ Imports System.Drawing.Design
 Imports System.Text
 Imports System.Threading
 Imports System.Windows.Forms
+
 ''' <summary>
 ''' Represents a Windows Forms text box that filters an associated <see cref="DataGridView"/> after a configurable debounce interval.
 ''' </summary>
@@ -17,7 +18,7 @@ Imports System.Windows.Forms
 <Description("Filters an associated DataGridView locally or requests application-defined remote filtering after a configurable debounce interval.")>
 <Designer(GetType(DataGridViewFilterBoxControlDesigner))>
 Public Class DataGridViewFilterBox
-    Inherits TextBox
+    Inherits PlaceHolderTextBox
     Private Const DefaultFilterInterval As Integer = 300
     Private Const DefaultMinimumCharacters As Integer = 1
     Private ReadOnly _FilterTimer As System.Windows.Forms.Timer

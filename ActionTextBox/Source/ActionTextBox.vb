@@ -3,6 +3,7 @@ Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
+
 ''' <summary>
 ''' Specifies the side on which the action button is displayed.
 ''' </summary>
@@ -23,7 +24,7 @@ End Enum
 <ToolboxItem(True)>
 <Designer(GetType(ActionTextBoxControlDesigner))>
 Public Class ActionTextBox
-    Inherits TextBox
+    Inherits PlaceHolderTextBox
     Private Const EM_SETMARGINS As Integer = &HD3
     Private Const EC_LEFTMARGIN As Integer = &H1
     Private Const EC_RIGHTMARGIN As Integer = &H2

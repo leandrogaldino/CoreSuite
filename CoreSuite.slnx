@@ -26,6 +26,7 @@
     <Project Path="PasswordBox/PasswordBox.vbproj" Id="e7536427-b0b0-46c4-8991-39f5a48b7360" />
     <Project Path="PercentageBox/PercentageBox.vbproj" Id="e9e3685e-36d9-44af-89b2-121c29ad236a" />
     <Project Path="PictureViewer/PictureViewer.vbproj" Id="dde40753-7859-48d8-a51d-8883fb683521" />
+    <Project Path="PlaceHolderTextBox/PlaceHolderTextBox.vbproj" Id="b5b40210-fce5-4b10-8c1c-a5ce615c2073" />
     <Project Path="RichTextButton/RichTextButton.vbproj" Id="c14598a2-2464-4563-92c9-1844c08684f6" />
     <Project Path="Separator/Separator.vbproj" Id="5aebb4ca-dd9d-4532-9d0e-9800fee4c0dd" />
     <Project Path="SplitButton/SplitButton.vbproj" Id="1dc53765-d904-44da-90cd-dd1a8e446602" />
@@ -38,11 +39,9 @@
     <Project Path="ValidationProvider/ValidationProvider.vbproj" Id="226ba3c4-38b5-4c26-911e-6f4d96b34456" />
   </Folder>
   <Folder Name="/Extensions/">
-    <Project Path="Extensions.Windows/Extensions.Windows.vbproj" Id="333401aa-eb3d-437b-8751-35440e538303" />
     <Project Path="Extensions/Extensions.vbproj" Id="f18f1a17-e4d2-494b-9cff-ff461fa15e21" />
   </Folder>
   <Folder Name="/Helpers/">
-    <Project Path="Helpers.Windows/Helpers.Windows.vbproj" Id="99a014fc-f9d3-41d8-9035-197bcaefdda6" />
     <Project Path="Helpers/Helpers.vbproj" Id="e425f9a8-c7b2-48da-9e22-c8ec4c56db35" />
   </Folder>
   <Folder Name="/Infrastructure/">
@@ -54,7 +53,6 @@
   <Folder Name="/Services/">
     <Project Path="CodeCompiler/CodeCompiler.vbproj" Id="90c46253-5e0a-4ea8-8ad8-07303c960387" />
     <Project Path="Connectivity/Connectivity.vbproj" Id="32be4e1f-6aa0-4cd0-bb18-49800e8fb89d" />
-    <Project Path="Cryptography.Windows/Cryptography.Windows.vbproj" Id="c7fda54e-3189-4074-9ff1-21409d9edee0" />
     <Project Path="Cryptography/Cryptography.vbproj" Id="b8809f91-3bd3-4e1c-b055-26eb4dccbbe2" />
     <Project Path="ExceptionReporter/ExceptionReporter.vbproj" Id="7d571391-be9b-49d2-8a55-591e6d90fc8c" />
     <Project Path="FileManager/FileManager.vbproj" Id="f90ba834-ef79-45c7-96d7-6e3c0cdfbbe5" />

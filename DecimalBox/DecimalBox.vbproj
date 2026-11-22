@@ -97,6 +97,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -111,6 +112,10 @@
     <ProjectReference Include="..\NumericBoxBase\NumericBoxBase.vbproj">
       <Project>{2c23c65f-d2d0-4996-8ea0-2cde387563c4}</Project>
       <Name>NumericBoxBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
+      <Project>{B5B40210-FCE5-4B10-8C1C-A5CE615C2073}</Project>
+      <Name>PlaceHolderTextBox</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

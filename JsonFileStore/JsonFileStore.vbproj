@@ -107,11 +107,5 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Helpers.Windows\Helpers.Windows.vbproj">
-      <Project>{99a014fc-f9d3-41d8-9035-197bcaefdda6}</Project>
-      <Name>Helpers.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

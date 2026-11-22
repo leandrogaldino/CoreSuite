@@ -80,5 +80,26 @@ Public Class MathHelper
         Next
         Return Vals.Pop()
     End Function
+    ''' <summary>
+    ''' Restricts a value to the specified minimum and maximum bounds.
+    ''' </summary>
+    ''' <param name="Value">The value to clamp.</param>
+    ''' <param name="Min">The minimum allowed value.</param>
+    ''' <param name="Max">The maximum allowed value.</param>
+    ''' <returns>
+    ''' The minimum value if <paramref name="Value"/> is less than
+    ''' <paramref name="Min"/>; the maximum value if it is greater than
+    ''' <paramref name="Max"/>; otherwise, the original value.
+    ''' </returns>
+    ''' <exception cref="ArgumentException">
+    ''' Thrown when <paramref name="Min"/> is greater than
+    ''' <paramref name="Max"/>.
+    ''' </exception>
+    Public Shared Function Clamp(Value As Integer, Min As Integer, Max As Integer) As Integer
+        If Min > Max Then
+            Throw New ArgumentException("The minimum value cannot be greater than the maximum value.", NameOf(Min))
+        End If
 
+        Return Math.Max(Min, Math.Min(Value, Max))
+    End Function
 End Class

@@ -46,6 +46,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -83,16 +86,19 @@
     <Compile Include="Source\AttributeHelper.vb" />
     <Compile Include="Source\BinaryHelper.vb" />
     <Compile Include="Source\BrazilianFormatHelper.vb" />
-    <Compile Include="Source\CryptographyHelper.vb" />
+    <Compile Include="Source\ControlHelper.vb" />
     <Compile Include="Source\DatabaseHelper.vb" />
     <Compile Include="Source\DateTimeHelper.vb" />
     <Compile Include="Source\EnumHelper.vb" />
     <Compile Include="Source\FileHelper.vb" />
     <Compile Include="Source\HttpHelper.vb" />
+    <Compile Include="Source\ImageHelper.vb" />
     <Compile Include="Source\InternetHelper.vb" />
     <Compile Include="Source\MathHelper.vb" />
     <Compile Include="Source\PathHelper.vb" />
     <Compile Include="Source\ReflectionHelper.vb" />
+    <Compile Include="Source\SystemClockHelper.vb" />
+    <Compile Include="Source\TextBoxPlaceholder.vb" />
     <Compile Include="Source\TextHelper.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +110,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
