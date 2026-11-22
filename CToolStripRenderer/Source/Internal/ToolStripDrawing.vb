@@ -77,4 +77,35 @@ Friend NotInheritable Class ToolStripDrawing
             Graphics.SmoothingMode = OldMode
         End Try
     End Sub
+    ''' <summary>Draws a centered, anti-aliased down chevron for a split button.</summary>
+    Friend Shared Sub DrawDownChevron(Graphics As Graphics, Bounds As Rectangle, Color As Color)
+        If Bounds.Width <= 0 OrElse Bounds.Height <= 0 Then Return
+
+        Dim DpiScale As Single = CSng(Graphics.DpiX / 96.0F)
+        Dim ArrowWidth As Single = Math.Min(6.0F * DpiScale, Bounds.Width - 2.0F * DpiScale)
+        Dim ArrowHeight As Single = Math.Min(3.5F * DpiScale, Bounds.Height - 2.0F * DpiScale)
+        If ArrowWidth <= 0 OrElse ArrowHeight <= 0 Then Return
+
+        Dim CenterX As Single = Bounds.Left + Bounds.Width / 2.0F
+        Dim CenterY As Single = Bounds.Top + Bounds.Height / 2.0F
+        Dim PreviousSmoothing As SmoothingMode = Graphics.SmoothingMode
+        Dim PreviousPixelOffset As PixelOffsetMode = Graphics.PixelOffsetMode
+        Graphics.SmoothingMode = SmoothingMode.AntiAlias
+        Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality
+        Try
+            Using ChevronPen As New Pen(Color, 1.4F * DpiScale)
+                ChevronPen.StartCap = LineCap.Round
+                ChevronPen.EndCap = LineCap.Round
+                ChevronPen.LineJoin = LineJoin.Round
+                Graphics.DrawLines(ChevronPen, New PointF() {
+                    New PointF(CenterX - ArrowWidth / 2.0F, CenterY - ArrowHeight / 2.0F),
+                    New PointF(CenterX, CenterY + ArrowHeight / 2.0F),
+                    New PointF(CenterX + ArrowWidth / 2.0F, CenterY - ArrowHeight / 2.0F)})
+            End Using
+        Finally
+            Graphics.SmoothingMode = PreviousSmoothing
+            Graphics.PixelOffsetMode = PreviousPixelOffset
+        End Try
+    End Sub
+
 End Class

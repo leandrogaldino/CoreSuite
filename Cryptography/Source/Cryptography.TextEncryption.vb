@@ -6,7 +6,9 @@ Partial Public NotInheritable Class Cryptography
     Public NotInheritable Class TextEncryption
         Public Const CurrentFormatVersion As Byte = 1
         Public Const DefaultIterations As Integer = 600_000
-        Public Const MinimumIterations As Integer = 100_000
+        ''' <summary>Fast PBKDF2 mode for cryptographically random, high-entropy application keys.</summary>
+        Public Const FastIterations As Integer = 600
+        Public Const MinimumIterations As Integer = FastIterations
         Public Const MaximumIterations As Integer = 5_000_000
         Private Const MagicSize As Integer = 4
         Private Const HeaderSize As Integer = 18

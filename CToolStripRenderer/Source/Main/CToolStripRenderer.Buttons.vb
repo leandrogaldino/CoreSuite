@@ -44,13 +44,8 @@ Public Partial Class CToolStripRenderer
     Protected Overrides Sub OnRenderDropDownButtonBackground(e As ToolStripItemRenderEventArgs)
         If e Is Nothing Then Return
         PaintItemBackground(e.Graphics, e.Item, False)
-        Dim Button As ToolStripDropDownButton = TryCast(e.Item, ToolStripDropDownButton)
-        If Button IsNot Nothing AndAlso Button.ShowDropDownArrow Then
-            Dim Palette As ToolStripPalette = EffectivePalette()
-            Dim Color As Color = If(Button.Enabled, Palette.Foreground, Palette.DisabledForeground)
-            Dim ArrowX As Integer = Button.Width - ToolStripDrawing.Scale(e.Graphics, 9)
-            ToolStripDrawing.DrawDownArrow(e.Graphics, New Point(ArrowX, Button.Height \ 2), Color, ToolStripDrawing.Scale(e.Graphics, 3))
-        End If
+        ' ToolStripDropDownButton draws its own arrow through OnRenderArrow.
+        ' Rendering it here would draw the arrow twice.
     End Sub
 
     Protected Overrides Sub OnRenderSplitButtonBackground(e As ToolStripItemRenderEventArgs)
@@ -66,7 +61,7 @@ Public Partial Class CToolStripRenderer
             End Using
         End If
         Dim Color As Color = If(Button.Enabled, Palette.Foreground, Palette.DisabledForeground)
-        ToolStripDrawing.DrawDownArrow(e.Graphics, New Point(ArrowRect.Left + ArrowRect.Width \ 2, ArrowRect.Top + ArrowRect.Height \ 2), Color, ToolStripDrawing.Scale(e.Graphics, 3))
+        ToolStripDrawing.DrawDownChevron(e.Graphics, ArrowRect, Color)
     End Sub
 
     Protected Overrides Sub OnRenderOverflowButtonBackground(e As ToolStripItemRenderEventArgs)

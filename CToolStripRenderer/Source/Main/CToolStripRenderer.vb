@@ -235,6 +235,59 @@ Public Partial Class CToolStripRenderer
         Return _Palette
     End Function
 
+    ''' <summary>Initializes ToolStrips even when the renderer is assigned directly through Renderer.</summary>
+    Protected Overrides Sub Initialize(Strip As ToolStrip)
+        MyBase.Initialize(Strip)
+        If Strip Is Nothing OrElse Strip.IsDisposed Then Return
+        TrackStrip(Strip)
+        ApplyDropDownSettings(Strip)
+        For Each Item As ToolStripItem In Strip.Items
+            HookDropDownOpening(Item)
+        Next
+    End Sub
+
+    ''' <summary>Tracks dropdown items added after the owning ToolStrip was initialized.</summary>
+    Protected Overrides Sub InitializeItem(Item As ToolStripItem)
+        MyBase.InitializeItem(Item)
+        HookDropDownOpening(Item)
+    End Sub
+
+    Private Sub HookDropDownOpening(Item As ToolStripItem)
+        Dim DropDownItem As ToolStripDropDownItem = TryCast(Item, ToolStripDropDownItem)
+        If DropDownItem Is Nothing Then Return
+        RemoveHandler DropDownItem.DropDownOpening, AddressOf OnDropDownOpening
+        AddHandler DropDownItem.DropDownOpening, AddressOf OnDropDownOpening
+    End Sub
+
+    Private Sub OnDropDownOpening(Sender As Object, e As EventArgs)
+        Dim Item As ToolStripDropDownItem = TryCast(Sender, ToolStripDropDownItem)
+        If Item Is Nothing OrElse Item.Owner Is Nothing Then Return
+        If Not Object.ReferenceEquals(Item.Owner.Renderer, Me) Then Return
+
+        ' The dropdown may be created lazily; apply layout options before it opens.
+        RegisterStrip(Item.DropDown)
+    End Sub
+
+    Private Sub ApplyDropDownSettings(Strip As ToolStrip)
+        Dim Menu As ToolStripDropDownMenu = TryCast(Strip, ToolStripDropDownMenu)
+        If Menu IsNot Nothing AndAlso Menu.ShowImageMargin <> _ShowImageMargin Then
+            ' Changing the control property triggers a layout pass; skipping painting does not.
+            Menu.ShowImageMargin = _ShowImageMargin
+        End If
+    End Sub
+
+    Private Sub TrackStrip(Strip As ToolStrip)
+        For i As Integer = _Targets.Count - 1 To 0 Step -1
+            Dim Candidate As ToolStrip = Nothing
+            If Not _Targets(i).TryGetTarget(Candidate) OrElse Candidate Is Nothing OrElse Candidate.IsDisposed Then
+                _Targets.RemoveAt(i)
+            ElseIf Object.ReferenceEquals(Candidate, Strip) Then
+                Return
+            End If
+        Next
+        _Targets.Add(New WeakReference(Of ToolStrip)(Strip))
+    End Sub
+
     ''' <summary>Assigns this renderer to controls and all currently created nested dropdowns.</summary>
     Public Sub ApplyTo(ParamArray Strips As ToolStrip())
         If Strips Is Nothing Then Throw New ArgumentNullException(NameOf(Strips))
@@ -246,22 +299,13 @@ Public Partial Class CToolStripRenderer
     End Sub
 
     Private Sub RegisterStrip(Strip As ToolStrip)
-        If Strip.IsDisposed Then Return
+        If Strip Is Nothing OrElse Strip.IsDisposed Then Return
         Strip.Renderer = Me
-        If TypeOf Strip Is ToolStripDropDownMenu Then
-            DirectCast(Strip, ToolStripDropDownMenu).ShowImageMargin = _ShowImageMargin
-        End If
-        Dim Found As Boolean = False
-        For i As Integer = _Targets.Count - 1 To 0 Step -1
-            Dim Candidate As ToolStrip = Nothing
-            If Not _Targets(i).TryGetTarget(Candidate) OrElse Candidate Is Nothing OrElse Candidate.IsDisposed Then
-                _Targets.RemoveAt(i)
-            ElseIf Object.ReferenceEquals(Candidate, Strip) Then
-                Found = True
-            End If
-        Next
-        If Not Found Then _Targets.Add(New WeakReference(Of ToolStrip)(Strip))
+        TrackStrip(Strip)
+        ApplyDropDownSettings(Strip)
+
         For Each Item As ToolStripItem In Strip.Items
+            HookDropDownOpening(Item)
             Dim DropDownItem As ToolStripDropDownItem = TryCast(Item, ToolStripDropDownItem)
             If DropDownItem IsNot Nothing AndAlso DropDownItem.HasDropDownItems Then
                 RegisterStrip(DropDownItem.DropDown)
@@ -269,16 +313,17 @@ Public Partial Class CToolStripRenderer
         Next
     End Sub
 
-    ''' <summary>Repaints registered controls. Use ApplyTo for automatic theme updates.</summary>
+    ''' <summary>Repaints registered controls and updates menu layout options.</summary>
     Public Sub RefreshAttached()
         For i As Integer = _Targets.Count - 1 To 0 Step -1
             Dim Strip As ToolStrip = Nothing
             If Not _Targets(i).TryGetTarget(Strip) OrElse Strip Is Nothing OrElse Strip.IsDisposed Then
                 _Targets.RemoveAt(i)
             ElseIf Object.ReferenceEquals(Strip.Renderer, Me) Then
-                If TypeOf Strip Is ToolStripDropDownMenu Then
-                    DirectCast(Strip, ToolStripDropDownMenu).ShowImageMargin = _ShowImageMargin
-                End If
+                ApplyDropDownSettings(Strip)
+                For Each Item As ToolStripItem In Strip.Items
+                    HookDropDownOpening(Item)
+                Next
                 Strip.Invalidate(True)
                 For Each Item As ToolStripItem In Strip.Items
                     Item.Invalidate()

@@ -82,14 +82,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Source\Enums\CheckedButtonStyle.vb" />
+    <Compile Include="Source\Enums\ToolStripTheme.vb" />
+    <Compile Include="Source\Internal\ToolStripDrawing.vb" />
     <Compile Include="Source\Main\CToolStripRenderer.Borders.vb" />
     <Compile Include="Source\Main\CToolStripRenderer.Buttons.vb" />
     <Compile Include="Source\Main\CToolStripRenderer.Menus.vb" />
     <Compile Include="Source\Main\CToolStripRenderer.Separators.vb" />
     <Compile Include="Source\Main\CToolStripRenderer.vb" />
-    <Compile Include="Source\Enums\CheckedButtonStyle.vb" />
-    <Compile Include="Source\Enums\ToolStripTheme.vb" />
-    <Compile Include="Source\Internal\ToolStripDrawing.vb" />
     <Compile Include="Source\Themes\ToolStripColorTable.vb" />
     <Compile Include="Source\Themes\ToolStripPalette.vb" />
   </ItemGroup>
