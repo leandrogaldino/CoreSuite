@@ -25,7 +25,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Scope">The Windows DPAPI protection scope.</param>
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
-        Public Shared Sub Save(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing)
+        Public Shared Sub Save(Of T)(FilePath As String, Value As T, Optional Scope As ProtectionScope = ProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing)
             Dim JsonBytes As Byte() = SerializeJsonBytes(Value, ResolveOptions(Options))
             Try
                 SaveBytes(FilePath, JsonBytes, Scope, Entropy)
@@ -43,7 +43,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <param name="CancellationToken">The token used to cancel the file operation.</param>
-        Public Shared Async Function SaveAsync(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+        Public Shared Async Function SaveAsync(Of T)(FilePath As String, Value As T, Optional Scope As ProtectionScope = ProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
             Dim JsonBytes As Byte() = SerializeJsonBytes(Value, ResolveOptions(Options))
             Try
                 Await SaveBytesAsync(FilePath, JsonBytes, Scope, Entropy, CancellationToken)
@@ -139,7 +139,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Data">The binary data to protect.</param>
         ''' <param name="Scope">The Windows DPAPI protection scope.</param>
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
-        Public Shared Sub SaveBytes(FilePath As String, Data As Byte(), Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing)
+        Public Shared Sub SaveBytes(FilePath As String, Data As Byte(), Optional Scope As ProtectionScope = ProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing)
             ValidatePlatform()
             ValidateFilePath(FilePath)
             If Data Is Nothing Then Throw New ArgumentNullException("Data")
@@ -160,7 +160,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Scope">The Windows DPAPI protection scope.</param>
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
         ''' <param name="CancellationToken">The token used to cancel the file operation.</param>
-        Public Shared Async Function SaveBytesAsync(FilePath As String, Data As Byte(), Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+        Public Shared Async Function SaveBytesAsync(FilePath As String, Data As Byte(), Optional Scope As ProtectionScope = ProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
             ValidatePlatform()
             ValidateFilePath(FilePath)
             If Data Is Nothing Then Throw New ArgumentNullException("Data")
@@ -183,11 +183,13 @@ Partial Public NotInheritable Class Cryptography
         Public Shared Function LoadBytes(FilePath As String, Optional Entropy As Byte() = Nothing) As Byte()
             ValidatePlatform()
             ValidateFilePath(FilePath)
+
             Dim Package As Byte() = File.ReadAllBytes(FilePath)
-            Dim Scope As DataProtectionScope
+            Dim Scope As ProtectionScope
             Dim ProtectedBytes As Byte() = ParsePackage(Package, Scope)
+
             Try
-                Return ProtectedData.Unprotect(ProtectedBytes, Entropy, Scope)
+                Return ProtectedData.Unprotect(ProtectedBytes, Entropy, CType(Scope, DataProtectionScope))
             Finally
                 Helper.ZeroMemory(ProtectedBytes)
             End Try
@@ -202,11 +204,13 @@ Partial Public NotInheritable Class Cryptography
         Public Shared Async Function LoadBytesAsync(FilePath As String, Optional Entropy As Byte() = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task(Of Byte())
             ValidatePlatform()
             ValidateFilePath(FilePath)
+
             Dim Package As Byte() = Await FileHelper.ReadAllBytesAsync(FilePath, CancellationToken)
-            Dim Scope As DataProtectionScope
+            Dim Scope As ProtectionScope
             Dim ProtectedBytes As Byte() = ParsePackage(Package, Scope)
+
             Try
-                Return ProtectedData.Unprotect(ProtectedBytes, Entropy, Scope)
+                Return ProtectedData.Unprotect(ProtectedBytes, Entropy, CType(Scope, DataProtectionScope))
             Finally
                 Helper.ZeroMemory(ProtectedBytes)
             End Try
@@ -246,9 +250,10 @@ Partial Public NotInheritable Class Cryptography
         ''' <returns><see langword="True"/> when the package structure is valid; otherwise, <see langword="False"/>.</returns>
         Public Shared Function IsProtectedFile(FilePath As String) As Boolean
             If String.IsNullOrWhiteSpace(FilePath) OrElse Not File.Exists(FilePath) Then Return False
+
             Try
                 Dim Package As Byte() = File.ReadAllBytes(FilePath)
-                Dim Scope As DataProtectionScope
+                Dim Scope As ProtectionScope
                 ParsePackage(Package, Scope)
                 Return True
             Catch Ex As IOException
@@ -264,11 +269,13 @@ Partial Public NotInheritable Class Cryptography
         ''' </summary>
         ''' <param name="FilePath">The protected file path.</param>
         ''' <returns>The stored DPAPI protection scope.</returns>
-        Public Shared Function GetProtectionScope(FilePath As String) As DataProtectionScope
+        Public Shared Function GetProtectionScope(FilePath As String) As ProtectionScope
             ValidateFilePath(FilePath)
+
             Dim Package As Byte() = File.ReadAllBytes(FilePath)
-            Dim Scope As DataProtectionScope
+            Dim Scope As ProtectionScope
             ParsePackage(Package, Scope)
+
             Return Scope
         End Function
         ''' <summary>
@@ -289,7 +296,7 @@ Partial Public NotInheritable Class Cryptography
         Public Shared Function CreateDefaultJsonOptions() As JsonSerializerSettings
             Return New JsonSerializerSettings With {.Formatting = Formatting.Indented, .TypeNameHandling = TypeNameHandling.None, .MetadataPropertyHandling = MetadataPropertyHandling.Ignore, .ObjectCreationHandling = ObjectCreationHandling.Replace, .CheckAdditionalContent = True, .MaxDepth = 64}
         End Function
-        Private Shared Function CreatePackage(ProtectedBytes As Byte(), Scope As DataProtectionScope) As Byte()
+        Private Shared Function CreatePackage(ProtectedBytes As Byte(), Scope As ProtectionScope) As Byte()
             Dim Header As Byte()
             Using Stream As New MemoryStream(HeaderSize)
                 Using Writer As New BinaryWriter(Stream, Encoding.UTF8, True)
@@ -300,30 +307,38 @@ Partial Public NotInheritable Class Cryptography
                 End Using
                 Header = Stream.ToArray()
             End Using
+
             If Header.Length <> HeaderSize Then Throw New InvalidOperationException("The protected storage header has an unexpected size.")
+
             Dim Package(Header.Length + ProtectedBytes.Length - 1) As Byte
             Buffer.BlockCopy(Header, 0, Package, 0, Header.Length)
             If ProtectedBytes.Length > 0 Then Buffer.BlockCopy(ProtectedBytes, 0, Package, Header.Length, ProtectedBytes.Length)
             Return Package
         End Function
-        Private Shared Function ParsePackage(Package As Byte(), ByRef Scope As DataProtectionScope) As Byte()
-            If Package Is Nothing Then Throw New ArgumentNullException("Package")
+        Private Shared Function ParsePackage(Package As Byte(), ByRef Scope As ProtectionScope) As Byte()
+            If Package Is Nothing Then Throw New ArgumentNullException(NameOf(Package))
             If Package.Length < HeaderSize Then Throw New FormatException("The protected storage file is incomplete.")
+
             Dim ProtectedLength As Integer
             Using Stream As New MemoryStream(Package, False)
                 Using Reader As New BinaryReader(Stream, Encoding.UTF8, True)
                     Dim StoredMagic As Byte() = Reader.ReadBytes(MagicSize)
                     If Not ByteArraysEqual(StoredMagic, MagicBytes) Then Throw New FormatException("The protected storage file identifier is invalid.")
+
                     Dim Version As Byte = Reader.ReadByte()
                     If Version <> CurrentFormatVersion Then Throw New FormatException($"Protected storage format version {Version} is not supported.")
-                    Scope = CType(Reader.ReadByte(), DataProtectionScope)
+
+                    Scope = CType(Reader.ReadByte(), ProtectionScope)
                     ValidateScopeForFormat(Scope)
                     ProtectedLength = Reader.ReadInt32()
                 End Using
             End Using
+
             If ProtectedLength <= 0 Then Throw New FormatException("The protected storage payload length is invalid.")
+
             Dim ExpectedLength As Long = CLng(HeaderSize) + ProtectedLength
             If ExpectedLength <> Package.LongLength Then Throw New FormatException("The protected storage file length is invalid.")
+
             Dim ProtectedBytes(ProtectedLength - 1) As Byte
             Buffer.BlockCopy(Package, HeaderSize, ProtectedBytes, 0, ProtectedLength)
             Return ProtectedBytes
@@ -403,11 +418,16 @@ Partial Public NotInheritable Class Cryptography
         Private Shared Sub ValidateFilePath(FilePath As String)
             If String.IsNullOrWhiteSpace(FilePath) Then Throw New ArgumentException("File path cannot be empty.", NameOf(FilePath))
         End Sub
-        Private Shared Sub ValidateScope(Scope As DataProtectionScope)
-            If Scope <> DataProtectionScope.CurrentUser AndAlso Scope <> DataProtectionScope.LocalMachine Then Throw New ArgumentOutOfRangeException(NameOf(Scope))
+        Private Shared Sub ValidateScope(Scope As ProtectionScope)
+            If Scope <> ProtectionScope.CurrentUser AndAlso Scope <> ProtectionScope.LocalMachine Then
+                Throw New ArgumentOutOfRangeException(NameOf(Scope))
+            End If
         End Sub
-        Private Shared Sub ValidateScopeForFormat(Scope As DataProtectionScope)
-            If Scope <> DataProtectionScope.CurrentUser AndAlso Scope <> DataProtectionScope.LocalMachine Then Throw New FormatException("The protected storage file contains an invalid protection scope.")
+
+        Private Shared Sub ValidateScopeForFormat(Scope As ProtectionScope)
+            If Scope <> ProtectionScope.CurrentUser AndAlso Scope <> ProtectionScope.LocalMachine Then
+                Throw New FormatException("The protected storage file contains an invalid protection scope.")
+            End If
         End Sub
         Private Shared Function ByteArraysEqual(First As Byte(), Second As Byte()) As Boolean
             If First.Length <> Second.Length Then Return False

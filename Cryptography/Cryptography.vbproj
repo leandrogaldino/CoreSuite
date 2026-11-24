@@ -105,6 +105,7 @@
     <Compile Include="Source\Helper.vb" />
     <Compile Include="Source\PasswordVerificationResult.vb" />
     <Compile Include="Source\Cryptography.TextEncryption.vb" />
+    <Compile Include="Source\ProtectionScope.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
