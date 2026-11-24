@@ -3,8 +3,8 @@ Imports System.Collections
 Imports System.Net
 Imports System.Net.Http
 Imports System.Text
-Imports System.Text.Json
-Imports System.Text.Json.Nodes
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 Imports System.Threading
 ''' <summary>
 ''' Provides authenticated Cloud Firestore document, collection and query operations.
@@ -33,25 +33,24 @@ Public NotInheritable Class FirebaseFirestore
             Try
                 Do
                     Await _Client.Auth.EnsureValidTokenAsync(OperationSource.Token).ConfigureAwait(False)
-                    Dim Payload As New JsonObject()
-                    Payload("pageSize") = JsonValue.Create(PageSize)
-                    If Not String.IsNullOrWhiteSpace(PageToken) Then Payload("pageToken") = JsonValue.Create(PageToken)
+                    Dim Payload As New JObject()
+                    Payload("pageSize") = New JValue(PageSize)
+                    If Not String.IsNullOrWhiteSpace(PageToken) Then Payload("pageToken") = New JValue(PageToken)
                     Using Request As HttpRequestMessage = _Client.CreateRequest(HttpMethod.Post, Url)
-                        Request.Content = New StringContent(Payload.ToJsonString(), Encoding.UTF8, "application/json")
+                        Request.Content = New StringContent(Payload.ToString(Formatting.None), Encoding.UTF8, "application/json")
                         Using Response As HttpResponseMessage = Await _Client.SendAsync(Request, FirebaseServiceArea.Firestore, HttpCompletionOption.ResponseContentRead, OperationSource.Token).ConfigureAwait(False)
                             Await FirebaseClient.EnsureSuccessAsync(Response, FirebaseServiceArea.Firestore, OperationSource.Token).ConfigureAwait(False)
                             Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
-                            Using Document As JsonDocument = ParseJson(ResponseBody, "collection list")
-                                Dim CollectionIdsElement As JsonElement
-                                If Document.RootElement.TryGetProperty("collectionIds", CollectionIdsElement) Then
-                                    If CollectionIdsElement.ValueKind <> JsonValueKind.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid collectionIds value.")
-                                    For Each CollectionIdElement As JsonElement In CollectionIdsElement.EnumerateArray()
-                                        If CollectionIdElement.ValueKind <> JsonValueKind.String Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned a non-string collection identifier.")
-                                        CollectionIds.Add(CollectionIdElement.GetString())
-                                    Next CollectionIdElement
-                                End If
-                                PageToken = ReadOptionalString(Document.RootElement, "nextPageToken")
-                            End Using
+                            Dim Document As JToken = ParseJson(ResponseBody, "collection list")
+                            Dim CollectionIdsElement As JToken = Nothing
+                            If FirebaseClient.TryGetJsonProperty(Document, "collectionIds", CollectionIdsElement) Then
+                                If CollectionIdsElement.Type <> JTokenType.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid collectionIds value.")
+                                For Each CollectionIdElement As JToken In CollectionIdsElement.Children()
+                                    If CollectionIdElement.Type <> JTokenType.String Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned a non-string collection identifier.")
+                                    CollectionIds.Add(FirebaseClient.ReadJsonString(CollectionIdElement))
+                                Next CollectionIdElement
+                            End If
+                            PageToken = ReadOptionalString(Document, "nextPageToken")
                         End Using
                     End Using
                 Loop While Not String.IsNullOrWhiteSpace(PageToken)
@@ -108,16 +107,15 @@ Public NotInheritable Class FirebaseFirestore
                         Using Response As HttpResponseMessage = Await _Client.SendAsync(Request, FirebaseServiceArea.Firestore, HttpCompletionOption.ResponseContentRead, OperationSource.Token).ConfigureAwait(False)
                             Await FirebaseClient.EnsureSuccessAsync(Response, FirebaseServiceArea.Firestore, OperationSource.Token).ConfigureAwait(False)
                             Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
-                            Using Document As JsonDocument = ParseJson(ResponseBody, "document list")
-                                Dim DocumentsElement As JsonElement
-                                If Document.RootElement.TryGetProperty("documents", DocumentsElement) Then
-                                    If DocumentsElement.ValueKind <> JsonValueKind.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid documents value.")
-                                    For Each DocumentElement As JsonElement In DocumentsElement.EnumerateArray()
-                                        Documents.Add(ParseDocument(DocumentElement))
-                                    Next DocumentElement
-                                End If
-                                PageToken = ReadOptionalString(Document.RootElement, "nextPageToken")
-                            End Using
+                            Dim Document As JToken = ParseJson(ResponseBody, "document list")
+                            Dim DocumentsElement As JToken = Nothing
+                            If FirebaseClient.TryGetJsonProperty(Document, "documents", DocumentsElement) Then
+                                If DocumentsElement.Type <> JTokenType.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid documents value.")
+                                For Each DocumentElement As JToken In DocumentsElement.Children()
+                                    Documents.Add(ParseDocument(DocumentElement))
+                                Next DocumentElement
+                            End If
+                            PageToken = ReadOptionalString(Document, "nextPageToken")
                         End Using
                     End Using
                 Loop While Not String.IsNullOrWhiteSpace(PageToken)
@@ -148,23 +146,22 @@ Public NotInheritable Class FirebaseFirestore
         Dim Url As String = GetDocumentsBaseUrl()
         If ParentDocumentPath IsNot Nothing Then Url &= "/" & FirebasePathHelper.EncodeFirestorePath(ParentDocumentPath)
         Url &= ":runQuery"
-        Dim Payload As JsonObject = CreateQueryPayload(CollectionId, FilterList)
+        Dim Payload As JObject = CreateQueryPayload(CollectionId, FilterList)
         Dim Results As New List(Of FirestoreDocument)()
         Using OperationSource As CancellationTokenSource = _Client.CreateOperationCancellationSource(False, CancellationToken)
             Try
                 Await _Client.Auth.EnsureValidTokenAsync(OperationSource.Token).ConfigureAwait(False)
                 Using Request As HttpRequestMessage = _Client.CreateRequest(HttpMethod.Post, Url)
-                    Request.Content = New StringContent(Payload.ToJsonString(), Encoding.UTF8, "application/json")
+                    Request.Content = New StringContent(Payload.ToString(Formatting.None), Encoding.UTF8, "application/json")
                     Using Response As HttpResponseMessage = Await _Client.SendAsync(Request, FirebaseServiceArea.Firestore, HttpCompletionOption.ResponseContentRead, OperationSource.Token).ConfigureAwait(False)
                         Await FirebaseClient.EnsureSuccessAsync(Response, FirebaseServiceArea.Firestore, OperationSource.Token).ConfigureAwait(False)
                         Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
-                        Using Document As JsonDocument = ParseJson(ResponseBody, "query result")
-                            If Document.RootElement.ValueKind <> JsonValueKind.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid query result.")
-                            For Each ResultElement As JsonElement In Document.RootElement.EnumerateArray()
-                                Dim DocumentElement As JsonElement
-                                If ResultElement.ValueKind = JsonValueKind.Object AndAlso ResultElement.TryGetProperty("document", DocumentElement) Then Results.Add(ParseDocument(DocumentElement))
-                            Next ResultElement
-                        End Using
+                        Dim Document As JToken = ParseJson(ResponseBody, "query result")
+                        If Document.Type <> JTokenType.Array Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned an invalid query result.")
+                        For Each ResultElement As JToken In Document.Children()
+                            Dim DocumentElement As JToken = Nothing
+                            If ResultElement.Type = JTokenType.Object AndAlso FirebaseClient.TryGetJsonProperty(ResultElement, "document", DocumentElement) Then Results.Add(ParseDocument(DocumentElement))
+                        Next ResultElement
                     End Using
                 End Using
             Catch ex As OperationCanceledException When Not CancellationToken.IsCancellationRequested
@@ -194,12 +191,12 @@ Public NotInheritable Class FirebaseFirestore
             Url = GetDocumentsBaseUrl() & "/" & FirebasePathHelper.EncodeFirestorePath(NormalizedCollectionPath & "/" & NormalizedDocumentId)
             Method = New HttpMethod("PATCH")
         End If
-        Dim Payload As JsonObject = FirestoreValueConverter.SerializeDocument(Fields)
+        Dim Payload As JObject = FirestoreValueConverter.SerializeDocument(Fields)
         Using OperationSource As CancellationTokenSource = _Client.CreateOperationCancellationSource(False, CancellationToken)
             Try
                 Await _Client.Auth.EnsureValidTokenAsync(OperationSource.Token).ConfigureAwait(False)
                 Using Request As HttpRequestMessage = _Client.CreateRequest(Method, Url)
-                    Request.Content = New StringContent(Payload.ToJsonString(), Encoding.UTF8, "application/json")
+                    Request.Content = New StringContent(Payload.ToString(Formatting.None), Encoding.UTF8, "application/json")
                     Using Response As HttpResponseMessage = Await _Client.SendAsync(Request, FirebaseServiceArea.Firestore, HttpCompletionOption.ResponseContentRead, OperationSource.Token).ConfigureAwait(False)
                         Await FirebaseClient.EnsureSuccessAsync(Response, FirebaseServiceArea.Firestore, OperationSource.Token).ConfigureAwait(False)
                         Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
@@ -278,40 +275,40 @@ Public NotInheritable Class FirebaseFirestore
         Dim NormalizedDocumentId As String = FirebasePathHelper.NormalizeDocumentId(DocumentId, NameOf(DocumentId))
         Return NormalizedCollectionPath & "/" & NormalizedDocumentId
     End Function
-    Private Shared Function CreateQueryPayload(CollectionId As String, Filters As List(Of FirestoreFilter)) As JsonObject
-        Dim FromValue As New JsonObject()
-        FromValue("collectionId") = JsonValue.Create(CollectionId)
-        Dim FromValues As New JsonArray From {
+    Private Shared Function CreateQueryPayload(CollectionId As String, Filters As List(Of FirestoreFilter)) As JObject
+        Dim FromValue As New JObject()
+        FromValue("collectionId") = New JValue(CollectionId)
+        Dim FromValues As New JArray From {
             FromValue
         }
-        Dim StructuredQuery As New JsonObject()
+        Dim StructuredQuery As New JObject()
         StructuredQuery("from") = FromValues
         If Filters.Count = 1 Then
             StructuredQuery("where") = CreateFieldFilter(Filters(0))
         Else
-            Dim FilterValues As New JsonArray()
+            Dim FilterValues As New JArray()
             For Each Filter As FirestoreFilter In Filters
                 FilterValues.Add(CreateFieldFilter(Filter))
             Next Filter
-            Dim CompositeFilter As New JsonObject()
-            CompositeFilter("op") = JsonValue.Create("AND")
+            Dim CompositeFilter As New JObject()
+            CompositeFilter("op") = New JValue("AND")
             CompositeFilter("filters") = FilterValues
-            Dim WhereValue As New JsonObject()
+            Dim WhereValue As New JObject()
             WhereValue("compositeFilter") = CompositeFilter
             StructuredQuery("where") = WhereValue
         End If
-        Dim Payload As New JsonObject()
+        Dim Payload As New JObject()
         Payload("structuredQuery") = StructuredQuery
         Return Payload
     End Function
-    Private Shared Function CreateFieldFilter(Filter As FirestoreFilter) As JsonObject
-        Dim FieldReference As New JsonObject()
-        FieldReference("fieldPath") = JsonValue.Create(Filter.Field)
-        Dim FieldFilter As New JsonObject()
+    Private Shared Function CreateFieldFilter(Filter As FirestoreFilter) As JObject
+        Dim FieldReference As New JObject()
+        FieldReference("fieldPath") = New JValue(Filter.Field)
+        Dim FieldFilter As New JObject()
         FieldFilter("field") = FieldReference
-        FieldFilter("op") = JsonValue.Create(GetOperatorString(Filter.Operator))
+        FieldFilter("op") = New JValue(GetOperatorString(Filter.Operator))
         FieldFilter("value") = FirestoreValueConverter.SerializeValue(Filter.Value)
-        Dim FilterValue As New JsonObject()
+        Dim FilterValue As New JObject()
         FilterValue("fieldFilter") = FieldFilter
         Return FilterValue
     End Function
@@ -350,11 +347,10 @@ Public NotInheritable Class FirebaseFirestore
         End Select
     End Function
     Private Shared Function ParseDocument(ResponseBody As String) As FirestoreDocument
-        Using Document As JsonDocument = ParseJson(ResponseBody, "document")
-            Return ParseDocument(Document.RootElement)
-        End Using
+        Dim Document As JToken = ParseJson(ResponseBody, "document")
+        Return ParseDocument(Document)
     End Function
-    Private Shared Function ParseDocument(DocumentElement As JsonElement) As FirestoreDocument
+    Private Shared Function ParseDocument(DocumentElement As JToken) As FirestoreDocument
         Try
             Return FirestoreValueConverter.DeserializeDocument(DocumentElement)
         Catch ex As JsonException
@@ -363,17 +359,17 @@ Public NotInheritable Class FirebaseFirestore
             Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, "Cloud Firestore returned a document containing an invalid value.", ex)
         End Try
     End Function
-    Private Shared Function ParseJson(ResponseBody As String, Description As String) As JsonDocument
+    Private Shared Function ParseJson(ResponseBody As String, Description As String) As JToken
         Try
-            Return JsonDocument.Parse(ResponseBody)
+            Return FirebaseClient.ParseJsonToken(ResponseBody)
         Catch ex As JsonException
             Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, $"Cloud Firestore returned malformed JSON for the {Description}.", ex)
         End Try
     End Function
-    Private Shared Function ReadOptionalString(Element As JsonElement, PropertyName As String) As String
-        Dim PropertyElement As JsonElement
-        If Not Element.TryGetProperty(PropertyName, PropertyElement) Then Return Nothing
-        If PropertyElement.ValueKind <> JsonValueKind.String Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, $"Cloud Firestore returned an invalid {PropertyName} value.")
-        Return PropertyElement.GetString()
+    Private Shared Function ReadOptionalString(Element As JToken, PropertyName As String) As String
+        Dim PropertyElement As JToken = Nothing
+        If Not FirebaseClient.TryGetJsonProperty(Element, PropertyName, PropertyElement) Then Return Nothing
+        If PropertyElement.Type <> JTokenType.String Then Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Firestore, $"Cloud Firestore returned an invalid {PropertyName} value.")
+        Return FirebaseClient.ReadJsonString(PropertyElement)
     End Function
 End Class

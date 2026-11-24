@@ -1,7 +1,7 @@
 ﻿Imports CoreSuite.Helpers
 Imports System.Net.Http
 Imports System.Text
-Imports System.Text.Json
+Imports Newtonsoft.Json
 Imports System.Threading
 ''' <summary>
 ''' Authenticates Firebase users with email and password and manages their in-memory session.
@@ -82,7 +82,7 @@ Public NotInheritable Class FirebaseAuth
         If String.IsNullOrEmpty(Password) Then Throw New ArgumentException("The password cannot be empty.", NameOf(Password))
         Dim Url As String = $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={Uri.EscapeDataString(_Client.Options.ApiKey)}"
         Dim Payload As New Dictionary(Of String, Object) From {{"email", Email}, {"password", Password}, {"returnSecureToken", True}}
-        Dim JsonBody As String = JsonSerializer.Serialize(Payload)
+        Dim JsonBody As String = FirebaseClient.SerializeJson(Payload)
         Using OperationSource As CancellationTokenSource = _Client.CreateOperationCancellationSource(False, CancellationToken)
             Try
                 Using Request As HttpRequestMessage = _Client.CreateRequest(HttpMethod.Post, Url)
@@ -92,7 +92,7 @@ Public NotInheritable Class FirebaseAuth
                         Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
                         Dim LoginResponse As FirebaseSignInResponse
                         Try
-                            LoginResponse = JsonSerializer.Deserialize(Of FirebaseSignInResponse)(ResponseBody)
+                            LoginResponse = FirebaseClient.DeserializeJson(Of FirebaseSignInResponse)(ResponseBody)
                         Catch ex As JsonException
                             Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Authentication, "Firebase Authentication returned malformed JSON.", ex)
                         End Try
@@ -158,7 +158,7 @@ Public NotInheritable Class FirebaseAuth
                             Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
                             Dim RefreshResponse As FirebaseRefreshResponse
                             Try
-                                RefreshResponse = JsonSerializer.Deserialize(Of FirebaseRefreshResponse)(ResponseBody)
+                                RefreshResponse = FirebaseClient.DeserializeJson(Of FirebaseRefreshResponse)(ResponseBody)
                             Catch ex As JsonException
                                 Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Authentication, "Firebase Authentication returned malformed refresh JSON.", ex)
                             End Try

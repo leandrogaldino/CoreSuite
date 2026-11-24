@@ -1,11 +1,11 @@
-﻿Imports System.Text.Json.Serialization
+﻿Imports Newtonsoft.Json
 Friend NotInheritable Class FirebaseRefreshResponse
-    <JsonPropertyName("id_token")>
+    <JsonProperty("id_token")>
     Public Property IdToken As String
-    <JsonPropertyName("refresh_token")>
+    <JsonProperty("refresh_token")>
     Public Property RefreshToken As String
-    <JsonPropertyName("expires_in")>
+    <JsonProperty("expires_in")>
     Public Property ExpiresIn As String
-    <JsonPropertyName("user_id")>
+    <JsonProperty("user_id")>
     Public Property UserId As String
 End Class

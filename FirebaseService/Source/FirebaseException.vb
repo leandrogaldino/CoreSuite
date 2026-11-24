@@ -1,7 +1,8 @@
 ﻿Imports CoreSuite.Helpers
 Imports System.Net
 Imports System.Net.Http
-Imports System.Text.Json
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 Imports System.Threading
 ''' <summary>
 ''' Represents an error returned by Firebase or produced while communicating with a Firebase service.
@@ -32,17 +33,16 @@ Public Class FirebaseException
         Dim ErrorMessage As String = Nothing
         If Not String.IsNullOrWhiteSpace(ResponseBody) Then
             Try
-                Using Document As JsonDocument = JsonDocument.Parse(ResponseBody)
-                    Dim ErrorElement As JsonElement = Document.RootElement
-                    Dim NestedError As JsonElement
-                    If ErrorElement.ValueKind = JsonValueKind.Object AndAlso ErrorElement.TryGetProperty("error", NestedError) Then ErrorElement = NestedError
-                    If ErrorElement.ValueKind = JsonValueKind.Object Then
-                        Dim StatusElement As JsonElement
-                        Dim MessageElement As JsonElement
-                        If ErrorElement.TryGetProperty("status", StatusElement) AndAlso StatusElement.ValueKind = JsonValueKind.String Then ErrorCode = StatusElement.GetString()
-                        If ErrorElement.TryGetProperty("message", MessageElement) AndAlso MessageElement.ValueKind = JsonValueKind.String Then ErrorMessage = MessageElement.GetString()
-                    End If
-                End Using
+                Dim Document As JToken = FirebaseClient.ParseJsonToken(ResponseBody)
+                Dim ErrorElement As JToken = Document
+                Dim NestedError As JToken = Nothing
+                If ErrorElement.Type = JTokenType.Object AndAlso FirebaseClient.TryGetJsonProperty(ErrorElement, "error", NestedError) Then ErrorElement = NestedError
+                If ErrorElement.Type = JTokenType.Object Then
+                    Dim StatusElement As JToken = Nothing
+                    Dim MessageElement As JToken = Nothing
+                    If FirebaseClient.TryGetJsonProperty(ErrorElement, "status", StatusElement) AndAlso StatusElement.Type = JTokenType.String Then ErrorCode = FirebaseClient.ReadJsonString(StatusElement)
+                    If FirebaseClient.TryGetJsonProperty(ErrorElement, "message", MessageElement) AndAlso MessageElement.Type = JTokenType.String Then ErrorMessage = FirebaseClient.ReadJsonString(MessageElement)
+                End If
             Catch ex As JsonException
                 ErrorMessage = Nothing
             End Try

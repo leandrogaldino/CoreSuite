@@ -2,7 +2,7 @@
 Imports System.IO
 Imports System.Security.Cryptography
 Imports System.Text
-Imports System.Text.Json
+Imports Newtonsoft.Json
 Imports System.Threading
 Partial Public NotInheritable Class Cryptography
     ''' <summary>
@@ -13,7 +13,7 @@ Partial Public NotInheritable Class Cryptography
         Private Const MagicSize As Integer = 4
         Private Const HeaderSize As Integer = 10
         Private Shared ReadOnly MagicBytes As Byte() = {&H43, &H53, &H44, &H50}
-        Private Shared ReadOnly DefaultJsonOptions As New JsonSerializerOptions With {.PropertyNameCaseInsensitive = True, .WriteIndented = True}
+        Private Shared ReadOnly DefaultJsonOptions As JsonSerializerSettings = CreateDefaultJsonOptions()
         Private Sub New()
         End Sub
         ''' <summary>
@@ -25,8 +25,8 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Scope">The Windows DPAPI protection scope.</param>
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
-        Public Shared Sub Save(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing)
-            Dim JsonBytes As Byte() = JsonSerializer.SerializeToUtf8Bytes(Value, ResolveOptions(Options))
+        Public Shared Sub Save(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing)
+            Dim JsonBytes As Byte() = SerializeJsonBytes(Value, ResolveOptions(Options))
             Try
                 SaveBytes(FilePath, JsonBytes, Scope, Entropy)
             Finally
@@ -43,8 +43,8 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Entropy">Optional additional entropy that must also be supplied when loading the file.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <param name="CancellationToken">The token used to cancel the file operation.</param>
-        Public Shared Async Function SaveAsync(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
-            Dim JsonBytes As Byte() = JsonSerializer.SerializeToUtf8Bytes(Value, ResolveOptions(Options))
+        Public Shared Async Function SaveAsync(Of T)(FilePath As String, Value As T, Optional Scope As DataProtectionScope = DataProtectionScope.CurrentUser, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task
+            Dim JsonBytes As Byte() = SerializeJsonBytes(Value, ResolveOptions(Options))
             Try
                 Await SaveBytesAsync(FilePath, JsonBytes, Scope, Entropy, CancellationToken)
             Finally
@@ -59,10 +59,10 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Entropy">The same optional additional entropy used when saving.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <returns>The deserialized value.</returns>
-        Public Shared Function Load(Of T)(FilePath As String, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing) As T
+        Public Shared Function Load(Of T)(FilePath As String, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing) As T
             Dim JsonBytes As Byte() = LoadBytes(FilePath, Entropy)
             Try
-                Return JsonSerializer.Deserialize(Of T)(JsonBytes, ResolveOptions(Options))
+                Return DeserializeJsonBytes(Of T)(JsonBytes, ResolveOptions(Options))
             Finally
                 Helper.ZeroMemory(JsonBytes)
             End Try
@@ -76,10 +76,10 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <param name="CancellationToken">The token used to cancel the file operation.</param>
         ''' <returns>The deserialized value.</returns>
-        Public Shared Async Function LoadAsync(Of T)(FilePath As String, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task(Of T)
+        Public Shared Async Function LoadAsync(Of T)(FilePath As String, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing, Optional CancellationToken As CancellationToken = Nothing) As Task(Of T)
             Dim JsonBytes As Byte() = Await LoadBytesAsync(FilePath, Entropy, CancellationToken)
             Try
-                Return JsonSerializer.Deserialize(Of T)(JsonBytes, ResolveOptions(Options))
+                Return DeserializeJsonBytes(Of T)(JsonBytes, ResolveOptions(Options))
             Finally
                 Helper.ZeroMemory(JsonBytes)
             End Try
@@ -93,7 +93,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Entropy">The same optional additional entropy used when saving.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <returns><see langword="True"/> when loading succeeds; otherwise, <see langword="False"/>.</returns>
-        Public Shared Function TryLoad(Of T)(FilePath As String, ByRef Value As T, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing) As Boolean
+        Public Shared Function TryLoad(Of T)(FilePath As String, ByRef Value As T, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing) As Boolean
             Value = Nothing
             Try
                 Value = Load(Of T)(FilePath, Entropy, Options)
@@ -127,7 +127,7 @@ Partial Public NotInheritable Class Cryptography
         ''' <param name="Entropy">The same optional additional entropy used when saving.</param>
         ''' <param name="Options">Optional JSON serialization options.</param>
         ''' <returns>The loaded value or the provided default value.</returns>
-        Public Shared Function LoadOrDefault(Of T)(FilePath As String, DefaultValue As T, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerOptions = Nothing) As T
+        Public Shared Function LoadOrDefault(Of T)(FilePath As String, DefaultValue As T, Optional Entropy As Byte() = Nothing, Optional Options As JsonSerializerSettings = Nothing) As T
             Dim Value As T = Nothing
             If TryLoad(FilePath, Value, Entropy, Options) Then Return Value
             Return DefaultValue
@@ -286,8 +286,8 @@ Partial Public NotInheritable Class Cryptography
         ''' Creates a new set of JSON options equivalent to the defaults used by this class.
         ''' </summary>
         ''' <returns>A mutable JSON serializer options instance.</returns>
-        Public Shared Function CreateDefaultJsonOptions() As JsonSerializerOptions
-            Return New JsonSerializerOptions(DefaultJsonOptions)
+        Public Shared Function CreateDefaultJsonOptions() As JsonSerializerSettings
+            Return New JsonSerializerSettings With {.Formatting = Formatting.Indented, .TypeNameHandling = TypeNameHandling.None, .MetadataPropertyHandling = MetadataPropertyHandling.Ignore, .ObjectCreationHandling = ObjectCreationHandling.Replace, .CheckAdditionalContent = True, .MaxDepth = 64}
         End Function
         Private Shared Function CreatePackage(ProtectedBytes As Byte(), Scope As DataProtectionScope) As Byte()
             Dim Header As Byte()
@@ -366,7 +366,35 @@ Partial Public NotInheritable Class Cryptography
             Directory.CreateDirectory(Folder)
             Return FullPath
         End Function
-        Private Shared Function ResolveOptions(Options As JsonSerializerOptions) As JsonSerializerOptions
+        Private Shared Function SerializeJsonBytes(Of T)(Value As T, Options As JsonSerializerSettings) As Byte()
+            Using Stream As New MemoryStream()
+                Try
+                    Using TextWriter As New StreamWriter(Stream, New UTF8Encoding(False, True), 1024, True)
+                        Using Writer As New JsonTextWriter(TextWriter)
+                            JsonSerializer.Create(Options).Serialize(Writer, Value, GetType(T))
+                            Writer.Flush()
+                        End Using
+                    End Using
+                    Return Stream.ToArray()
+                Finally
+                    Helper.ZeroMemory(Stream.GetBuffer())
+                End Try
+            End Using
+        End Function
+        Private Shared Function DeserializeJsonBytes(Of T)(Bytes As Byte(), Options As JsonSerializerSettings) As T
+            Using Stream As New MemoryStream(Bytes, False)
+                Using TextReader As New StreamReader(Stream, New UTF8Encoding(False, True), False)
+                    Using Reader As New JsonTextReader(TextReader)
+                        Try
+                            Return JsonSerializer.Create(Options).Deserialize(Of T)(Reader)
+                        Catch Ex As DecoderFallbackException
+                            Throw New JsonSerializationException("Invalid UTF-8 JSON data.", Ex)
+                        End Try
+                    End Using
+                End Using
+            End Using
+        End Function
+        Private Shared Function ResolveOptions(Options As JsonSerializerSettings) As JsonSerializerSettings
             Return If(Options, DefaultJsonOptions)
         End Function
         Private Shared Sub ValidatePlatform()

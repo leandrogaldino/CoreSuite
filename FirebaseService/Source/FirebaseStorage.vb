@@ -3,7 +3,7 @@ Imports System.IO
 Imports System.Net
 Imports System.Net.Http
 Imports System.Net.Http.Headers
-Imports System.Text.Json
+Imports Newtonsoft.Json
 Imports System.Threading
 ''' <summary>
 ''' Provides authenticated Cloud Storage for Firebase upload, download and deletion operations.
@@ -54,7 +54,7 @@ Public NotInheritable Class FirebaseStorage
                             Dim ResponseBody As String = Await HttpHelper.ReadAsStringAsync(Response.Content, OperationSource.Token).ConfigureAwait(False)
                             Dim UploadResponse As FirebaseStorageUploadResponse
                             Try
-                                UploadResponse = JsonSerializer.Deserialize(Of FirebaseStorageUploadResponse)(ResponseBody)
+                                UploadResponse = FirebaseClient.DeserializeJson(Of FirebaseStorageUploadResponse)(ResponseBody)
                             Catch ex As JsonException
                                 Throw FirebaseException.CreateInvalidResponse(FirebaseServiceArea.Storage, "Cloud Storage returned malformed upload metadata.", ex)
                             End Try

@@ -1,5 +1,8 @@
 Imports System.IO
-Imports System.Text.Json
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+Imports Newtonsoft.Json.Serialization
+Imports System.Text
 Imports System.Threading
 ''' <summary>
 ''' Provides strongly typed JSON persistence with atomic writes, backup creation, and automatic recovery.
@@ -14,7 +17,9 @@ Public NotInheritable Class JsonFileStore(Of T)
     Private ReadOnly _FilePath As String
     Private ReadOnly _BackupPath As String
     Private ReadOnly _OperationGate As New SemaphoreSlim(1, 1)
-    Private ReadOnly _SerializerOptions As JsonSerializerOptions
+    Private ReadOnly _SerializerOptions As JsonSerializerSettings
+    Private ReadOnly _ReaderOptions As JsonSerializerSettings
+    Private ReadOnly _Options As JsonFileStoreOptions
     Private _AutoRecoverFromBackup As Boolean = True
     ''' <summary>
     ''' Initializes a new instance of the <see cref="JsonFileStore(Of T)"/> class.
@@ -36,7 +41,9 @@ Public NotInheritable Class JsonFileStore(Of T)
         End If
         Dim pathComparison As StringComparison = If((Environment.OSVersion.Platform = PlatformID.Win32NT), StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)
         If String.Equals(_FilePath, _BackupPath, pathComparison) Then Throw New ArgumentException("The primary and backup paths must be different.", NameOf(BackupPath))
-        _SerializerOptions = If(Options, New JsonFileStoreOptions()).CreateSerializerOptions()
+        _Options = If(Options, New JsonFileStoreOptions()).CreateSnapshot()
+        _SerializerOptions = _Options.CreateSerializerOptions()
+        _ReaderOptions = _Options.CreateSerializerOptions(True)
     End Sub
     ''' <summary>
     ''' Gets the absolute path of the primary JSON file.
@@ -250,27 +257,137 @@ Public NotInheritable Class JsonFileStore(Of T)
     End Function
     Private Sub SerializeToFile(FilePath As String, Value As T)
         Using OutputStream As New FileStream(FilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, FileBufferSize, FileOptions.WriteThrough Or FileOptions.SequentialScan)
-            JsonSerializer.Serialize(OutputStream, Value, _SerializerOptions)
+            Using TextWriter As New StreamWriter(OutputStream, New UTF8Encoding(False, True), FileBufferSize, True)
+                Using Writer As New JsonTextWriter(TextWriter) With {.CloseOutput = False}
+                    JsonSerializer.Create(_SerializerOptions).Serialize(Writer, Value, GetType(T))
+                    Writer.Flush()
+                End Using
+            End Using
             OutputStream.Flush(True)
         End Using
     End Sub
     Private Async Function SerializeToFileAsync(FilePath As String, Value As T, CancellationToken As CancellationToken) As Task
-        Using OutputStream As New FileStream(FilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, FileBufferSize, FileOptions.Asynchronous Or FileOptions.WriteThrough Or FileOptions.SequentialScan)
-            Await JsonSerializer.SerializeAsync(OutputStream, Value, _SerializerOptions, CancellationToken).ConfigureAwait(False)
-            Await OutputStream.FlushAsync(CancellationToken).ConfigureAwait(False)
-            OutputStream.Flush(True)
-        End Using
+        ' Json.NET's object serializer is synchronous; keep it off the caller's thread.
+        Await Task.Run(Sub() SerializeToFile(FilePath, Value), CancellationToken).ConfigureAwait(False)
+        CancellationToken.ThrowIfCancellationRequested()
     End Function
     Private Function DeserializeFromFile(FilePath As String) As T
         Using InputStream As New FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileBufferSize, FileOptions.SequentialScan)
-            Return JsonSerializer.Deserialize(Of T)(InputStream, _SerializerOptions)
+            Using TextReader As New StreamReader(InputStream, New UTF8Encoding(False, True), False)
+                Return DeserializeJson(TextReader.ReadToEnd(), CancellationToken.None)
+            End Using
         End Using
     End Function
     Private Async Function DeserializeFromFileAsync(FilePath As String, CancellationToken As CancellationToken) As Task(Of T)
+        Dim Content As String
         Using InputStream As New FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read, FileBufferSize, FileOptions.Asynchronous Or FileOptions.SequentialScan)
-            Return Await JsonSerializer.DeserializeAsync(Of T)(InputStream, _SerializerOptions, CancellationToken).ConfigureAwait(False)
+            Using TextReader As New StreamReader(InputStream, New UTF8Encoding(False, True), False)
+                Dim Buffer(8191) As Char
+                Dim Builder As New StringBuilder()
+                Do
+                    CancellationToken.ThrowIfCancellationRequested()
+                    Dim Count As Integer = Await TextReader.ReadAsync(Buffer, 0, Buffer.Length).ConfigureAwait(False)
+                    If Count = 0 Then Exit Do
+                    Builder.Append(Buffer, 0, Count)
+                Loop
+                Content = Builder.ToString()
+            End Using
+        End Using
+        Dim Result As T = Await Task.Run(Function() DeserializeJson(Content, CancellationToken), CancellationToken).ConfigureAwait(False)
+        CancellationToken.ThrowIfCancellationRequested()
+        Return Result
+    End Function
+    Private Function DeserializeJson(Content As String, Token As CancellationToken) As T
+        If Content.Length > 0 AndAlso Content(0) = ChrW(&HFEFF) Then Content = Content.Substring(1)
+        ValidateJsonSyntax(Content, Token)
+        Using TextReader As New StringReader(Content)
+            Using Reader As New JsonTextReader(TextReader) With {.DateParseHandling = DateParseHandling.None, .MaxDepth = _ReaderOptions.MaxDepth}
+                While Reader.Read() AndAlso Reader.TokenType = JsonToken.Comment
+                End While
+                If Reader.TokenType = JsonToken.None OrElse Reader.TokenType = JsonToken.Comment Then Throw New JsonReaderException("The JSON value is missing.")
+                Dim Value As JToken = JToken.ReadFrom(Reader)
+                While Reader.Read()
+                    If Reader.TokenType <> JsonToken.Comment Then Throw New JsonReaderException("Unexpected content after the JSON value.")
+                End While
+                If Not _Options.PropertyNameCaseInsensitive Then FilterCaseMismatches(Value, GetType(T), Token)
+                Token.ThrowIfCancellationRequested()
+                Return Value.ToObject(Of T)(JsonSerializer.Create(_ReaderOptions))
+            End Using
         End Using
     End Function
+    Private Sub FilterCaseMismatches(Value As JToken, TargetType As Type, Token As CancellationToken)
+        Token.ThrowIfCancellationRequested()
+        If Value Is Nothing OrElse TargetType Is Nothing OrElse TargetType Is GetType(Object) Then Return
+        TargetType = If(Nullable.GetUnderlyingType(TargetType), TargetType)
+        Dim Contract As JsonContract = _ReaderOptions.ContractResolver.ResolveContract(TargetType)
+        If Contract.Converter IsNot Nothing Then Return
+        Dim ObjectValue As JObject = TryCast(Value, JObject)
+        Dim ObjectContract As JsonObjectContract = TryCast(Contract, JsonObjectContract)
+        If ObjectValue IsNot Nothing AndAlso ObjectContract IsNot Nothing Then
+            For Each Member As JProperty In ObjectValue.Properties().ToList()
+                Dim Exact As JsonProperty = ObjectContract.Properties.GetProperty(Member.Name, StringComparison.Ordinal)
+                If Exact Is Nothing Then
+                    Dim Similar As JsonProperty = ObjectContract.Properties.GetProperty(Member.Name, StringComparison.OrdinalIgnoreCase)
+                    If Similar IsNot Nothing Then Member.Remove()
+                ElseIf Not Exact.Ignored AndAlso Exact.Converter Is Nothing Then
+                    FilterCaseMismatches(Member.Value, Exact.PropertyType, Token)
+                End If
+            Next
+        ElseIf ObjectValue IsNot Nothing AndAlso TypeOf Contract Is JsonDictionaryContract Then
+            Dim ItemType As Type = DirectCast(Contract, JsonDictionaryContract).DictionaryValueType
+            For Each Member As JProperty In ObjectValue.Properties()
+                FilterCaseMismatches(Member.Value, ItemType, Token)
+            Next
+        ElseIf TypeOf Value Is JArray AndAlso TypeOf Contract Is JsonArrayContract Then
+            Dim ItemType As Type = DirectCast(Contract, JsonArrayContract).CollectionItemType
+            For Each Item As JToken In Value.Children()
+                FilterCaseMismatches(Item, ItemType, Token)
+            Next
+        End If
+    End Sub
+    Private Sub ValidateJsonSyntax(Content As String, Token As CancellationToken)
+        ' Json.NET accepts comments and trailing commas by default; enforce the store's existing options.
+        Dim InString As Boolean = False
+        Dim Escaped As Boolean = False
+        Dim Previous As Char = ChrW(0)
+        Dim Index As Integer = 0
+        While Index < Content.Length
+            If (Index And 4095) = 0 Then Token.ThrowIfCancellationRequested()
+            Dim Character As Char = Content(Index)
+            If InString Then
+                If Escaped Then
+                    Escaped = False
+                ElseIf Character = "\"c Then
+                    Escaped = True
+                ElseIf Character = """"c Then
+                    InString = False
+                    Previous = Character
+                ElseIf Character < ChrW(32) Then
+                    Throw New JsonReaderException("Unescaped control character in JSON string.")
+                End If
+            ElseIf Character = """"c Then
+                InString = True
+            ElseIf Character = "'"c Then
+                Throw New JsonReaderException("JSON strings must use double quotes.")
+            ElseIf Character = "/"c AndAlso Index + 1 < Content.Length AndAlso (Content(Index + 1) = "/"c OrElse Content(Index + 1) = "*"c) Then
+                If Not _Options.AllowJsonComments Then Throw New JsonReaderException("JSON comments are not allowed.")
+                If Content(Index + 1) = "/"c Then
+                    Index += 2
+                    While Index < Content.Length AndAlso Content(Index) <> ChrW(10) AndAlso Content(Index) <> ChrW(13)
+                        Index += 1
+                    End While
+                Else
+                    Dim EndIndex As Integer = Content.IndexOf("*/", Index + 2, StringComparison.Ordinal)
+                    If EndIndex < 0 Then Throw New JsonReaderException("Unterminated JSON comment.")
+                    Index = EndIndex + 1
+                End If
+            ElseIf Not Char.IsWhiteSpace(Character) Then
+                If Not _Options.AllowTrailingCommas AndAlso Previous = ","c AndAlso (Character = "}"c OrElse Character = "]"c) Then Throw New JsonReaderException("Trailing commas are not allowed.")
+                Previous = Character
+            End If
+            Index += 1
+        End While
+    End Sub
     Private Function IsValidStoredValue(FilePath As String) As Boolean
         Try
             Dim IgnoredValue As T = DeserializeFromFile(FilePath)
@@ -344,6 +461,7 @@ Public NotInheritable Class JsonFileStore(Of T)
     End Sub
     Private Shared Function IsRecoverablePrimaryFailure(ex As Exception) As Boolean
         Return TypeOf ex Is JsonException OrElse
+               TypeOf ex Is DecoderFallbackException OrElse
                TypeOf ex Is FileNotFoundException OrElse
                TypeOf ex Is DirectoryNotFoundException
     End Function
@@ -351,6 +469,7 @@ Public NotInheritable Class JsonFileStore(Of T)
     Private Shared Function IsExpectedLoadException(ex As Exception) As Boolean
         Return TypeOf ex Is IOException OrElse
                TypeOf ex Is UnauthorizedAccessException OrElse
+               TypeOf ex Is DecoderFallbackException OrElse
                TypeOf ex Is JsonException
     End Function
 End Class

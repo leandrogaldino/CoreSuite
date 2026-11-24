@@ -1,13 +1,13 @@
-﻿Imports System.Text.Json.Serialization
+﻿Imports Newtonsoft.Json
 Friend NotInheritable Class FirebaseSignInResponse
-    <JsonPropertyName("idToken")>
+    <JsonProperty("idToken")>
     Public Property IdToken As String
-    <JsonPropertyName("refreshToken")>
+    <JsonProperty("refreshToken")>
     Public Property RefreshToken As String
-    <JsonPropertyName("expiresIn")>
+    <JsonProperty("expiresIn")>
     Public Property ExpiresIn As String
-    <JsonPropertyName("localId")>
+    <JsonProperty("localId")>
     Public Property LocalId As String
-    <JsonPropertyName("email")>
+    <JsonProperty("email")>
     Public Property Email As String
 End Class

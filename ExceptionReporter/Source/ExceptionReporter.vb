@@ -2,8 +2,7 @@
 Imports CoreSuite.Services
 Imports System.IO
 Imports System.Text
-Imports System.Text.Encodings.Web
-Imports System.Text.Json
+Imports Newtonsoft.Json
 Imports System.Threading
 Imports MailKit.Net.Smtp
 Imports MailKit.Security
@@ -13,21 +12,21 @@ Imports MimeKit
 ''' Captures, serializes, saves and sends structured exception reports without depending on a user interface.
 ''' </summary>
 Public Class ExceptionReporter
-    Private ReadOnly _JsonOptions As JsonSerializerOptions
+    Private ReadOnly _JsonSerializer As JsonSerializer
     ''' <summary>
     ''' Initializes a new reporter with the default indented JSON configuration.
     ''' </summary>
     Public Sub New()
-        Me.New(New JsonSerializerOptions With {.WriteIndented = True, .Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping})
+        Me.New(New JsonSerializerSettings With {.Formatting = Formatting.Indented, .TypeNameHandling = TypeNameHandling.None, .MetadataPropertyHandling = MetadataPropertyHandling.Ignore, .MaxDepth = 64})
     End Sub
     ''' <summary>
     ''' Initializes a new reporter with custom JSON serialization options.
     ''' </summary>
     ''' <param name="JsonOptions">The JSON options used to serialize reports.</param>
     ''' <exception cref="ArgumentNullException">Thrown when <paramref name="JsonOptions"/> is <see langword="Nothing"/>.</exception>
-    Public Sub New(JsonOptions As JsonSerializerOptions)
+    Public Sub New(JsonOptions As JsonSerializerSettings)
         If JsonOptions Is Nothing Then Throw New ArgumentNullException("JsonOptions")
-        _JsonOptions = New JsonSerializerOptions(JsonOptions)
+        _JsonSerializer = JsonSerializer.Create(JsonOptions)
     End Sub
     ''' <summary>
     ''' Creates a structured report from an exception and optional application context.
@@ -66,7 +65,15 @@ Public Class ExceptionReporter
     ''' <exception cref="ArgumentNullException">Thrown when <paramref name="Report"/> is <see langword="Nothing"/>.</exception>
     Public Function Serialize(Report As ExceptionReport) As String
         If Report Is Nothing Then Throw New ArgumentNullException("Report")
-        Return JsonSerializer.Serialize(Report, _JsonOptions)
+        SyncLock _JsonSerializer
+            Using Writer As New StringWriter(Global.System.Globalization.CultureInfo.InvariantCulture)
+                Using JsonWriter As New JsonTextWriter(Writer)
+                    _JsonSerializer.Serialize(JsonWriter, Report)
+                    JsonWriter.Flush()
+                    Return Writer.ToString()
+                End Using
+            End Using
+        End SyncLock
     End Function
     ''' <summary>
     ''' Saves a report to a UTF-8 JSON file using an atomic replacement operation.

@@ -1,5 +1,5 @@
-﻿Imports System.Text.Json.Serialization
+﻿Imports Newtonsoft.Json
 Friend NotInheritable Class FirebaseStorageUploadResponse
-    <JsonPropertyName("downloadTokens")>
+    <JsonProperty("downloadTokens")>
     Public Property DownloadTokens As String
 End Class

@@ -1,4 +1,8 @@
-﻿Imports System.Net.Http
+﻿Imports System.IO
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+Imports Newtonsoft.Json.Serialization
+Imports System.Net.Http
 Imports System.Net.Http.Headers
 Imports System.Threading
 Friend NotInheritable Class FirebaseClient
@@ -46,6 +50,70 @@ Friend NotInheritable Class FirebaseClient
         If Response.IsSuccessStatusCode Then Return
         Dim RequestException As FirebaseException = Await FirebaseException.FromResponseAsync(ServiceArea, Response, CancellationToken).ConfigureAwait(False)
         Throw RequestException
+    End Function
+    Friend Shared Function CreateJsonSettings() As JsonSerializerSettings
+        Return New JsonSerializerSettings With {
+            .DateParseHandling = DateParseHandling.None,
+            .TypeNameHandling = TypeNameHandling.None,
+            .MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            .MaxDepth = 64
+        }
+    End Function
+    Friend Shared Function SerializeJson(Value As Object) As String
+        Using TextWriter As New StringWriter(Global.System.Globalization.CultureInfo.InvariantCulture)
+            Using Writer As New JsonTextWriter(TextWriter)
+                JsonSerializer.Create(CreateJsonSettings()).Serialize(Writer, Value)
+                Writer.Flush()
+                Return TextWriter.ToString()
+            End Using
+        End Using
+    End Function
+    Friend Shared Function ParseJsonToken(Content As String) As JToken
+        Using TextReader As New StringReader(Content)
+            Using Reader As New JsonTextReader(TextReader) With {.DateParseHandling = DateParseHandling.None, .MaxDepth = 64}
+                Dim Result As JToken = JToken.ReadFrom(Reader)
+                If Reader.Read() Then Throw New JsonReaderException("Unexpected content after the JSON value.")
+                Return Result
+            End Using
+        End Using
+    End Function
+    Friend Shared Function DeserializeJson(Of T)(Content As String) As T
+        Dim Token As JToken = ParseJsonToken(Content)
+        If Token.Type = JTokenType.Null Then Return Nothing
+        Dim ObjectValue As JObject = TryCast(Token, JObject)
+        If ObjectValue Is Nothing Then Throw New JsonSerializationException("The JSON response must be an object.")
+        Dim Serializer As JsonSerializer = JsonSerializer.Create(CreateJsonSettings())
+        Dim Contract As JsonObjectContract = DirectCast(Serializer.ContractResolver.ResolveContract(GetType(T)), JsonObjectContract)
+        For Each PropertyValue As JProperty In ObjectValue.Properties().ToList()
+            Dim PropertyContract As JsonProperty = Contract.Properties.GetProperty(PropertyValue.Name, StringComparison.Ordinal)
+            If PropertyContract Is Nothing Then
+                PropertyValue.Remove()
+            ElseIf PropertyContract.PropertyType Is GetType(String) AndAlso PropertyValue.Value.Type <> JTokenType.String AndAlso PropertyValue.Value.Type <> JTokenType.Null Then
+                Throw New JsonSerializationException($"The JSON property '{PropertyValue.Name}' must be a string.")
+            End If
+        Next
+        Return ObjectValue.ToObject(Of T)(Serializer)
+    End Function
+    Friend Shared Function TryGetJsonProperty(Element As JToken, PropertyName As String, ByRef Value As JToken) As Boolean
+        Dim ObjectValue As JObject = TryCast(Element, JObject)
+        If ObjectValue Is Nothing Then Throw New InvalidOperationException("The JSON value is not an object.")
+        Return ObjectValue.TryGetValue(PropertyName, StringComparison.Ordinal, Value)
+    End Function
+    Friend Shared Function ReadJsonString(Value As JToken) As String
+        If Value.Type = JTokenType.Null Then Return Nothing
+        If Value.Type <> JTokenType.String Then Throw New InvalidOperationException("The JSON value is not a string.")
+        Return CType(Value, String)
+    End Function
+    Friend Shared Function ReadJsonBoolean(Value As JToken) As Boolean
+        If Value.Type <> JTokenType.Boolean Then Throw New InvalidOperationException("The JSON value is not a Boolean.")
+        Return CType(Value, Boolean)
+    End Function
+    Friend Shared Function IsJsonNumber(Value As JToken) As Boolean
+        Return Value.Type = JTokenType.Integer OrElse Value.Type = JTokenType.Float
+    End Function
+    Friend Shared Function ReadJsonDouble(Value As JToken) As Double
+        If Not IsJsonNumber(Value) Then Throw New InvalidOperationException("The JSON value is not a number.")
+        Return CType(Value, Double)
     End Function
     Private Sub ThrowIfDisposed()
         If _Disposed Then Throw New ObjectDisposedException(Me.GetType().FullName)
