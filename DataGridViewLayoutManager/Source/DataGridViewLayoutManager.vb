@@ -2,6 +2,7 @@
 Imports System.Drawing
 Imports System.IO
 Imports System.Windows.Forms
+Imports CoreSuite.Services
 
 ''' <summary>
 ''' Manages DataGridView layout persistence, including column visibility, order,

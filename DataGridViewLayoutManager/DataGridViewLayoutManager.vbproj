@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B956463F-AB33-4E68-BEDE-C31E0B5AF09E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>CoreSuite.Services</RootNamespace>
+    <RootNamespace>CoreSuite.Controls</RootNamespace>
     <AssemblyName>CoreSuite.DataGridViewLayoutManager</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
@@ -44,6 +44,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoreSuite.JsonFileStore">
+      <HintPath>..\JsonFileStore\bin\Debug\CoreSuite.JsonFileStore.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
