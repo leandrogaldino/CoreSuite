@@ -95,15 +95,11 @@
     <Compile Include="Source\Views\FrmMessageBox.Designer.vb">
       <DependentUpon>FrmMessageBox.vb</DependentUpon>
     </Compile>
-    <Compile Include="Source\Views\FrmMessageBox.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Source\Views\FrmMessageBox.vb" />
     <Compile Include="Source\Views\UcException.Designer.vb">
       <DependentUpon>UcException.vb</DependentUpon>
     </Compile>
-    <Compile Include="Source\Views\UcException.vb">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Source\Views\UcException.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

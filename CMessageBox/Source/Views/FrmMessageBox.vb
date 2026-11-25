@@ -58,17 +58,38 @@ Public Class FrmMessageBox
         End Try
     End Sub
 
-    Private Sub PnlMessage_Resize(sender As Object, e As EventArgs) Handles PnlMessage.Resize
+    Private Sub PnlMessage_Resize(sender As Object, e As EventArgs) Handles PnlMessage.Resize, PnlIcon.Resize
         AdjustMessagePosition()
     End Sub
 
-    Private Sub AdjustMessagePosition()
+    Private Function GetMessageTextHeight() As Integer
         Dim AvailableWidth As Integer = Math.Max(1, PnlMessage.ClientSize.Width - 20)
         LblMessage.MaximumSize = New Size(AvailableWidth, 0)
-        Dim TextHeight As Integer = LblMessage.GetPreferredSize(New Size(AvailableWidth, 0)).Height
+        Return LblMessage.GetPreferredSize(New Size(AvailableWidth, 0)).Height
+    End Function
+
+    Private Sub AdjustMessagePosition()
+        Dim TextHeight As Integer = GetMessageTextHeight()
         LblMessage.Location = New Point(10, Math.Max(10, (PnlMessage.ClientSize.Height - TextHeight) \ 2))
         PnlMessage.AutoScrollMinSize = If(TextHeight + 20 > PnlMessage.ClientSize.Height,
                                          New Size(0, TextHeight + 20), Size.Empty)
+        AdjustIconAlignment(TextHeight)
+    End Sub
+
+    Private Sub AdjustIconAlignment(TextHeight As Integer)
+        If PnlIcon Is Nothing OrElse PbxIcon Is Nothing Then Return
+
+        Dim X As Integer = Math.Max(0, (PnlIcon.ClientSize.Width - PbxIcon.Width) \ 2)
+        Dim AlignToTop As Boolean = TextHeight > PbxIcon.Height OrElse PnlMessage.AutoScrollMinSize.Height > PnlMessage.ClientSize.Height
+        Dim Y As Integer
+
+        If AlignToTop Then
+            Y = 10
+        Else
+            Y = Math.Max(0, (PnlIcon.ClientSize.Height - PbxIcon.Height) \ 2)
+        End If
+
+        PbxIcon.Location = New Point(X, Y)
     End Sub
 
 
@@ -76,8 +97,7 @@ Public Class FrmMessageBox
         PerformLayout()
         TlpContainer.PerformLayout()
         TlpBody.PerformLayout()
-        Dim AvailableWidth As Integer = Math.Max(1, PnlMessage.ClientSize.Width - 20)
-        Dim TextHeight As Integer = LblMessage.GetPreferredSize(New Size(AvailableWidth, 0)).Height
+        Dim TextHeight As Integer = GetMessageTextHeight()
         Dim ErrorHeight As Integer = CInt(TlpBody.RowStyles(0).Height)
         Dim DesiredHeight As Integer = 186 + ErrorHeight + Math.Max(0, TextHeight - 72)
         Dim MaxHeight As Integer = Math.Max(186, Screen.FromPoint(Cursor.Position).WorkingArea.Height - 40)

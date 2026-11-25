@@ -33,6 +33,7 @@ Partial Class FrmMessageBox
         BtnClose = New NoFocusCueButton()
         LblTitle = New Label()
         TlpBody = New TableLayoutPanel()
+        PnlIcon = New Panel()
         PbxIcon = New PictureBox()
         LblErrorCode = New Label()
         PnlMessage = New Panel()
@@ -46,6 +47,7 @@ Partial Class FrmMessageBox
         TlpTopBar.SuspendLayout()
         TlpBody.SuspendLayout()
         CType(PbxIcon, ComponentModel.ISupportInitialize).BeginInit()
+        PnlIcon.SuspendLayout()
         PnlMessage.SuspendLayout()
         PnlBottomArea.SuspendLayout()
         SuspendLayout()
@@ -132,7 +134,7 @@ Partial Class FrmMessageBox
         TlpBody.ColumnCount = 2
         TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 76F))
         TlpBody.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
-        TlpBody.Controls.Add(PbxIcon, 0, 1)
+        TlpBody.Controls.Add(PnlIcon, 0, 1)
         TlpBody.Controls.Add(LblErrorCode, 0, 0)
         TlpBody.Controls.Add(PnlMessage, 1, 1)
         TlpBody.Dock = DockStyle.Fill
@@ -144,15 +146,24 @@ Partial Class FrmMessageBox
         TlpBody.Size = New Size(422, 93)
         TlpBody.TabIndex = 2
         ' 
+        ' PnlIcon
+        ' 
+        PnlIcon.Controls.Add(PbxIcon)
+        PnlIcon.Dock = DockStyle.Fill
+        PnlIcon.Location = New Point(3, 33)
+        PnlIcon.Name = "PnlIcon"
+        PnlIcon.Size = New Size(70, 57)
+        PnlIcon.TabIndex = 5
+        ' 
         ' PbxIcon
         ' 
-        PbxIcon.Anchor = AnchorStyles.None
         PbxIcon.Image = My.Resources.Images.Information
-        PbxIcon.Location = New Point(3, 33)
+        PbxIcon.Location = New Point(11, 4)
+        PbxIcon.Margin = New Padding(0)
         PbxIcon.Name = "PbxIcon"
         PbxIcon.Size = New Size(48, 48)
         PbxIcon.SizeMode = PictureBoxSizeMode.Zoom
-        PbxIcon.TabIndex = 5
+        PbxIcon.TabIndex = 0
         PbxIcon.TabStop = False
         ' 
         ' LblErrorCode
@@ -253,6 +264,7 @@ Partial Class FrmMessageBox
         TlpTopBar.ResumeLayout(False)
         TlpBody.ResumeLayout(False)
         CType(PbxIcon, ComponentModel.ISupportInitialize).EndInit()
+        PnlIcon.ResumeLayout(False)
         PnlMessage.ResumeLayout(False)
         PnlMessage.PerformLayout()
         PnlBottomArea.ResumeLayout(False)
@@ -268,6 +280,7 @@ Partial Class FrmMessageBox
     Friend WithEvents TlpBottomBar As TableLayoutPanel
     Friend WithEvents PnlBottomSeparator As Panel
     Friend WithEvents TlpBody As TableLayoutPanel
+    Friend WithEvents PnlIcon As Panel
     Friend WithEvents PbxIcon As PictureBox
     Friend WithEvents LblErrorCode As Label
     Friend WithEvents LblMessage As Label
