@@ -207,7 +207,7 @@ Public Class CMessageBox
                     End If
                 End If
 
-                Frm.LblTitle.Text = Title
+                Frm.SetTitle(Title, MessageType)
                 Frm.LblMessage.Text = Message
 
                 If MessageType = CMessageBoxType.Error AndAlso Not String.IsNullOrWhiteSpace(ErrorCode) Then
@@ -224,6 +224,7 @@ Public Class CMessageBox
                 Frm.AllocateButtons(MessageType, Exception IsNot Nothing)
                 Frm.SetMessageIcon(MessageType)
 
+                Frm.AdjustDialogSize()
                 Return Frm.ShowDialog()
             End Using
         End Using

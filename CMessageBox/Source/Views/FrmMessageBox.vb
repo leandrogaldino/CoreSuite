@@ -63,14 +63,42 @@ Public Class FrmMessageBox
     End Sub
 
     Private Sub AdjustMessagePosition()
-        LblMessage.MaximumSize = New Size(Math.Max(0, PnlMessage.ClientSize.Width - 20), 0)
-
-        Dim TextHeight As Integer = LblMessage.PreferredHeight
-
-        LblMessage.Left = 10
-        LblMessage.Top = If(TextHeight < PnlMessage.ClientSize.Height, (PnlMessage.ClientSize.Height - TextHeight) \ 2, 10)
+        Dim AvailableWidth As Integer = Math.Max(1, PnlMessage.ClientSize.Width - 20)
+        LblMessage.MaximumSize = New Size(AvailableWidth, 0)
+        Dim TextHeight As Integer = LblMessage.GetPreferredSize(New Size(AvailableWidth, 0)).Height
+        LblMessage.Location = New Point(10, Math.Max(10, (PnlMessage.ClientSize.Height - TextHeight) \ 2))
+        PnlMessage.AutoScrollMinSize = If(TextHeight + 20 > PnlMessage.ClientSize.Height,
+                                         New Size(0, TextHeight + 20), Size.Empty)
     End Sub
 
+
+    Friend Sub AdjustDialogSize()
+        PerformLayout()
+        TlpContainer.PerformLayout()
+        TlpBody.PerformLayout()
+        Dim AvailableWidth As Integer = Math.Max(1, PnlMessage.ClientSize.Width - 20)
+        Dim TextHeight As Integer = LblMessage.GetPreferredSize(New Size(AvailableWidth, 0)).Height
+        Dim ErrorHeight As Integer = CInt(TlpBody.RowStyles(0).Height)
+        Dim DesiredHeight As Integer = 186 + ErrorHeight + Math.Max(0, TextHeight - 72)
+        Dim MaxHeight As Integer = Math.Max(186, Screen.FromPoint(Cursor.Position).WorkingArea.Height - 40)
+        ClientSize = New Size(ClientSize.Width, Math.Min(DesiredHeight, MaxHeight))
+        PerformLayout()
+        AdjustMessagePosition()
+    End Sub
+
+    Friend Sub SetTitle(Title As String, MessageType As CMessageBoxType)
+        If String.IsNullOrWhiteSpace(Title) Then
+            Select Case MessageType
+                Case CMessageBoxType.Question : Title = "Confirmação"
+                Case CMessageBoxType.Warning : Title = "Atenção"
+                Case CMessageBoxType.Error : Title = "Erro"
+                Case CMessageBoxType.Success : Title = "Sucesso"
+                Case Else : Title = "Informação"
+            End Select
+        End If
+        LblTitle.Text = Title
+        Text = Title
+    End Sub
 
     Friend Sub AllocateButtons(MessageType As CMessageBoxType, HasException As Boolean)
         ClearButtons()
@@ -148,7 +176,7 @@ Public Class FrmMessageBox
             .ForeColor = Color.FromArgb(45, 45, 48),
             .Font = New Font("Segoe UI", 9.75F),
             .Margin = New Padding(3),
-            .Size = New Size(110, 34),
+            .Size = New Size(100, 32),
             .TextAlign = ContentAlignment.MiddleCenter,
             .FlatStyle = FlatStyle.Flat
         }
