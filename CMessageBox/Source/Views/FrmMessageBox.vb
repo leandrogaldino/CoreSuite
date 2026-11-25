@@ -127,7 +127,10 @@ Public Class FrmMessageBox
             .Margin = New Padding(3),
             .Size = New Size(110, 34),
             .TextAlign = ContentAlignment.MiddleCenter,
-            .FlatStyle = FlatStyle.Flat
+            .FlatStyle = FlatStyle.Flat,
+            .ShowDefaultBorder = False,
+            .FocusedBackColor = Color.FromArgb(233, 235, 238),
+            .FocusedBorderColor = Color.FromArgb(133, 139, 147)
         }
 
         Button.FlatAppearance.BorderColor = Color.FromArgb(190, 193, 197)
