@@ -35,6 +35,29 @@ Public Class FrmMessageBox
         SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0)
     End Sub
 
+    Private Sub BtnClose_VisualStateChanged(sender As Object, e As EventArgs) Handles BtnClose.GotFocus, BtnClose.LostFocus, BtnClose.MouseEnter, BtnClose.MouseLeave, BtnClose.MouseDown, BtnClose.MouseUp, BtnClose.KeyDown, BtnClose.KeyUp
+        BtnClose.BackColor = If(BtnClose.Focused, BtnClose.FlatAppearance.MouseOverBackColor, TlpTopBar.BackColor)
+        BtnClose.Invalidate()
+    End Sub
+
+    Private Sub BtnClose_Paint(sender As Object, e As PaintEventArgs) Handles BtnClose.Paint
+        Dim Highlighted As Boolean = BtnClose.Focused OrElse BtnClose.ClientRectangle.Contains(BtnClose.PointToClient(Cursor.Position))
+        Dim IconColor As Color = If(Highlighted, Color.White, LblTitle.ForeColor)
+        Dim X As Single = BtnClose.ClientSize.Width / 2.0F
+        Dim Y As Single = BtnClose.ClientSize.Height / 2.0F
+        Const Radius As Single = 4.5F
+        Dim State = e.Graphics.Save()
+        Try
+            e.Graphics.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+            Using Pen As New Pen(IconColor, 1.0F)
+                e.Graphics.DrawLine(Pen, X - Radius, Y - Radius, X + Radius, Y + Radius)
+                e.Graphics.DrawLine(Pen, X + Radius, Y - Radius, X - Radius, Y + Radius)
+            End Using
+        Finally
+            e.Graphics.Restore(State)
+        End Try
+    End Sub
+
     Private Sub PnlMessage_Resize(sender As Object, e As EventArgs) Handles PnlMessage.Resize
         AdjustMessagePosition()
     End Sub
@@ -127,10 +150,7 @@ Public Class FrmMessageBox
             .Margin = New Padding(3),
             .Size = New Size(110, 34),
             .TextAlign = ContentAlignment.MiddleCenter,
-            .FlatStyle = FlatStyle.Flat,
-            .ShowDefaultBorder = False,
-            .FocusedBackColor = Color.FromArgb(233, 235, 238),
-            .FocusedBorderColor = Color.FromArgb(133, 139, 147)
+            .FlatStyle = FlatStyle.Flat
         }
 
         Button.FlatAppearance.BorderColor = Color.FromArgb(190, 193, 197)

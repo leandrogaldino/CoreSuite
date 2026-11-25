@@ -71,7 +71,7 @@ Partial Class FrmMessageBox
         TlpContainer.Location = New Point(0, 0)
         TlpContainer.Name = "TlpContainer"
         TlpContainer.RowCount = 3
-        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 35F))
+        TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 30F))
         TlpContainer.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
         TlpContainer.RowStyles.Add(New RowStyle(SizeType.Absolute, 55F))
         TlpContainer.Size = New Size(428, 238)
@@ -82,7 +82,7 @@ Partial Class FrmMessageBox
         TlpTopBar.BackColor = Color.FromArgb(CByte(248), CByte(249), CByte(250))
         TlpTopBar.ColumnCount = 2
         TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
-        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 50F))
+        TlpTopBar.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, 46F))
         TlpTopBar.Controls.Add(BtnClose, 1, 0)
         TlpTopBar.Controls.Add(LblTitle, 0, 0)
         TlpTopBar.Dock = DockStyle.Fill
@@ -91,8 +91,8 @@ Partial Class FrmMessageBox
         TlpTopBar.Name = "TlpTopBar"
         TlpTopBar.RowCount = 1
         TlpTopBar.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
-        TlpTopBar.Size = New Size(428, 35)
-        TlpTopBar.TabIndex = 0
+        TlpTopBar.Size = New Size(428, 30)
+        TlpTopBar.TabIndex = 3
         ' 
         ' BtnClose
         ' 
@@ -103,22 +103,23 @@ Partial Class FrmMessageBox
         BtnClose.FlatAppearance.MouseDownBackColor = Color.FromArgb(CByte(200), CByte(15), CByte(30))
         BtnClose.FlatAppearance.MouseOverBackColor = Color.FromArgb(CByte(232), CByte(17), CByte(35))
         BtnClose.FlatStyle = FlatStyle.Flat
-        BtnClose.Image = My.Resources.Images.Close
-        BtnClose.Location = New Point(378, 0)
+        BtnClose.AccessibleName = "Fechar"
+        BtnClose.Location = New Point(382, 0)
         BtnClose.Margin = New Padding(0)
         BtnClose.Name = "BtnClose"
-        BtnClose.Size = New Size(50, 35)
+        BtnClose.Size = New Size(46, 30)
         BtnClose.TabIndex = 0
         BtnClose.UseVisualStyleBackColor = False
         ' 
         ' LblTitle
         ' 
         LblTitle.Dock = DockStyle.Fill
-        LblTitle.Font = New Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblTitle.Font = New Font("Segoe UI", 9.0F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         LblTitle.ForeColor = Color.FromArgb(CByte(45), CByte(45), CByte(48))
-        LblTitle.Location = New Point(3, 0)
+        LblTitle.Location = New Point(12, 0)
+        LblTitle.Margin = New Padding(12, 0, 3, 0)
         LblTitle.Name = "LblTitle"
-        LblTitle.Size = New Size(372, 35)
+        LblTitle.Size = New Size(367, 30)
         LblTitle.TabIndex = 1
         LblTitle.Text = "Erro"
         LblTitle.TextAlign = ContentAlignment.MiddleLeft
@@ -132,12 +133,12 @@ Partial Class FrmMessageBox
         TlpBody.Controls.Add(LblErrorCode, 0, 0)
         TlpBody.Controls.Add(PnlMessage, 1, 1)
         TlpBody.Dock = DockStyle.Fill
-        TlpBody.Location = New Point(3, 38)
+        TlpBody.Location = New Point(3, 33)
         TlpBody.Name = "TlpBody"
         TlpBody.RowCount = 2
         TlpBody.RowStyles.Add(New RowStyle(SizeType.Absolute, 30F))
         TlpBody.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
-        TlpBody.Size = New Size(422, 142)
+        TlpBody.Size = New Size(422, 147)
         TlpBody.TabIndex = 2
         ' 
         ' PbxIcon
@@ -146,7 +147,7 @@ Partial Class FrmMessageBox
         PbxIcon.Image = My.Resources.Images.Information
         PbxIcon.Location = New Point(3, 33)
         PbxIcon.Name = "PbxIcon"
-        PbxIcon.Size = New Size(94, 106)
+        PbxIcon.Size = New Size(94, 111)
         PbxIcon.SizeMode = PictureBoxSizeMode.CenterImage
         PbxIcon.TabIndex = 5
         PbxIcon.TabStop = False
@@ -173,7 +174,7 @@ Partial Class FrmMessageBox
         PnlMessage.Location = New Point(103, 33)
         PnlMessage.Name = "PnlMessage"
         PnlMessage.Padding = New Padding(5)
-        PnlMessage.Size = New Size(316, 106)
+        PnlMessage.Size = New Size(316, 111)
         PnlMessage.TabIndex = 3
         ' 
         ' LblMessage

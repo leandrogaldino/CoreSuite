@@ -137,7 +137,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Images\Close.png" />
     <Content Include="Resources\Images\Error.png" />
     <Content Include="Resources\Images\Information.png" />
     <Content Include="Resources\Images\Question.png" />
