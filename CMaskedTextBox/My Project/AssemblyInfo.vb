@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Revise os valores dos atributos do assembly
 
-<Assembly: AssemblyTitle("PlaceHolderTextBox")>
+<Assembly: AssemblyTitle("CMaskedTextBox")>
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("PlaceHolderTextBox")>
+<Assembly: AssemblyProduct("CMaskedTextBox")>
 <Assembly: AssemblyCopyright("Copyright ©  2026")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
 'O GUID a seguir será destinado à ID de typelib se este projeto for exposto para COM
-<Assembly: Guid("7539fd9c-53df-47a3-9bd3-6bf621bb8d8d")>
+<Assembly: Guid("cebf58c0-c1ad-48f9-b67f-2dbc5b8e6fb1")>
 
 ' As informações da versão de um assembly consistem nos quatro valores a seguir:
 '

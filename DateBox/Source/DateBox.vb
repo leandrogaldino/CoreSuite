@@ -34,14 +34,11 @@ Public Class DateBox
         MinimumSize = New Size(100, 0)
         Calendar.Visible = False
         Calendar.MaxSelectionCount = 1
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
         DropDownButton.Cursor = Cursors.Default
         DropDownButton.TabStop = False
-        DropDownButton.BackgroundImage = _ButtonImage
-        DropDownButton.BackgroundImageLayout = ImageLayout.Center
         DropDownButton.BackColor = BackColor
         Controls.Add(DropDownButton)
+        ConfigureDropDownButton(DropDownButton, AddressOf RenderDropDownButton, Sub() DropDownButton_Click(DropDownButton, EventArgs.Empty))
         Controls.Add(Calendar)
         ControlContainer.HostControl = DropDownButton
         ControlContainer.HostedControl = Calendar
@@ -111,7 +108,6 @@ Public Class DateBox
         Set(value As Image)
             If ReferenceEquals(_ButtonImage, value) Then Return
             _ButtonImage = value
-            DropDownButton.BackgroundImage = value
             DropDownButton.Invalidate()
         End Set
     End Property
@@ -151,23 +147,6 @@ Public Class DateBox
     ''' </summary>
     Protected Overridable Sub OnDateValueChanged(e As EventArgs)
         RaiseEvent DateValueChanged(Me, e)
-    End Sub
-    ''' <summary>
-    ''' Configures the right text margin after the handle is created.
-    ''' </summary>
-    Protected Overrides Sub OnHandleCreated(e As EventArgs)
-        MyBase.OnHandleCreated(e)
-        SetRightTextMargin(DropDownButton.Width)
-    End Sub
-    ''' <summary>
-    ''' Repositions the calendar button when the control size changes.
-    ''' </summary>
-    Protected Overrides Sub OnSizeChanged(e As EventArgs)
-        MyBase.OnSizeChanged(e)
-        If DropDownButton Is Nothing Then Return
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
-        SetRightTextMargin(DropDownButton.Width)
     End Sub
     ''' <summary>
     ''' Synchronizes the button background color.
@@ -241,21 +220,24 @@ Public Class DateBox
     ''' <summary>
     ''' Draws a default calendar image when no button image is assigned.
     ''' </summary>
-    Private Sub DropDownButton_Paint(sender As Object, e As PaintEventArgs) Handles DropDownButton.Paint
-        If ButtonImage IsNot Nothing Then Return
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-        Dim IconWidth As Integer = Math.Min(DropDownButton.ClientSize.Width - 10, 14)
-        Dim IconHeight As Integer = Math.Min(DropDownButton.ClientSize.Height - 10, 14)
+    Private Sub RenderDropDownButton(G As Graphics, SurfaceSize As Size)
+        If ButtonImage IsNot Nothing Then
+            EmbeddedTextButtonLayout.DrawCenteredImage(G, ButtonImage, SurfaceSize, CInt(Math.Round(4 * DeviceDpi / 96.0R)), DropDownButton.Enabled, DropDownButton.BackColor)
+            Return
+        End If
+        G.SmoothingMode = SmoothingMode.AntiAlias
+        Dim IconWidth As Integer = Math.Min(SurfaceSize.Width - 10, 14)
+        Dim IconHeight As Integer = Math.Min(SurfaceSize.Height - 10, 14)
         If IconWidth <= 0 OrElse IconHeight <= 0 Then Return
-        Dim Left As Integer = (DropDownButton.ClientSize.Width - IconWidth) \ 2
-        Dim Top As Integer = (DropDownButton.ClientSize.Height - IconHeight) \ 2
+        Dim Left As Integer = (SurfaceSize.Width - IconWidth) \ 2
+        Dim Top As Integer = (SurfaceSize.Height - IconHeight) \ 2
         Dim HeaderHeight As Integer = Math.Max(3, IconHeight \ 3)
         Using CalendarPen As New Pen(SystemColors.ControlDarkDark, 1.4F)
             Using HeaderBrush As New SolidBrush(SystemColors.ControlDarkDark)
-                e.Graphics.DrawRectangle(CalendarPen, Left, Top + 2, IconWidth, IconHeight - 2)
-                e.Graphics.FillRectangle(HeaderBrush, Left, Top + 2, IconWidth, HeaderHeight)
-                e.Graphics.DrawLine(CalendarPen, Left + 3, Top, Left + 3, Top + 4)
-                e.Graphics.DrawLine(CalendarPen, Left + IconWidth - 3, Top, Left + IconWidth - 3, Top + 4)
+                G.DrawRectangle(CalendarPen, Left, Top + 2, IconWidth, IconHeight - 2)
+                G.FillRectangle(HeaderBrush, Left, Top + 2, IconWidth, HeaderHeight)
+                G.DrawLine(CalendarPen, Left + 3, Top, Left + 3, Top + 4)
+                G.DrawLine(CalendarPen, Left + IconWidth - 3, Top, Left + IconWidth - 3, Top + 4)
                 Dim CellTop As Integer = Top + HeaderHeight + 4
                 Dim CellBottom As Integer = Top + IconHeight - 2
                 Dim CellHeight As Integer = CellBottom - CellTop
@@ -263,9 +245,9 @@ Public Class DateBox
                     Dim FirstColumn As Integer = Left + IconWidth \ 3
                     Dim SecondColumn As Integer = Left + (IconWidth * 2) \ 3
                     Dim Row As Integer = CellTop + CellHeight \ 2
-                    e.Graphics.DrawLine(CalendarPen, FirstColumn, CellTop, FirstColumn, CellBottom)
-                    e.Graphics.DrawLine(CalendarPen, SecondColumn, CellTop, SecondColumn, CellBottom)
-                    e.Graphics.DrawLine(CalendarPen, Left + 1, Row, Left + IconWidth - 1, Row)
+                    G.DrawLine(CalendarPen, FirstColumn, CellTop, FirstColumn, CellBottom)
+                    G.DrawLine(CalendarPen, SecondColumn, CellTop, SecondColumn, CellBottom)
+                    G.DrawLine(CalendarPen, Left + 1, Row, Left + IconWidth - 1, Row)
                 End If
             End Using
         End Using

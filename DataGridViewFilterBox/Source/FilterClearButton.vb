@@ -22,27 +22,19 @@ Friend Class FilterClearButton
     ''' <summary>
     ''' Paints the assigned image or the built-in close glyph using the current enabled and color state.
     ''' </summary>
-    ''' <param name="e">The paint event data.</param>
-    Protected Overrides Sub OnPaint(e As PaintEventArgs)
-        e.Graphics.Clear(BackColor)
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+    Friend Sub RenderContent(G As Graphics, SurfaceSize As Size)
+        G.SmoothingMode = SmoothingMode.AntiAlias
         If Image IsNot Nothing Then
-            Dim ImageSize As Integer = Math.Max(1, Math.Min(Width - 6, Height - 6))
-            Dim ImageBounds As New Rectangle((Width - ImageSize) \ 2, (Height - ImageSize) \ 2, ImageSize, ImageSize)
-            If Enabled Then
-                e.Graphics.DrawImage(Image, ImageBounds)
-            Else
-                ControlPaint.DrawImageDisabled(e.Graphics, Image, ImageBounds.X, ImageBounds.Y, BackColor)
-            End If
+            EmbeddedTextButtonLayout.DrawCenteredImage(G, Image, SurfaceSize, CInt(Math.Round(3 * DeviceDpi / 96.0R)), Enabled, BackColor)
             Return
         End If
         Dim GlyphColor As Color = If(Enabled, ForeColor, SystemColors.GrayText)
-        Dim Margin As Single = Math.Max(5.0F, Math.Min(Width, Height) * 0.32F)
+        Dim Margin As Single = Math.Max(5.0F, Math.Min(SurfaceSize.Width, SurfaceSize.Height) * 0.32F)
         Using GlyphPen As New Pen(GlyphColor, 1.6F)
             GlyphPen.StartCap = LineCap.Round
             GlyphPen.EndCap = LineCap.Round
-            e.Graphics.DrawLine(GlyphPen, Margin, Margin, Width - Margin, Height - Margin)
-            e.Graphics.DrawLine(GlyphPen, Width - Margin, Margin, Margin, Height - Margin)
+            G.DrawLine(GlyphPen, Margin, Margin, SurfaceSize.Width - Margin, SurfaceSize.Height - Margin)
+            G.DrawLine(GlyphPen, SurfaceSize.Width - Margin, Margin, Margin, SurfaceSize.Height - Margin)
         End Using
     End Sub
     ''' <summary>

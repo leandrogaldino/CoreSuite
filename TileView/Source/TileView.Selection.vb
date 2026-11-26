@@ -128,9 +128,23 @@ Public Partial Class TileView
             Case Keys.Down
                 NextIndex += _Columns
             Case Keys.PageUp
-                NextIndex -= Math.Max(1, ClientSize.Height \ (_ItemSize.Height + _ItemSpacing)) * _Columns
+                If _RowOffsets Is Nothing Then
+                    NextIndex -= Math.Max(1, ClientSize.Height \ (_ItemSize.Height + _ItemSpacing)) * _Columns
+                Else
+                    Dim CurrentRow As Integer = Current \ _Columns
+                    Dim TargetRow As Integer = GetRowAtOffset(GetRowOffset(CurrentRow) + -1L * Math.Max(1, ClientSize.Height))
+                    NextIndex += If(TargetRow = CurrentRow, -1, TargetRow - CurrentRow) * _Columns
+                    If TargetRow <> CurrentRow AndAlso NextIndex >= Count Then NextIndex = Count - 1
+                End If
             Case Keys.PageDown
-                NextIndex += Math.Max(1, ClientSize.Height \ (_ItemSize.Height + _ItemSpacing)) * _Columns
+                If _RowOffsets Is Nothing Then
+                    NextIndex += Math.Max(1, ClientSize.Height \ (_ItemSize.Height + _ItemSpacing)) * _Columns
+                Else
+                    Dim CurrentRow As Integer = Current \ _Columns
+                    Dim TargetRow As Integer = GetRowAtOffset(GetRowOffset(CurrentRow) + 1L * Math.Max(1, ClientSize.Height))
+                    NextIndex += If(TargetRow = CurrentRow, 1, TargetRow - CurrentRow) * _Columns
+                    If TargetRow <> CurrentRow AndAlso NextIndex >= Count Then NextIndex = Count - 1
+                End If
         End Select
         If NextIndex < 0 OrElse NextIndex >= Count Then
             If Not _WrapNavigation Then Return False

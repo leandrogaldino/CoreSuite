@@ -1,9 +1,9 @@
 ﻿Imports System.Windows.Forms
 
 Partial Public Class TextBoxActionPanel
-    Private Sub SetTargetControl(Value As TextBoxBase)
+    Private Sub SetTargetControl(Value As System.Windows.Forms.TextBoxBase)
         If ReferenceEquals(_TargetControl, Value) Then Return
-        If Value IsNot Nothing AndAlso Value.IsDisposed Then Throw New ObjectDisposedException(Value.Name, "A disposed TextBoxBase cannot be assigned as the target control.")
+        If Value IsNot Nothing AndAlso Value.IsDisposed Then Throw New ObjectDisposedException(Value.Name, "A disposed System.Windows.Forms.TextBoxBase cannot be assigned as the target control.")
         DetachTargetControl()
         _TargetControl = Value
         AttachTargetControl()

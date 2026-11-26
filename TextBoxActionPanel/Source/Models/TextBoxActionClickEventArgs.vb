@@ -7,7 +7,7 @@
 Public NotInheritable Class TextBoxActionClickEventArgs
     Inherits EventArgs
     Private ReadOnly _Source As TextBoxActionPanel
-    Private ReadOnly _TargetControl As TextBoxBase
+    Private ReadOnly _TargetControl As System.Windows.Forms.TextBoxBase
     Private ReadOnly _Action As TextBoxAction
     ''' <summary>
     ''' Initializes a new instance of the <see cref="TextBoxActionClickEventArgs"/> class.
@@ -15,7 +15,7 @@ Public NotInheritable Class TextBoxActionClickEventArgs
     ''' <param name="Source">The component that executed the action.</param>
     ''' <param name="TargetControl">The text box associated with the component.</param>
     ''' <param name="Action">The action that was executed.</param>
-    Public Sub New(Source As TextBoxActionPanel, TargetControl As TextBoxBase, Action As TextBoxAction)
+    Public Sub New(Source As TextBoxActionPanel, TargetControl As System.Windows.Forms.TextBoxBase, Action As TextBoxAction)
         If Source Is Nothing Then Throw New ArgumentNullException("Source")
         If TargetControl Is Nothing Then Throw New ArgumentNullException("TargetControl")
         If Action Is Nothing Then Throw New ArgumentNullException("Action")
@@ -36,7 +36,7 @@ Public NotInheritable Class TextBoxActionClickEventArgs
     ''' Gets the text box associated with the action panel.
     ''' </summary>
     ''' <value>The current target control.</value>
-    Public ReadOnly Property TargetControl As TextBoxBase
+    Public ReadOnly Property TargetControl As System.Windows.Forms.TextBoxBase
         Get
             Return _TargetControl
         End Get

@@ -18,11 +18,12 @@ Imports System.Windows.Forms
 <Description("Filters an associated DataGridView locally or requests application-defined remote filtering after a configurable debounce interval.")>
 <Designer(GetType(DataGridViewFilterBoxControlDesigner))>
 Public Class DataGridViewFilterBox
-    Inherits PlaceHolderTextBox
+    Inherits CTextBox
     Private Const DefaultFilterInterval As Integer = 300
     Private Const DefaultMinimumCharacters As Integer = 1
     Private ReadOnly _FilterTimer As System.Windows.Forms.Timer
     Private ReadOnly _ClearButton As FilterClearButton
+    Private ReadOnly _ButtonLayout As EmbeddedTextButtonLayout
     Private ReadOnly _FilterColumns As DataGridViewFilterColumnCollection
     Private ReadOnly _IgnoredColumns As DataGridViewFilterColumnCollection
     Private _DataGridView As DataGridView
@@ -86,6 +87,7 @@ Public Class DataGridViewFilterBox
         _ClearButton = New FilterClearButton With {.BackColor = BackColor, .ForeColor = ForeColor, .Visible = False}
         AddHandler _ClearButton.Click, AddressOf ClearButtonClick
         Controls.Add(_ClearButton)
+        _ButtonLayout = New EmbeddedTextButtonLayout(Me, _ClearButton, AddressOf _ClearButton.RenderContent, Sub() ClearButtonClick(_ClearButton, EventArgs.Empty))
         UpdateClearButtonLayout()
         PlaceholderText = "Filter..."
     End Sub
@@ -414,6 +416,7 @@ Public Class DataGridViewFilterBox
             RemoveHandler _FilterColumns.Changed, AddressOf FilterConfigurationChanged
             RemoveHandler _IgnoredColumns.Changed, AddressOf FilterConfigurationChanged
             RemoveHandler _FilterTimer.Tick, AddressOf FilterTimerTick
+            If _ButtonLayout IsNot Nothing Then _ButtonLayout.Dispose()
             RemoveHandler _ClearButton.Click, AddressOf ClearButtonClick
             _FilterTimer.Dispose()
         End If
@@ -459,6 +462,31 @@ Public Class DataGridViewFilterBox
     ''' Reapplies native text margins after the control handle is created.
     ''' </summary>
     ''' <param name="e">The event data.</param>
+    Protected Overrides Sub OnClientSizeChanged(E As EventArgs)
+        MyBase.OnClientSizeChanged(E)
+        UpdateClearButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnFontChanged(E As EventArgs)
+        MyBase.OnFontChanged(E)
+        UpdateClearButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnBorderStyleChanged(E As EventArgs)
+        MyBase.OnBorderStyleChanged(E)
+        UpdateClearButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnDpiChangedAfterParent(E As EventArgs)
+        MyBase.OnDpiChangedAfterParent(E)
+        UpdateClearButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnMultilineChanged(E As EventArgs)
+        MyBase.OnMultilineChanged(E)
+        UpdateClearButtonLayout()
+    End Sub
+
     Protected Overrides Sub OnHandleCreated(e As EventArgs)
         MyBase.OnHandleCreated(e)
         UpdateClearButtonLayout()
@@ -775,23 +803,21 @@ Public Class DataGridViewFilterBox
         Next
         Return Builder.ToString()
     End Function
+    Protected Overrides Sub WndProc(ByRef M As Message)
+        If _ButtonLayout IsNot Nothing AndAlso _ButtonLayout.BeforeWndProc(M) Then Return
+        MyBase.WndProc(M)
+        If _ButtonLayout IsNot Nothing Then _ButtonLayout.AfterWndProc(M)
+    End Sub
+
     Private Sub UpdateClearButtonLayout()
-        If _ClearButton Is Nothing Then Return
-        Dim ButtonSize As Integer = Math.Max(16, Math.Min(22, ClientSize.Height - 2))
-        _ClearButton.Size = New Size(ButtonSize, ButtonSize)
-        Dim ButtonY As Integer = Math.Max(0, (ClientSize.Height - ButtonSize) \ 2)
+        If _ButtonLayout Is Nothing Then Return
         Dim IsRightToLeft As Boolean = Me.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Dim ButtonX As Integer = If(IsRightToLeft, 1, Math.Max(0, ClientSize.Width - ButtonSize - 1))
-        _ClearButton.Location = New Point(ButtonX, ButtonY)
-        _ClearButton.Visible = ShowClearButton AndAlso TextLength > 0
         _ClearButton.Enabled = Enabled AndAlso Not Me.ReadOnly
-        _ClearButton.BringToFront()
-        Dim ReservedMargin As Integer = If(ShowClearButton, ButtonSize + 3, 0)
-        If IsRightToLeft Then
-            DataGridViewFilterBoxInterop.SetTextMargins(Me, ReservedMargin, 0)
-        Else
-            DataGridViewFilterBoxInterop.SetTextMargins(Me, 0, ReservedMargin)
-        End If
+        Dim ButtonWidth As Integer = _ButtonLayout.UpdateLayout(22, IsRightToLeft, ShowClearButton AndAlso TextLength > 0)
+        ' Retain the reserved width while the clear-button feature is enabled;
+        ' only HorizontalPadding adds spacing between the text and the button.
+        Dim ReservedMargin As Integer = If(ShowClearButton, ButtonWidth, 0)
+        SetTextMarginReservation(If(IsRightToLeft, ReservedMargin, 0), If(IsRightToLeft, 0, ReservedMargin))
     End Sub
     Private Sub RaiseFilterFailed(FilterText As String, Failure As Exception)
         RaiseEvent FilterFailed(Me, New FilterFailedEventArgs(FilterText, Failure))

@@ -4,7 +4,7 @@ Partial Public Class TextBoxActionPanel
     ''' Occurs when the <see cref="TargetControl"/> reference changes.
     ''' </summary>
     <Category(CategoryName)>
-    <Description("Occurs when the target TextBoxBase reference changes.")>
+    <Description("Occurs when the target System.Windows.Forms.TextBoxBase reference changes.")>
     Public Event TargetControlChanged As EventHandler
     ''' <summary>
     ''' Occurs when the floating action panel becomes visible.

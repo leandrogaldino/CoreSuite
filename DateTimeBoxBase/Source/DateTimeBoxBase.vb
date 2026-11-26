@@ -1,15 +1,14 @@
 ﻿Imports System.ComponentModel
 Imports System.Globalization
-Imports System.Runtime.InteropServices
+Imports System.Drawing
 Imports System.Windows.Forms
 ''' <summary>
 ''' Provides a base implementation for culture-aware date and time input controls.
 ''' </summary>
 <ToolboxItem(False)>
 Public MustInherit Class DateTimeBoxBase
-    Inherits MaskedTextBox
-    Private Const EmSetMargins As Integer = &HD3
-    Private Const EcRightMargin As Integer = &H2
+    Inherits CMaskedTextBox
+    Private _DropDownButtonLayout As EmbeddedTextButtonLayout
     Private _CurrentValue As DateTime?
     Private _ValueCulture As CultureInfo = CultureInfo.CurrentCulture
     Private _InternalTextChange As Boolean
@@ -183,10 +182,55 @@ Public MustInherit Class DateTimeBoxBase
     ''' <summary>
     ''' Reserves space on the right side of the input area.
     ''' </summary>
+    Protected Sub ConfigureDropDownButton(Button As Control, Render As Action(Of Graphics, Size), Click As Action)
+        If _DropDownButtonLayout IsNot Nothing Then _DropDownButtonLayout.Dispose()
+        _DropDownButtonLayout = New EmbeddedTextButtonLayout(Me, Button, Render, Click)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Private Sub UpdateDropDownButtonLayout()
+        If _DropDownButtonLayout Is Nothing Then Return
+        SetRightTextMargin(_DropDownButtonLayout.UpdateLayout(25, False, True))
+    End Sub
+
+    Protected Overrides Sub OnHandleCreated(E As EventArgs)
+        MyBase.OnHandleCreated(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnClientSizeChanged(E As EventArgs)
+        MyBase.OnClientSizeChanged(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnSizeChanged(E As EventArgs)
+        MyBase.OnSizeChanged(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnFontChanged(E As EventArgs)
+        MyBase.OnFontChanged(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnBorderStyleChanged(E As EventArgs)
+        MyBase.OnBorderStyleChanged(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnDpiChangedAfterParent(E As EventArgs)
+        MyBase.OnDpiChangedAfterParent(E)
+        UpdateDropDownButtonLayout()
+    End Sub
+
+    Protected Overrides Sub WndProc(ByRef M As Message)
+        If _DropDownButtonLayout IsNot Nothing AndAlso _DropDownButtonLayout.BeforeWndProc(M) Then Return
+        MyBase.WndProc(M)
+        If _DropDownButtonLayout IsNot Nothing Then _DropDownButtonLayout.AfterWndProc(M)
+    End Sub
+
     Protected Sub SetRightTextMargin(Width As Integer)
-        If Not IsHandleCreated Then Return
-        Dim PackedMargins As Integer = Math.Max(0, Width) << 16
-        SendMessage(Handle, EmSetMargins, EcRightMargin, CType(PackedMargins, IntPtr))
+        SetTextMarginReservation(0, Math.Max(0, Width))
     End Sub
     ''' <summary>
     ''' Processes changes to the displayed text.
@@ -284,10 +328,4 @@ Public MustInherit Class DateTimeBoxBase
             _InternalTextChange = False
         End Try
     End Sub
-    ''' <summary>
-    ''' Sends a message to a Windows control.
-    ''' </summary>
-    <DllImport("User32.dll", SetLastError:=True)>
-    Private Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As Integer, lParam As IntPtr) As IntPtr
-    End Function
 End Class

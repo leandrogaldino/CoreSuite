@@ -38,13 +38,11 @@ Public Class TimeBox
         TimePicker.ShowUpDown = True
         TimePicker.Width = 130
         TimePicker.Visible = False
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
         DropDownButton.Cursor = Cursors.Default
         DropDownButton.TabStop = False
-        DropDownButton.BackgroundImageLayout = ImageLayout.Center
         DropDownButton.BackColor = BackColor
         Controls.Add(DropDownButton)
+        ConfigureDropDownButton(DropDownButton, AddressOf RenderDropDownButton, Sub() DropDownButton_Click(DropDownButton, EventArgs.Empty))
         Controls.Add(TimePicker)
         ControlContainer.HostControl = DropDownButton
         ControlContainer.HostedControl = TimePicker
@@ -142,7 +140,6 @@ Public Class TimeBox
         Set(value As Image)
             If ReferenceEquals(_ButtonImage, value) Then Return
             _ButtonImage = value
-            DropDownButton.BackgroundImage = value
             DropDownButton.Invalidate()
         End Set
     End Property
@@ -200,23 +197,6 @@ Public Class TimeBox
         RaiseEvent TimeValueChanged(Me, e)
     End Sub
     ''' <summary>
-    ''' Configures the right text margin after the handle is created.
-    ''' </summary>
-    Protected Overrides Sub OnHandleCreated(e As EventArgs)
-        MyBase.OnHandleCreated(e)
-        SetRightTextMargin(DropDownButton.Width)
-    End Sub
-    ''' <summary>
-    ''' Repositions the selector button when the control size changes.
-    ''' </summary>
-    Protected Overrides Sub OnSizeChanged(e As EventArgs)
-        MyBase.OnSizeChanged(e)
-        If DropDownButton Is Nothing Then Return
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
-        SetRightTextMargin(DropDownButton.Width)
-    End Sub
-    ''' <summary>
     ''' Synchronizes the selector button background color.
     ''' </summary>
     Protected Overrides Sub OnBackColorChanged(e As EventArgs)
@@ -262,19 +242,22 @@ Public Class TimeBox
     ''' <summary>
     ''' Draws a default clock image when no button image is assigned.
     ''' </summary>
-    Private Sub DropDownButton_Paint(sender As Object, e As PaintEventArgs) Handles DropDownButton.Paint
-        If ButtonImage IsNot Nothing Then Return
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-        Dim Size As Integer = Math.Min(DropDownButton.ClientSize.Width, DropDownButton.ClientSize.Height) - 10
+    Private Sub RenderDropDownButton(G As Graphics, SurfaceSize As Size)
+        If ButtonImage IsNot Nothing Then
+            EmbeddedTextButtonLayout.DrawCenteredImage(G, ButtonImage, SurfaceSize, CInt(Math.Round(4 * DeviceDpi / 96.0R)), DropDownButton.Enabled, DropDownButton.BackColor)
+            Return
+        End If
+        G.SmoothingMode = SmoothingMode.AntiAlias
+        Dim Size As Integer = Math.Min(SurfaceSize.Width, SurfaceSize.Height) - 10
         If Size <= 0 Then Return
-        Dim Left As Integer = (DropDownButton.ClientSize.Width - Size) \ 2
-        Dim Top As Integer = (DropDownButton.ClientSize.Height - Size) \ 2
+        Dim Left As Integer = (SurfaceSize.Width - Size) \ 2
+        Dim Top As Integer = (SurfaceSize.Height - Size) \ 2
         Dim CenterX As Single = Left + Size / 2.0F
         Dim CenterY As Single = Top + Size / 2.0F
         Using ClockPen As New Pen(SystemColors.ControlDarkDark, 1.4F)
-            e.Graphics.DrawEllipse(ClockPen, Left, Top, Size, Size)
-            e.Graphics.DrawLine(ClockPen, CenterX, CenterY, CenterX, Top + Size * 0.27F)
-            e.Graphics.DrawLine(ClockPen, CenterX, CenterY, Left + Size * 0.72F, Top + Size * 0.62F)
+            G.DrawEllipse(ClockPen, Left, Top, Size, Size)
+            G.DrawLine(ClockPen, CenterX, CenterY, CenterX, Top + Size * 0.27F)
+            G.DrawLine(ClockPen, CenterX, CenterY, Left + Size * 0.72F, Top + Size * 0.62F)
         End Using
     End Sub
     ''' <summary>

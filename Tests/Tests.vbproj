@@ -289,9 +289,9 @@
       <Project>{dde40753-7859-48d8-a51d-8883fb683521}</Project>
       <Name>PictureViewer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
-      <Project>{b5b40210-fce5-4b10-8c1c-a5ce615c2073}</Project>
-      <Name>PlaceHolderTextBox</Name>
+    <ProjectReference Include="..\CTextBox\CTextBox.vbproj">
+      <Project>{e0b4e16e-aa73-4cf9-a230-4c96df0c354d}</Project>
+      <Name>CTextBox</Name>
     </ProjectReference>
     <ProjectReference Include="..\RichTextButton\RichTextButton.vbproj">
       <Project>{c14598a2-2464-4563-92c9-1844c08684f6}</Project>
@@ -332,6 +332,12 @@
     <ProjectReference Include="..\ValidationProvider\ValidationProvider.vbproj">
       <Project>{226ba3c4-38b5-4c26-911e-6f4d96b34456}</Project>
       <Name>ValidationProvider</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CMaskedTextBox\CMaskedTextBox.vbproj">
+      <Project>{91DC47E3-25D4-476C-99C8-FA9B076E50A2}</Project>
+      <Name>CMaskedTextBox</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

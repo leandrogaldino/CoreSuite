@@ -36,13 +36,11 @@ Public Class DateTimeBox
     Public Sub New()
         MinimumSize = New Size(140, 0)
         DropDownEditor.Visible = False
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
         DropDownButton.Cursor = Cursors.Default
         DropDownButton.TabStop = False
-        DropDownButton.BackgroundImageLayout = ImageLayout.Center
         DropDownButton.BackColor = BackColor
         Controls.Add(DropDownButton)
+        ConfigureDropDownButton(DropDownButton, AddressOf RenderDropDownButton, Sub() DropDownButton_Click(DropDownButton, EventArgs.Empty))
         Controls.Add(DropDownEditor)
         ControlContainer.HostControl = DropDownButton
         ControlContainer.HostedControl = DropDownEditor
@@ -126,7 +124,6 @@ Public Class DateTimeBox
         Set(value As Image)
             If ReferenceEquals(_ButtonImage, value) Then Return
             _ButtonImage = value
-            DropDownButton.BackgroundImage = value
             DropDownButton.Invalidate()
         End Set
     End Property
@@ -242,23 +239,6 @@ Public Class DateTimeBox
         RaiseEvent DateTimeValueChanged(Me, e)
     End Sub
     ''' <summary>
-    ''' Configures the right text margin after the control handle is created.
-    ''' </summary>
-    Protected Overrides Sub OnHandleCreated(e As EventArgs)
-        MyBase.OnHandleCreated(e)
-        SetRightTextMargin(DropDownButton.Width)
-    End Sub
-    ''' <summary>
-    ''' Repositions the dropdown button when the control size changes.
-    ''' </summary>
-    Protected Overrides Sub OnSizeChanged(e As EventArgs)
-        MyBase.OnSizeChanged(e)
-        If DropDownButton Is Nothing Then Return
-        DropDownButton.Size = New Size(25, ClientSize.Height + 2)
-        DropDownButton.Location = New Point(ClientSize.Width - DropDownButton.Width + 1, -1)
-        SetRightTextMargin(DropDownButton.Width)
-    End Sub
-    ''' <summary>
     ''' Synchronizes the dropdown button background color.
     ''' </summary>
     Protected Overrides Sub OnBackColorChanged(e As EventArgs)
@@ -344,17 +324,24 @@ Public Class DateTimeBox
     ''' <summary>
     ''' Draws a default combined calendar and clock image when no custom button image is assigned.
     ''' </summary>
-    Private Sub DropDownButton_Paint(sender As Object, e As PaintEventArgs) Handles DropDownButton.Paint
-        If ButtonImage IsNot Nothing Then Return
-        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
+    Private Sub RenderDropDownButton(G As Graphics, SurfaceSize As Size)
+        If ButtonImage IsNot Nothing Then
+            EmbeddedTextButtonLayout.DrawCenteredImage(G, ButtonImage, SurfaceSize, CInt(Math.Round(4 * DeviceDpi / 96.0R)), DropDownButton.Enabled, DropDownButton.BackColor)
+            Return
+        End If
+        G.SmoothingMode = SmoothingMode.AntiAlias
+        Dim Scale As Single = Math.Min(1.0F, Math.Min((SurfaceSize.Width - 4) / 16.0F, (SurfaceSize.Height - 4) / 16.0F))
+        If Scale <= 0 Then Return
+        G.TranslateTransform((SurfaceSize.Width - 15 * Scale) / 2.0F - 5 * Scale, (SurfaceSize.Height - 15 * Scale) / 2.0F - 4 * Scale)
+        G.ScaleTransform(Scale, Scale)
         Using IconPen As New Pen(SystemColors.ControlDarkDark, 1.25F)
-            e.Graphics.DrawRectangle(IconPen, 5, 6, 11, 10)
-            e.Graphics.DrawLine(IconPen, 5, 9, 16, 9)
-            e.Graphics.DrawLine(IconPen, 8, 4, 8, 8)
-            e.Graphics.DrawLine(IconPen, 13, 4, 13, 8)
-            e.Graphics.DrawEllipse(IconPen, 12, 11, 8, 8)
-            e.Graphics.DrawLine(IconPen, 16, 15, 16, 12.5F)
-            e.Graphics.DrawLine(IconPen, 16, 15, 18, 16)
+            G.DrawRectangle(IconPen, 5, 6, 11, 10)
+            G.DrawLine(IconPen, 5, 9, 16, 9)
+            G.DrawLine(IconPen, 8, 4, 8, 8)
+            G.DrawLine(IconPen, 13, 4, 13, 8)
+            G.DrawEllipse(IconPen, 12, 11, 8, 8)
+            G.DrawLine(IconPen, 16, 15, 16, 12.5F)
+            G.DrawLine(IconPen, 16, 15, 18, 16)
         End Using
     End Sub
 End Class

@@ -9,6 +9,7 @@ Public Partial Class TileView
     Private _TileWidth As Integer = 260
     Private _LastColumnExtraWidth As Integer
     Private _RowCount As Integer
+    Private _RowOffsets As Long()
     Private _ContentHeight As Integer
     Private _LayoutDirty As Boolean = True
     Private _Refreshing As Boolean
@@ -22,28 +23,74 @@ Public Partial Class TileView
 
     Private Sub CalculateLayout()
         Dim Available As Integer = Math.Max(1, ClientSize.Width - _ContentPadding.Horizontal)
-        Dim ColumnCount As Integer = DetermineColumns(Available)
-        Dim RowCount As Integer = GetRowCount(ColumnCount)
-        Dim TotalHeight As Integer = GetContentHeight(RowCount)
-        If TotalHeight > ClientSize.Height Then
+        CalculateColumnsAndRows(Available)
+        If _ContentHeight > ClientSize.Height Then
             Available = Math.Max(1, Available - _VerticalBar.Width)
-            ColumnCount = DetermineColumns(Available)
-            RowCount = GetRowCount(ColumnCount)
-            TotalHeight = GetContentHeight(RowCount)
+            CalculateColumnsAndRows(Available)
         End If
-        _Columns = ColumnCount
-        _RowCount = RowCount
-        _ContentHeight = TotalHeight
-        ' For fixed columns, limit each tile to its available column slot. When
-        ' stretching, assign any remainder to the last column to fill the row.
-        Dim GapWidth As Long = CLng(ColumnCount - 1) * _ItemSpacing
-        Dim WidthForTiles As Long = CLng(Available) - GapWidth
-        Dim SlotWidth As Integer = CInt(Math.Max(1L, WidthForTiles \ ColumnCount))
-        _TileWidth = If(_StretchItems, SlotWidth, Math.Min(_ItemSize.Width, SlotWidth))
-        _LastColumnExtraWidth = If(_StretchItems AndAlso WidthForTiles >= ColumnCount, CInt(WidthForTiles Mod ColumnCount), 0)
         _LayoutDirty = False
-        ConfigureVirtualScrollBar(TotalHeight)
+        ConfigureVirtualScrollBar(_ContentHeight)
     End Sub
+
+    Private Sub CalculateColumnsAndRows(Available As Integer)
+        _Columns = DetermineColumns(Available)
+        _RowCount = GetRowCount(_Columns)
+        Dim GapWidth As Long = CLng(_Columns - 1) * _ItemSpacing
+        Dim WidthForTiles As Long = CLng(Available) - GapWidth
+        Dim SlotWidth As Integer = CInt(Math.Max(1L, WidthForTiles \ _Columns))
+        _TileWidth = If(_StretchItems, SlotWidth, Math.Min(_ItemSize.Width, SlotWidth))
+        _LastColumnExtraWidth = If(_StretchItems AndAlso WidthForTiles >= _Columns, CInt(WidthForTiles Mod _Columns), 0)
+        _RowOffsets = Nothing
+        If _MeasureHeight IsNot Nothing AndAlso _RowCount > 0 Then
+            Dim Offsets(_RowCount) As Long
+            For Row As Integer = 0 To _RowCount - 1
+                Dim RowHeight As Integer = _ItemSize.Height
+                Dim First As Integer = Row * _Columns
+                Dim Last As Integer = CInt(Math.Min(CLng(_VisibleSourceIndices.Count - 1), CLng(First) + _Columns - 1L))
+                For Index As Integer = First To Last
+                    Dim Width As Integer = GetColumnWidth(Index Mod _Columns)
+                    RowHeight = Math.Max(RowHeight, _MeasureHeight(_Data(_VisibleSourceIndices(Index)), Width, _ItemSize.Height))
+                Next
+                Offsets(Row + 1) = Offsets(Row) + CLng(RowHeight) + _ItemSpacing
+            Next
+            _RowOffsets = Offsets
+        End If
+        _ContentHeight = GetContentHeight(_RowCount)
+    End Sub
+
+    Private Function GetColumnWidth(Column As Integer) As Integer
+        Return _TileWidth + If(_StretchItems AndAlso Column = _Columns - 1, _LastColumnExtraWidth, 0)
+    End Function
+
+    Private Function GetRowOffset(Row As Integer) As Long
+        If _RowOffsets IsNot Nothing Then Return _RowOffsets(Row)
+        Return CLng(Row) * (CLng(_ItemSize.Height) + _ItemSpacing)
+    End Function
+
+    Private Function GetRowHeight(Row As Integer) As Integer
+        If _RowOffsets Is Nothing Then Return _ItemSize.Height
+        Return CInt(_RowOffsets(Row + 1) - _RowOffsets(Row) - _ItemSpacing)
+    End Function
+
+    ' Binary search in the prefix offsets; no controls are created to measure rows.
+    Private Function GetRowAtOffset(Offset As Long) As Integer
+        If _RowCount = 0 Then Return -1
+        If Offset <= 0 Then Return 0
+        If _RowOffsets Is Nothing Then
+            Return CInt(Math.Min(CLng(_RowCount - 1), Offset \ (CLng(_ItemSize.Height) + _ItemSpacing)))
+        End If
+        Dim Low As Integer = 0
+        Dim High As Integer = _RowCount - 1
+        While Low < High
+            Dim Middle As Integer = Low + (High - Low + 1) \ 2
+            If _RowOffsets(Middle) <= Offset Then
+                Low = Middle
+            Else
+                High = Middle - 1
+            End If
+        End While
+        Return Low
+    End Function
 
     Private Function DetermineColumns(AvailableWidth As Integer) As Integer
         If _RequestedColumns > 0 Then Return _RequestedColumns
@@ -58,7 +105,7 @@ Public Partial Class TileView
 
     Private Function GetContentHeight(Rows As Integer) As Integer
         If Rows = 0 Then Return 0
-        Dim Height As Long = CLng(_ContentPadding.Top) + CLng(Rows) * (CLng(_ItemSize.Height) + _ItemSpacing) - _ItemSpacing + _ContentPadding.Bottom
+        Dim Height As Long = CLng(_ContentPadding.Top) + GetRowOffset(Rows) - _ItemSpacing + _ContentPadding.Bottom
         If Height > Integer.MaxValue - 128L Then
             Throw New InvalidOperationException("The virtual content exceeds the WinForms scrollbar coordinate range.")
         End If
@@ -95,10 +142,9 @@ Public Partial Class TileView
             Return
         End If
 
-        Dim Stride As Long = CLng(_ItemSize.Height) + _ItemSpacing
         Dim ScrollTop As Integer = GetScrollTop()
-        Dim FirstRow As Integer = CInt(Math.Max(0L, (CLng(ScrollTop) - _ContentPadding.Top) \ Stride - _OverscanRows))
-        Dim LastRow As Integer = CInt(Math.Min(CLng(_RowCount - 1), (CLng(ScrollTop) + ClientSize.Height - _ContentPadding.Top) \ Stride + _OverscanRows))
+        Dim FirstRow As Integer = Math.Max(0, GetRowAtOffset(CLng(ScrollTop) - _ContentPadding.Top) - _OverscanRows)
+        Dim LastRow As Integer = CInt(Math.Min(CLng(_RowCount - 1), CLng(GetRowAtOffset(CLng(ScrollTop) + ClientSize.Height - _ContentPadding.Top)) + _OverscanRows))
         If LastRow < FirstRow Then
             ReleaseAllTiles()
             RaiseEvent ViewportChanged(Me, EventArgs.Empty)
@@ -116,15 +162,7 @@ Public Partial Class TileView
                 If Not _Realized.TryGetValue(i, Tile) Then
                     Tile = AcquireTile(i)
                 End If
-                Dim RowNumber As Integer = i \ _Columns
-                Dim ColumnNumber As Integer = i Mod _Columns
-                Dim X As Integer = _ContentPadding.Left + ColumnNumber * (_TileWidth + _ItemSpacing)
-                Dim Y As Integer = CInt(CLng(_ContentPadding.Top) + CLng(RowNumber) * (CLng(_ItemSize.Height) + _ItemSpacing) - ScrollTop)
-                Dim TileWidth As Integer = _TileWidth
-                If _StretchItems AndAlso ColumnNumber = _Columns - 1 Then
-                    TileWidth += _LastColumnExtraWidth
-                End If
-                Dim Target As New Rectangle(X, Y, TileWidth, _ItemSize.Height)
+                Dim Target As Rectangle = GetTileBounds(i)
                 If Tile.Bounds <> Target Then Tile.Bounds = Target
                 If Not Tile.Visible Then Tile.Visible = True
                 Tile.SetSelectedInternal(_VisibleSourceIndices(i) = _SelectedSourceIndex)
@@ -208,13 +246,14 @@ Public Partial Class TileView
         End If
         If _LayoutDirty Then UpdateViewport()
         Dim RowNumber As Integer = DisplayIndex \ _Columns
-        Dim Top As Long = CLng(_ContentPadding.Top) + CLng(RowNumber) * (CLng(_ItemSize.Height) + _ItemSpacing)
+        Dim Top As Long = CLng(_ContentPadding.Top) + GetRowOffset(RowNumber)
+        Dim RowHeight As Integer = GetRowHeight(RowNumber)
         Dim ScrollTop As Integer = GetScrollTop()
         Dim Target As Long = ScrollTop
         If Top < ScrollTop Then
             Target = Top
-        ElseIf Top + _ItemSize.Height > CLng(ScrollTop) + ClientSize.Height Then
-            Target = Top + _ItemSize.Height - ClientSize.Height
+        ElseIf Top + RowHeight > CLng(ScrollTop) + ClientSize.Height Then
+            Target = If(RowHeight > ClientSize.Height, Top, Top + RowHeight - ClientSize.Height)
         End If
         Target = Math.Max(0L, Math.Min(Target, CLng(Math.Max(0, _ContentHeight - ClientSize.Height))))
         If Target <> ScrollTop Then ScrollToOffset(CInt(Target))

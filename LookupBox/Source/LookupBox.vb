@@ -16,7 +16,7 @@ Imports System.Windows.Forms
 <Designer(GetType(LookupBoxControlDesigner))>
 <ToolboxItem(True)>
 Partial Public Class LookupBox
-    Inherits TextBox
+    Inherits CTextBox
     Private Const DefaultSearchInterval As Integer = 300
     Private Const DefaultMinimumCharacters As Integer = 2
     Private Const DefaultMaximumResults As Integer = 100
@@ -24,6 +24,7 @@ Partial Public Class LookupBox
     Private ReadOnly _SearchTimer As System.Windows.Forms.Timer
     Private ReadOnly _Columns As LookupColumnCollection
     Private ReadOnly _ActionButton As LookupActionButton
+    Private ReadOnly _ButtonLayout As EmbeddedTextButtonLayout
     Private _DropDown As LookupDropDown
     Private _ResultsViewMode As LookupResultsViewMode = LookupResultsViewMode.Grid
     Private _ItemTemplateType As Type
@@ -155,6 +156,7 @@ Partial Public Class LookupBox
         _ActionButton = New LookupActionButton With {.BackColor = BackColor, .ForeColor = ForeColor, .Visible = False}
         AddHandler _ActionButton.Click, AddressOf ActionButtonClick
         Controls.Add(_ActionButton)
+        _ButtonLayout = New EmbeddedTextButtonLayout(Me, _ActionButton, AddressOf _ActionButton.RenderContent, Sub() ActionButtonClick(_ActionButton, EventArgs.Empty))
         InitializeSelectionAppearance()
         AccessibleRole = AccessibleRole.ComboBox
         UpdateActionButtonLayout()
@@ -209,6 +211,7 @@ Partial Public Class LookupBox
             CancelActiveSearch()
             RemoveHandler _Columns.Changed, AddressOf ColumnsChanged
             RemoveHandler _SearchTimer.Tick, AddressOf SearchTimerTick
+            If _ButtonLayout IsNot Nothing Then _ButtonLayout.Dispose()
             RemoveHandler _ActionButton.Click, AddressOf ActionButtonClick
             _SearchTimer.Dispose()
             DisposeDropDown()
@@ -325,10 +328,34 @@ Partial Public Class LookupBox
     ''' Reapplies native text margins after the control handle is created.
     ''' </summary>
     ''' <param name="e">The event data.</param>
+    Protected Overrides Sub OnClientSizeChanged(E As EventArgs)
+        MyBase.OnClientSizeChanged(E)
+        UpdateActionButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnFontChanged(E As EventArgs)
+        MyBase.OnFontChanged(E)
+        UpdateActionButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnBorderStyleChanged(E As EventArgs)
+        MyBase.OnBorderStyleChanged(E)
+        UpdateActionButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnDpiChangedAfterParent(E As EventArgs)
+        MyBase.OnDpiChangedAfterParent(E)
+        UpdateActionButtonLayout()
+    End Sub
+
+    Protected Overrides Sub OnMultilineChanged(E As EventArgs)
+        MyBase.OnMultilineChanged(E)
+        UpdateActionButtonLayout()
+    End Sub
+
     Protected Overrides Sub OnHandleCreated(e As EventArgs)
         MyBase.OnHandleCreated(e)
         UpdateActionButtonLayout()
-        LookupBoxInterop.SetCueBanner(Me, PlaceholderText)
     End Sub
     ''' <summary>
     ''' Updates action-button placement when right-to-left layout changes.
@@ -430,25 +457,23 @@ Partial Public Class LookupBox
             Focus()
         End If
     End Sub
+    Protected Overrides Sub WndProc(ByRef M As Message)
+        If _ButtonLayout IsNot Nothing AndAlso _ButtonLayout.BeforeWndProc(M) Then Return
+        MyBase.WndProc(M)
+        If _ButtonLayout IsNot Nothing Then _ButtonLayout.AfterWndProc(M)
+    End Sub
+
     Private Sub UpdateActionButtonLayout()
-        If _ActionButton Is Nothing Then Return
-        Dim ButtonSize As Integer = Math.Max(16, Math.Min(22, ClientSize.Height - 2))
-        _ActionButton.Size = New Size(ButtonSize, ButtonSize)
-        Dim ButtonY As Integer = Math.Max(0, (ClientSize.Height - ButtonSize) \ 2)
-        Dim IsRightToLeft As Boolean = RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Dim ButtonX As Integer = If(IsRightToLeft, 1, Math.Max(0, ClientSize.Width - ButtonSize - 1))
-        _ActionButton.Location = New Point(ButtonX, ButtonY)
+        If _ButtonLayout Is Nothing Then Return
+        Dim IsRightToLeft As Boolean = Me.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         _ActionButton.IsSelected = HasSelection
         _ActionButton.Image = If(HasSelection AndAlso SelectedButtonImage IsNot Nothing, SelectedButtonImage, ClearButtonImage)
-        _ActionButton.Visible = ShowClearButton AndAlso (TextLength > 0 OrElse HasSelection)
         _ActionButton.Enabled = Enabled AndAlso (IsSearching OrElse Not Me.ReadOnly)
-        _ActionButton.BringToFront()
-        Dim ReservedMargin As Integer = If(ShowClearButton, ButtonSize + 3, 0)
-        If IsRightToLeft Then
-            LookupBoxInterop.SetTextMargins(Me, ReservedMargin, 0)
-        Else
-            LookupBoxInterop.SetTextMargins(Me, 0, ReservedMargin)
-        End If
+        Dim ButtonWidth As Integer = _ButtonLayout.UpdateLayout(22, IsRightToLeft, ShowClearButton AndAlso (TextLength > 0 OrElse HasSelection OrElse IsSearching))
+        ' Retain the reserved width while the clear-button feature is enabled;
+        ' only HorizontalPadding adds spacing between the text and the button.
+        Dim ReservedMargin As Integer = If(ShowClearButton, ButtonWidth, 0)
+        SetTextMarginReservation(If(IsRightToLeft, ReservedMargin, 0), If(IsRightToLeft, 0, ReservedMargin))
     End Sub
     Private Function IsInDesignMode() As Boolean
         Return LicenseManager.UsageMode = LicenseUsageMode.Designtime OrElse DesignMode

@@ -7,7 +7,7 @@ Imports System.Windows.Forms
 ''' </summary>
 <ToolboxItem(False)>
 Public MustInherit Class NumericBoxBase
-    Inherits PlaceHolderTextBox
+    Inherits CTextBox
     Private Const NumericNumberStyles As NumberStyles = NumberStyles.AllowLeadingSign Or NumberStyles.AllowDecimalPoint Or NumberStyles.AllowThousands
     Private _DecimalPlaces As Integer = 2
     Private _NumericValue As Decimal

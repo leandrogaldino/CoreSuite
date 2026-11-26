@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FBEDAF29-8BF8-40BF-A0EB-25AFCFCC8CEE}</ProjectGuid>
+    <ProjectGuid>{E0B4E16E-AA73-4CF9-A230-4C96DF0C354D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>CoreSuite.Controls</RootNamespace>
-    <AssemblyName>CoreSuite.PlaceHolderTextBox</AssemblyName>
+    <AssemblyName>CoreSuite.CTextBox</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -19,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>CoreSuite.PlaceHolderTextBox.xml</DocumentationFile>
+    <DocumentationFile>CoreSuite.CTextBox.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -28,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>CoreSuite.PlaceHolderTextBox.xml</DocumentationFile>
+    <DocumentationFile>CoreSuite.CTextBox.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -46,6 +46,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -65,7 +67,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TextBoxBase.vb">
+    <Compile Include="Internal\EmbeddedTextButtonLayout.vb" />
+    <Compile Include="CTextBox.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />

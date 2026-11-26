@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -83,7 +83,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Source\DataGridViewFilterBox.Interop.vb" />
     <Compile Include="Source\DataGridViewFilterBox.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -130,9 +129,9 @@
       <Project>{3286b6b5-12e8-4a9a-89ed-7de0313100cf}</Project>
       <Name>NoFocusCueButton</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
-      <Project>{b5b40210-fce5-4b10-8c1c-a5ce615c2073}</Project>
-      <Name>PlaceHolderTextBox</Name>
+    <ProjectReference Include="..\CTextBox\CTextBox.vbproj">
+      <Project>{e0b4e16e-aa73-4cf9-a230-4c96df0c354d}</Project>
+      <Name>CTextBox</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

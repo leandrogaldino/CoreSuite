@@ -2,14 +2,14 @@
 Imports System.Drawing
 Imports System.Windows.Forms
 ''' <summary>
-''' Adds a configurable floating action panel to an existing <see cref="TextBoxBase"/> without replacing or subclassing the target control.
+''' Adds a configurable floating action panel to an existing <see cref="System.Windows.Forms.TextBoxBase"/> without replacing or subclassing the target control.
 ''' </summary>
 ''' <remarks>
 ''' The component appears in the Windows Forms component tray. Assign <see cref="TargetControl"/>, configure <see cref="Actions"/>, and handle <see cref="ActionClicked"/> or assign an action delegate.
 ''' </remarks>
 <DefaultEvent("ActionClicked")>
 <DefaultProperty("Actions")>
-<Description("Adds a configurable floating image-action panel to an existing TextBoxBase control.")>
+<Description("Adds a configurable floating image-action panel to an existing System.Windows.Forms.TextBoxBase control.")>
 <DesignerCategory("Component")>
 <ToolboxItem(True)>
 Partial Public Class TextBoxActionPanel
@@ -17,7 +17,7 @@ Partial Public Class TextBoxActionPanel
     Private Const CategoryName As String = "TextBoxActionPanel"
     Private ReadOnly _Actions As TextBoxActionCollection
     Private ReadOnly _ObservedAncestors As New List(Of Control)
-    Private _TargetControl As TextBoxBase
+    Private _TargetControl As System.Windows.Forms.TextBoxBase
     Private _OwnerForm As Form
     Private _Popup As TextBoxActionPopup
     Private _Enabled As Boolean = True

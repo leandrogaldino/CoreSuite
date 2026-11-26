@@ -110,9 +110,9 @@
       <Project>{e425f9a8-c7b2-48da-9e22-c8ec4c56db35}</Project>
       <Name>Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PlaceHolderTextBox\PlaceHolderTextBox.vbproj">
-      <Project>{b5b40210-fce5-4b10-8c1c-a5ce615c2073}</Project>
-      <Name>PlaceHolderTextBox</Name>
+    <ProjectReference Include="..\CTextBox\CTextBox.vbproj">
+      <Project>{e0b4e16e-aa73-4cf9-a230-4c96df0c354d}</Project>
+      <Name>CTextBox</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

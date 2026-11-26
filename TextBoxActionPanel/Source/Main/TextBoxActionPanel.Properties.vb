@@ -7,15 +7,15 @@ Partial Public Class TextBoxActionPanel
     ''' <summary>
     ''' Gets or sets the existing text box enhanced by this component.
     ''' </summary>
-    ''' <value>A <see cref="TextBoxBase"/> such as <see cref="TextBox"/> or any compatible derived CoreSuite control, or <see langword="Nothing"/>.</value>
+    ''' <value>A <see cref="System.Windows.Forms.TextBoxBase"/> such as <see cref="TextBox"/> or any compatible derived CoreSuite control, or <see langword="Nothing"/>.</value>
     <Category(CategoryName)>
-    <Description("Specifies the existing TextBoxBase control enhanced by this action panel.")>
+    <Description("Specifies the existing System.Windows.Forms.TextBoxBase control enhanced by this action panel.")>
     <RefreshProperties(RefreshProperties.All)>
-    Public Property TargetControl As TextBoxBase
+    Public Property TargetControl As System.Windows.Forms.TextBoxBase
         Get
             Return _TargetControl
         End Get
-        Set(Value As TextBoxBase)
+        Set(Value As System.Windows.Forms.TextBoxBase)
             SetTargetControl(Value)
         End Set
     End Property

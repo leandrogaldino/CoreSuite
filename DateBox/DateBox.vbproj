@@ -118,5 +118,17 @@
       <Name>DateTimeBoxBase</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CTextBox\CTextBox.vbproj">
+      <Project>{E0B4E16E-AA73-4CF9-A230-4C96DF0C354D}</Project>
+      <Name>CTextBox</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CMaskedTextBox\CMaskedTextBox.vbproj">
+      <Project>{91DC47E3-25D4-476C-99C8-FA9B076E50A2}</Project>
+      <Name>CMaskedTextBox</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -16,6 +16,7 @@ Public Partial Class TileView
     Private _Binder As Action(Of TileViewItem, Object)
     Private _PreviewPainter As Action(Of Graphics, Rectangle, Object, Boolean)
     Private _Filter As Func(Of Object, Boolean)
+    Private _MeasureHeight As Func(Of Object, Integer, Integer, Integer)
     Private _SelectedSourceIndex As Integer = -1
 
     Private _ItemSize As New Size(260, 112)
@@ -353,6 +354,12 @@ Public Partial Class TileView
     ''' The binding delegate must overwrite ALL visual data that can vary between records.
     ''' </summary>
     Public Sub SetItems(Of T)(Source As IEnumerable(Of T), TileFactory As Func(Of TileViewItem), BindItem As Action(Of TileViewItem, T), Optional PaintPreview As Action(Of Graphics, Rectangle, T, Boolean) = Nothing)
+        SetItems(Of T)(Source, TileFactory, BindItem, PaintPreview, Nothing)
+    End Sub
+
+    ''' <summary>Optionally measures each record from its data, available width and minimum item height.
+    ''' Items in the same row share the largest measured height. The callback must be side-effect free.</summary>
+    Public Sub SetItems(Of T)(Source As IEnumerable(Of T), TileFactory As Func(Of TileViewItem), BindItem As Action(Of TileViewItem, T), PaintPreview As Action(Of Graphics, Rectangle, T, Boolean), MeasureHeight As Func(Of T, Integer, Integer, Integer))
         If Source Is Nothing Then Throw New ArgumentNullException(NameOf(Source))
         If TileFactory Is Nothing Then Throw New ArgumentNullException(NameOf(TileFactory))
         If BindItem Is Nothing Then Throw New ArgumentNullException(NameOf(BindItem))
@@ -370,7 +377,11 @@ Public Partial Class TileView
                           PaintPreview(g, Bounds, CType(Model, T), IsSelected)
                       End Sub
         End If
-        ReplaceData(Snapshot, TileFactory, Binding, Painter)
+        Dim HeightSelector As Func(Of Object, Integer, Integer, Integer) = Nothing
+        If MeasureHeight IsNot Nothing Then
+            HeightSelector = Function(Model As Object, Width As Integer, MinimumHeight As Integer) MeasureHeight(CType(Model, T), Width, MinimumHeight)
+        End If
+        ReplaceData(Snapshot, TileFactory, Binding, Painter, HeightSelector)
     End Sub
 
     ''' <summary>Applies a model filter, without creating a visual control for each record.</summary>
@@ -404,6 +415,7 @@ Public Partial Class TileView
                 Tile.Invalidate()
             End If
         Next
+        If _MeasureHeight IsNot Nothing Then InvalidateVirtualLayout()
     End Sub
 
     ''' <summary>Discard all data and dispose every visual control owned by this view.</summary>
@@ -421,6 +433,8 @@ Public Partial Class TileView
         _Factory = Nothing
         _Binder = Nothing
         _PreviewPainter = Nothing
+        _MeasureHeight = Nothing
+        _RowOffsets = Nothing
         _layoutDirty = True
         If OldIndex <> -1 Then RaiseSelectionChanged(OldIndex, -1, OldData, Nothing, OldTile, Nothing)
         UpdateViewport()
@@ -441,13 +455,14 @@ Public Partial Class TileView
         End If
     End Sub
 
-    Private Sub ReplaceData(Snapshot As List(Of Object), Factory As Func(Of TileViewItem), Binder As Action(Of TileViewItem, Object), Painter As Action(Of Graphics, Rectangle, Object, Boolean))
+    Private Sub ReplaceData(Snapshot As List(Of Object), Factory As Func(Of TileViewItem), Binder As Action(Of TileViewItem, Object), Painter As Action(Of Graphics, Rectangle, Object, Boolean), HeightSelector As Func(Of Object, Integer, Integer, Integer))
         BeginUpdate()
         Try
             ClearItems()
             _Factory = Factory
             _Binder = Binder
             _PreviewPainter = Painter
+            _MeasureHeight = HeightSelector
             _Data.AddRange(Snapshot)
             RebuildFilteredIndices()
         Finally
@@ -501,6 +516,8 @@ Public Partial Class TileView
             _Factory = Nothing
             _Binder = Nothing
             _PreviewPainter = Nothing
+            _MeasureHeight = Nothing
+            _RowOffsets = Nothing
             _Filter = Nothing
         End If
         MyBase.Dispose(disposing)

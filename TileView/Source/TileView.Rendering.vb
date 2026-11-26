@@ -1,4 +1,4 @@
-Imports System.Drawing
+﻿Imports System.Drawing
 Imports System.Drawing.Imaging
 Imports System.Windows.Forms
 Public Partial Class TileView
@@ -129,10 +129,8 @@ Public Partial Class TileView
     End Sub
 
     Private Sub DrawPreview(Graphics As Graphics, DrawingWidth As Integer)
-        Dim Stride As Long = CLng(_ItemSize.Height) + _ItemSpacing
-        Dim FirstRow As Long = Math.Max(0L, (CLng(_ScrollOffset) - _ContentPadding.Top) \ Stride)
-        Dim LastRow As Long = Math.Min(CLng(_rowCount - 1),
-                                     (CLng(_ScrollOffset) + ClientSize.Height - _ContentPadding.Top) \ Stride)
+        Dim FirstRow As Long = GetRowAtOffset(CLng(_ScrollOffset) - _ContentPadding.Top)
+        Dim LastRow As Long = GetRowAtOffset(CLng(_ScrollOffset) + ClientSize.Height - _ContentPadding.Top)
         If LastRow < FirstRow Then Return
 
         Dim FirstIndex As Long = FirstRow * _Columns
@@ -162,13 +160,11 @@ Public Partial Class TileView
     End Sub
 
     Private Function GetTileBounds(DisplayIndex As Integer) As Rectangle
-        Dim RowIndex As Long = DisplayIndex \ _Columns
+        Dim RowIndex As Integer = DisplayIndex \ _Columns
         Dim ColumnIndex As Integer = DisplayIndex Mod _Columns
         Dim X As Long = CLng(_ContentPadding.Left) + CLng(ColumnIndex) * (_TileWidth + _ItemSpacing)
-        Dim Y As Long = CLng(_ContentPadding.Top) + RowIndex * (CLng(_ItemSize.Height) + _ItemSpacing) - _ScrollOffset
-        Dim Width As Integer = _TileWidth
-        If _StretchItems AndAlso ColumnIndex = _Columns - 1 Then Width += _LastColumnExtraWidth
-        Return New Rectangle(CInt(X), CInt(Y), Width, _ItemSize.Height)
+        Dim Y As Long = CLng(_ContentPadding.Top) + GetRowOffset(RowIndex) - _ScrollOffset
+        Return New Rectangle(CInt(X), CInt(Y), GetColumnWidth(ColumnIndex), GetRowHeight(RowIndex))
     End Function
 
     Private Function GetPreviewSnapshot(DisplayIndex As Integer, SourceIndex As Integer, Size As Size, IsSelected As Boolean) As Bitmap
@@ -220,7 +216,7 @@ Public Partial Class TileView
         If Location.X < 0 OrElse Location.X >= SurfaceWidth OrElse Location.Y < 0 OrElse _rowCount = 0 Then Return -1
         Dim Y As Long = CLng(Location.Y) + _ScrollOffset - _ContentPadding.Top
         If Y < 0 Then Return -1
-        Dim Row As Long = Y \ (CLng(_ItemSize.Height) + _ItemSpacing)
+        Dim Row As Long = GetRowAtOffset(Y)
         If Row < 0 OrElse Row >= _rowCount Then Return -1
         For Column As Integer = 0 To _Columns - 1
             Dim candidate As Long = Row * _Columns + Column

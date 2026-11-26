@@ -1,6 +1,5 @@
 ﻿Imports System.ComponentModel
 Imports System.Drawing
-Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
 ''' <summary>
@@ -10,17 +9,15 @@ Imports System.Windows.Forms
 <DefaultEvent("PasswordValueChanged")>
 <DesignerCategory("Code")>
 Public Class PasswordBox
-    Inherits PlaceHolderTextBox
+    Inherits CTextBox
 
     Private Const DefaultButtonWidth As Integer = 30
     Private Const DefaultMaskLength As Integer = 8
     Private Const MinimumButtonWidth As Integer = 24
     Private Const MinimumMaskLength As Integer = 1
-    Private Const ButtonMargin As Integer = 2
-    Private Const EmSetMargins As Integer = &HD3
-    Private Const EcRightMargin As Integer = &H2
 
     Private ReadOnly _ActionButton As PasswordActionButton
+    Private ReadOnly _ButtonLayout As EmbeddedTextButtonLayout
     Private ReadOnly _ToolTip As ToolTip
     Private _PasswordDefined As Boolean
     Private _IsEditingPassword As Boolean
@@ -51,6 +48,7 @@ Public Class PasswordBox
         _ToolTip = New ToolTip()
         Controls.Add(_ActionButton)
         AddHandler _ActionButton.Click, AddressOf ActionButton_Click
+        _ButtonLayout = New EmbeddedTextButtonLayout(Me, _ActionButton, AddressOf RenderPasswordButton, Sub() ActionButton_Click(_ActionButton, EventArgs.Empty))
         UpdateVisualState()
     End Sub
 
@@ -540,6 +538,7 @@ Public Class PasswordBox
     ''' </param>
     Protected Overrides Sub Dispose(Disposing As Boolean)
         If Disposing Then
+            If _ButtonLayout IsNot Nothing Then _ButtonLayout.Dispose()
             RemoveHandler _ActionButton.Click, AddressOf ActionButton_Click
             _ToolTip.Dispose()
         End If
@@ -550,6 +549,24 @@ Public Class PasswordBox
     ''' Raises the <see cref="Control.HandleCreated"/> event and initializes the embedded button layout.
     ''' </summary>
     ''' <param name="e">The event data.</param>
+    Protected Overrides Sub OnClientSizeChanged(E As EventArgs)
+        MyBase.OnClientSizeChanged(E)
+        UpdateActionButtonBounds()
+        UpdateTextMargin()
+    End Sub
+
+    Protected Overrides Sub OnDpiChangedAfterParent(E As EventArgs)
+        MyBase.OnDpiChangedAfterParent(E)
+        UpdateActionButtonBounds()
+        UpdateTextMargin()
+    End Sub
+
+    Protected Overrides Sub OnMultilineChanged(E As EventArgs)
+        MyBase.OnMultilineChanged(E)
+        UpdateActionButtonBounds()
+        UpdateTextMargin()
+    End Sub
+
     Protected Overrides Sub OnHandleCreated(e As EventArgs)
         MyBase.OnHandleCreated(e)
         UpdateActionButtonBounds()
@@ -768,44 +785,51 @@ Public Class PasswordBox
     ''' Positions the embedded action button at the right edge of the text box client area.
     ''' </summary>
     Private Sub UpdateActionButtonBounds()
-        If _ActionButton Is Nothing Then Return
-        Dim BorderInset As Integer
-        Select Case BorderStyle
-            Case BorderStyle.FixedSingle
-                BorderInset = 1
-            Case BorderStyle.Fixed3D
-                BorderInset = 2
-            Case Else
-                BorderInset = 0
-        End Select
-        Dim ButtonWidth As Integer = If(_ShowActionButton, Math.Min(_ButtonWidth, Math.Max(0, ClientSize.Width - BorderInset * 2)), 0)
-        Dim ButtonLeft As Integer = Math.Max(BorderInset, ClientSize.Width - ButtonWidth - BorderInset)
-        _ActionButton.Bounds = New Rectangle(ButtonLeft, BorderInset, ButtonWidth, Math.Max(1, ClientSize.Height - BorderInset * 2))
-        _ActionButton.BringToFront()
-        _ActionButton.Invalidate()
+        If _ButtonLayout Is Nothing Then Return
+        _ButtonLayout.UpdateLayout(_ButtonWidth, False, _ShowActionButton)
     End Sub
 
     ''' <summary>
     ''' Updates the native right text margin so entered text does not overlap the embedded action button.
     ''' </summary>
-    Private Sub UpdateTextMargin()
-        If Not IsHandleCreated OrElse _ActionButton Is Nothing Then Return
-        Dim RightMargin As Integer = If(_ShowActionButton, _ActionButton.Width + ButtonMargin, 0)
-        Dim MarginValue As Integer = (RightMargin And &HFFFF) << 16
-        SendMessage(Handle, EmSetMargins, New IntPtr(EcRightMargin), New IntPtr(MarginValue))
+    Private Sub RenderPasswordButton(G As Graphics, SurfaceSize As Size)
+        Dim Image As Image = _ActionButton.Image
+        If Image Is Nothing Then Return
+        Dim Padding As Integer = CInt(Math.Round(4 * DeviceDpi / 96.0R))
+        Dim AvailableWidth As Integer = SurfaceSize.Width - Padding * 2
+        Dim AvailableHeight As Integer = SurfaceSize.Height - Padding * 2
+        If AvailableWidth <= 0 OrElse AvailableHeight <= 0 OrElse Image.Width <= 0 OrElse Image.Height <= 0 Then Return
+        Dim Scale As Double = Math.Min(AvailableWidth / CDbl(Image.Width), AvailableHeight / CDbl(Image.Height))
+        Dim W As Integer = Math.Max(1, CInt(Math.Round(Image.Width * Scale)))
+        Dim H As Integer = Math.Max(1, CInt(Math.Round(Image.Height * Scale)))
+        Dim X As Integer = (SurfaceSize.Width - W) \ 2
+        Dim Y As Integer = (SurfaceSize.Height - H) \ 2
+        Select Case _ActionButton.ImageAlign
+            Case ContentAlignment.TopLeft, ContentAlignment.MiddleLeft, ContentAlignment.BottomLeft
+                X = Padding
+            Case ContentAlignment.TopRight, ContentAlignment.MiddleRight, ContentAlignment.BottomRight
+                X = SurfaceSize.Width - W - Padding
+        End Select
+        Select Case _ActionButton.ImageAlign
+            Case ContentAlignment.TopLeft, ContentAlignment.TopCenter, ContentAlignment.TopRight
+                Y = Padding
+            Case ContentAlignment.BottomLeft, ContentAlignment.BottomCenter, ContentAlignment.BottomRight
+                Y = SurfaceSize.Height - H - Padding
+        End Select
+        EmbeddedTextButtonLayout.DrawImage(G, Image, New Rectangle(X, Y, W, H), _ActionButton.Enabled, _ActionButton.BackColor)
     End Sub
 
-    ''' <summary>
-    ''' Sends a native Windows message to the text box control.
-    ''' </summary>
-    ''' <param name="hWnd">The handle of the target window.</param>
-    ''' <param name="Msg">The message identifier.</param>
-    ''' <param name="wParam">The first message parameter.</param>
-    ''' <param name="lParam">The second message parameter.</param>
-    ''' <returns>The result returned by the native window procedure.</returns>
-    <DllImport("user32.dll", CharSet:=CharSet.Auto)>
-    Private Shared Function SendMessage(hWnd As IntPtr, Msg As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
-    End Function
+    Protected Overrides Sub WndProc(ByRef M As Message)
+        If _ButtonLayout IsNot Nothing AndAlso _ButtonLayout.BeforeWndProc(M) Then Return
+        MyBase.WndProc(M)
+        If _ButtonLayout IsNot Nothing Then _ButtonLayout.AfterWndProc(M)
+    End Sub
+
+    Private Sub UpdateTextMargin()
+        If _ActionButton Is Nothing Then Return
+        SetTextMarginReservation(0, If(_ShowActionButton, _ActionButton.Width, 0))
+    End Sub
+
 
     ''' <summary>
     ''' Identifies the action represented by the embedded password button.
