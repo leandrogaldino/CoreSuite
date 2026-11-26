@@ -67,10 +67,10 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Internal\EmbeddedTextButtonLayout.vb" />
     <Compile Include="CTextBox.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Internal\EmbeddedTextButtonLayout.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

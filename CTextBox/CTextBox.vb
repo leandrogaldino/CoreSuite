@@ -42,6 +42,23 @@ Public Class CTextBox
     Private _BorderColor As Color = Color.Empty
     Private _FocusedBorderColor As Color = SystemColors.Highlight
 
+    Private Const Fixed3DFadeDuration As Integer = 150
+    Private Const WM_MOUSEMOVE As Integer = &H200
+    Private Const WM_MOUSELEAVE As Integer = &H2A3
+    Private Const WM_NCMOUSEMOVE As Integer = &HA0
+    Private Const WM_NCMOUSELEAVE As Integer = &H2A2
+    Private Const WM_TIMER As Integer = &H113
+    Private Const WM_ENABLE As Integer = &HA
+    Private Const WM_THEMECHANGED As Integer = &H31A
+    Private _BorderFadeTimer As System.Windows.Forms.Timer
+    Private _BorderFadeClock As New System.Diagnostics.Stopwatch()
+    Private _BorderFadeFrom As Color = Color.Empty
+    Private _BorderFadeTo As Color = Color.Empty
+    Private _BorderFadeColor As Color = Color.Empty
+    Private _BorderFadeExtraFrom As Color = Color.Empty
+    Private _BorderFadeExtraTo As Color = Color.Empty
+    Private _BorderFadeExtraColor As Color = Color.Empty
+
     ' A native WS_BORDER is drawn by EDIT itself, sometimes outside WM_NCPAINT.
     ' For the single-line FixedSingle case, reserve its space ourselves so there
     ' is exactly one owner of the outline. Keep the managed BorderStyle intact.
@@ -111,6 +128,7 @@ Public Class CTextBox
         Set(Value As Color)
             If _BorderColor = Value Then Return
             _BorderColor = Value
+            UpdateFixed3DFade(False)
             InvalidateBorder()
         End Set
     End Property
@@ -124,6 +142,7 @@ Public Class CTextBox
         Set(Value As Color)
             If _FocusedBorderColor = Value Then Return
             _FocusedBorderColor = Value
+            UpdateFixed3DFade(False)
             InvalidateBorder()
         End Set
     End Property
@@ -148,12 +167,14 @@ Public Class CTextBox
 
     Protected Overrides Sub OnHandleCreated(E As EventArgs)
         MyBase.OnHandleCreated(E)
+        UpdateFixed3DFade(False)
         UpdatePlaceholder()
         If OwnsSingleLineFrame Then RefreshFrame()
         UpdateTextLayout()
     End Sub
 
     Protected Overrides Sub OnHandleDestroyed(E As EventArgs)
+        ReleaseFixed3DFade()
         _RequestedTopInset = 0
         _AppliedTopInset = 0
         _MultilinePaddingApplied = False
@@ -172,6 +193,7 @@ Public Class CTextBox
 
     Protected Overrides Sub OnBorderStyleChanged(E As EventArgs)
         MyBase.OnBorderStyleChanged(E)
+        UpdateFixed3DFade(False)
         UpdateTextLayout()
     End Sub
 
@@ -188,31 +210,37 @@ Public Class CTextBox
 
     Protected Overrides Sub OnGotFocus(E As EventArgs)
         MyBase.OnGotFocus(E)
+        UpdateFixed3DFade(True)
         InvalidateBorder()
     End Sub
 
     Protected Overrides Sub OnLostFocus(E As EventArgs)
         MyBase.OnLostFocus(E)
+        UpdateFixed3DFade(True)
         InvalidateBorder()
     End Sub
 
     Protected Overrides Sub OnEnabledChanged(E As EventArgs)
         MyBase.OnEnabledChanged(E)
+        UpdateFixed3DFade(False)
         InvalidateBorder()
     End Sub
 
     Protected Overrides Sub OnReadOnlyChanged(E As EventArgs)
         MyBase.OnReadOnlyChanged(E)
+        If BorderStyle = BorderStyle.Fixed3D Then UpdateFixed3DFade(False)
         InvalidateBorder()
     End Sub
 
     Protected Overrides Sub OnBackColorChanged(E As EventArgs)
         MyBase.OnBackColorChanged(E)
+        If BorderStyle = BorderStyle.Fixed3D Then UpdateFixed3DFade(False)
         InvalidateBorder()
     End Sub
 
     Protected Overrides Sub OnSystemColorsChanged(E As EventArgs)
         MyBase.OnSystemColorsChanged(E)
+        UpdateFixed3DFade(False)
         InvalidateBorder()
     End Sub
 
@@ -353,7 +381,16 @@ Public Class CTextBox
             End If
         End If
 
+        ' Stop the OS buffered transition before and after relevant native messages.
+        ' Focus, hover and native timer messages can all initiate frame painting.
+        Dim GuardNativeFade As Boolean = IsHandleCreated AndAlso BorderStyle = BorderStyle.Fixed3D AndAlso
+            (M.Msg = WM_NCPAINT OrElse M.Msg = WM_PAINT OrElse M.Msg = WM_SETFOCUS OrElse
+             M.Msg = WM_KILLFOCUS OrElse M.Msg = WM_NCACTIVATE OrElse M.Msg = WM_MOUSEMOVE OrElse
+             M.Msg = WM_MOUSELEAVE OrElse M.Msg = WM_NCMOUSEMOVE OrElse M.Msg = WM_NCMOUSELEAVE OrElse
+             M.Msg = WM_TIMER OrElse M.Msg = WM_ENABLE OrElse M.Msg = WM_THEMECHANGED)
+        If GuardNativeFade Then StopNativeBorderAnimation()
         MyBase.WndProc(M)
+        If GuardNativeFade Then StopNativeBorderAnimation()
         Select Case M.Msg
             Case WM_NCCALCSIZE
                 _AppliedTopInset = 0
@@ -380,6 +417,9 @@ Public Class CTextBox
             Case WM_NCPAINT, WM_PAINT, WM_SETFOCUS, WM_KILLFOCUS, WM_NCACTIVATE
                 PaintBorder()
 
+            Case WM_MOUSEMOVE, WM_MOUSELEAVE, WM_NCMOUSEMOVE, WM_NCMOUSELEAVE, WM_TIMER, WM_ENABLE, WM_THEMECHANGED
+                If GuardNativeFade Then PaintBorder()
+
             Case WM_NCHITTEST
                 If _AppliedTopInset <= 0 OrElse Not IsHandleCreated Then Return
                 Dim Info As New NativeWindowInfo With {.Size = CUInt(Marshal.SizeOf(GetType(NativeWindowInfo)))}
@@ -396,6 +436,136 @@ Public Class CTextBox
         End Select
     End Sub
 
+    ' Fixed3D owns the bottom band at all times while enabled, including when
+    ' BorderColor is Empty. Native geometry and the other frame edges remain intact.
+    Private Function GetFixed3DTargetColor() As Color
+        Dim NormalColor As Color = If(_BorderColor.IsEmpty, SystemColors.ControlDark, _BorderColor)
+        Return If(Focused AndAlso Not _FocusedBorderColor.IsEmpty, _FocusedBorderColor, NormalColor)
+    End Function
+
+    ' The extra inner stripe is invisible against the edit background when
+    ' unfocused, and matches the focused border when the control has focus.
+    Private Function GetFixed3DExtraTargetColor() As Color
+        Return If(Focused, GetFixed3DTargetColor(), BackColor)
+    End Function
+
+    Private Sub ResetFixed3DFade()
+        If _BorderFadeTimer IsNot Nothing Then _BorderFadeTimer.Stop()
+        If _BorderFadeClock IsNot Nothing Then _BorderFadeClock.Reset()
+        _BorderFadeColor = Color.Empty
+        _BorderFadeFrom = Color.Empty
+        _BorderFadeTo = Color.Empty
+        _BorderFadeExtraColor = Color.Empty
+        _BorderFadeExtraFrom = Color.Empty
+        _BorderFadeExtraTo = Color.Empty
+    End Sub
+
+    Private Sub ReleaseFixed3DFade()
+        ResetFixed3DFade()
+        If _BorderFadeTimer Is Nothing Then Return
+        RemoveHandler _BorderFadeTimer.Tick, AddressOf Fixed3DFadeTick
+        _BorderFadeTimer.Dispose()
+        _BorderFadeTimer = Nothing
+    End Sub
+
+    Private Sub StopNativeBorderAnimation()
+        If IsHandleCreated AndAlso BorderStyle = BorderStyle.Fixed3D Then
+            ' Do not change the visual style or the native client geometry.
+            BufferedPaintStopAllAnimations(Handle)
+        End If
+    End Sub
+
+    Private Function ReadFixed3DFadeColor() As Color
+        If _BorderFadeColor.IsEmpty Then Return GetFixed3DTargetColor()
+        If _BorderFadeClock Is Nothing OrElse Not _BorderFadeClock.IsRunning Then Return _BorderFadeColor
+        Return InterpolateBorderColor(_BorderFadeFrom, _BorderFadeTo, ReadFixed3DFadeProgress())
+    End Function
+
+    Private Function ReadFixed3DFadeExtraColor() As Color
+        If _BorderFadeExtraColor.IsEmpty Then Return GetFixed3DExtraTargetColor()
+        If _BorderFadeClock Is Nothing OrElse Not _BorderFadeClock.IsRunning Then Return _BorderFadeExtraColor
+        Return InterpolateBorderColor(_BorderFadeExtraFrom, _BorderFadeExtraTo, ReadFixed3DFadeProgress())
+    End Function
+
+    Private Function ReadFixed3DFadeProgress() As Double
+        Dim Progress As Double = Math.Max(0.0R, Math.Min(1.0R, _BorderFadeClock.Elapsed.TotalMilliseconds / Fixed3DFadeDuration))
+        ' Smoothstep: no abrupt change in velocity at either endpoint.
+        Return Progress * Progress * (3.0R - 2.0R * Progress)
+    End Function
+
+    Private Shared Function InterpolateBorderColor(FromColor As Color, ToColor As Color, Progress As Double) As Color
+        If Progress <= 0.0R Then Return FromColor
+        If Progress >= 1.0R Then Return ToColor
+        Return Color.FromArgb(
+            InterpolateColorChannel(FromColor.R, ToColor.R, Progress),
+            InterpolateColorChannel(FromColor.G, ToColor.G, Progress),
+            InterpolateColorChannel(FromColor.B, ToColor.B, Progress))
+    End Function
+
+    Private Shared Function InterpolateColorChannel(FromValue As Byte, ToValue As Byte, Progress As Double) As Integer
+        ' Convert before subtraction to avoid overflow when a channel decreases.
+        Dim Value As Double = CDbl(FromValue) + (CDbl(ToValue) - CDbl(FromValue)) * Progress
+        Return Math.Max(0, Math.Min(255, CInt(Math.Round(Value))))
+    End Function
+
+    Private Sub UpdateFixed3DFade(Animate As Boolean)
+        If Not IsHandleCreated OrElse IsDisposed OrElse Disposing OrElse
+           BorderStyle <> BorderStyle.Fixed3D OrElse Not Enabled Then
+            ResetFixed3DFade()
+            Return
+        End If
+        Dim Target As Color = GetFixed3DTargetColor()
+        Dim ExtraTarget As Color = GetFixed3DExtraTargetColor()
+        ' Both stripes share a clock, including when focus changes mid-fade.
+        Dim Current As Color = _BorderFadeColor
+        Dim ExtraCurrent As Color = _BorderFadeExtraColor
+        If _BorderFadeClock.IsRunning Then
+            Dim Progress As Double = ReadFixed3DFadeProgress()
+            Current = InterpolateBorderColor(_BorderFadeFrom, _BorderFadeTo, Progress)
+            ExtraCurrent = InterpolateBorderColor(_BorderFadeExtraFrom, _BorderFadeExtraTo, Progress)
+            If Animate AndAlso _BorderFadeTo.ToArgb() = Target.ToArgb() AndAlso
+               _BorderFadeExtraTo.ToArgb() = ExtraTarget.ToArgb() Then Return
+        End If
+        ResetFixed3DFade()
+        _BorderFadeColor = Target
+        _BorderFadeExtraColor = ExtraTarget
+        If Not Animate OrElse DesignMode OrElse LicenseManager.UsageMode = LicenseUsageMode.Designtime OrElse
+           Not SystemInformation.UIEffectsEnabled OrElse Current.IsEmpty OrElse ExtraCurrent.IsEmpty OrElse
+           (Current.ToArgb() = Target.ToArgb() AndAlso ExtraCurrent.ToArgb() = ExtraTarget.ToArgb()) Then Return
+
+        _BorderFadeFrom = Current
+        _BorderFadeTo = Target
+        _BorderFadeColor = Current
+        _BorderFadeExtraFrom = ExtraCurrent
+        _BorderFadeExtraTo = ExtraTarget
+        _BorderFadeExtraColor = ExtraCurrent
+        If _BorderFadeTimer Is Nothing Then
+            _BorderFadeTimer = New System.Windows.Forms.Timer With {.Interval = 15}
+            AddHandler _BorderFadeTimer.Tick, AddressOf Fixed3DFadeTick
+        End If
+        _BorderFadeClock.Restart()
+        _BorderFadeTimer.Start()
+    End Sub
+
+    Private Sub Fixed3DFadeTick(Sender As Object, E As EventArgs)
+        If Not IsHandleCreated OrElse IsDisposed OrElse Disposing OrElse
+           BorderStyle <> BorderStyle.Fixed3D OrElse Not Enabled Then
+            ResetFixed3DFade()
+            Return
+        End If
+        _BorderFadeColor = ReadFixed3DFadeColor()
+        _BorderFadeExtraColor = ReadFixed3DFadeExtraColor()
+        If _BorderFadeClock.Elapsed.TotalMilliseconds >= Fixed3DFadeDuration Then
+            _BorderFadeColor = _BorderFadeTo
+            _BorderFadeExtraColor = _BorderFadeExtraTo
+            _BorderFadeClock.Reset()
+            _BorderFadeTimer.Stop()
+        End If
+        StopNativeBorderAnimation()
+        ' Draw only the bottom band, without invalidating the native text area.
+        PaintBorder()
+    End Sub
+
     Private Sub InvalidateBorder()
         If Not IsHandleCreated OrElse IsDisposed OrElse Disposing Then Return
         RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, RDW_INVALIDATE Or RDW_FRAME)
@@ -407,8 +577,12 @@ Public Class CTextBox
         If Not IsHandleCreated OrElse IsDisposed OrElse Disposing Then Return False
         Dim CurrentColor As Color = Color.Empty
         If Enabled AndAlso BorderStyle <> BorderStyle.None Then
-            CurrentColor = _BorderColor
-            If Focused AndAlso Not _FocusedBorderColor.IsEmpty Then CurrentColor = _FocusedBorderColor
+            If BorderStyle = BorderStyle.Fixed3D Then
+                CurrentColor = ReadFixed3DFadeColor()
+            Else
+                CurrentColor = _BorderColor
+                If Focused AndAlso Not _FocusedBorderColor.IsEmpty Then CurrentColor = _FocusedBorderColor
+            End If
         End If
         If OwnsSingleLineFrame AndAlso CurrentColor.IsEmpty Then
             CurrentColor = If(Enabled, SystemColors.WindowFrame, SystemColors.ControlDark)
@@ -447,11 +621,20 @@ Public Class CTextBox
                     FillNativeRectangle(DC, CurrentColor, WindowWidth - 1, 1, WindowWidth, WindowHeight - 1)
 
                 Case BorderStyle.Fixed3D
-                    ' Recolor the native bottom band across the full window
-                    ' width, including both corners. Preserve the other edges.
+                    ' Split the existing native bottom band into a permanent
+                    ' outer line and an inner stripe that fades into the background.
+                    ' Never modify the native frame geometry or paint the text area.
                     Dim BottomThickness As Integer = Math.Min(NativeTop, WindowHeight - ClientBottom)
                     If BottomThickness > 0 AndAlso BottomThickness < WindowHeight Then
-                        FillNativeRectangle(DC, CurrentColor, 0, WindowHeight - BottomThickness, WindowWidth, WindowHeight)
+                        Dim NormalThickness As Integer = Math.Max(1, CInt(Math.Round(DeviceDpi / 96.0R, MidpointRounding.AwayFromZero)))
+                        ' Keep room for the extra stripe when the native band permits it.
+                        NormalThickness = Math.Min(NormalThickness, Math.Max(1, BottomThickness - 1))
+                        Dim NormalTop As Integer = WindowHeight - NormalThickness
+                        If BottomThickness > NormalThickness Then
+                            FillNativeRectangle(DC, ReadFixed3DFadeExtraColor(), 0,
+                                                WindowHeight - BottomThickness, WindowWidth, NormalTop)
+                        End If
+                        FillNativeRectangle(DC, CurrentColor, 0, NormalTop, WindowWidth, WindowHeight)
                     End If
             End Select
             Return True
@@ -508,6 +691,10 @@ Public Class CTextBox
 
     <DllImport("user32.dll")>
     Private Shared Function SetWindowPos(HWnd As IntPtr, HWndInsertAfter As IntPtr, X As Integer, Y As Integer, CX As Integer, CY As Integer, Flags As UInteger) As Boolean
+    End Function
+
+    <DllImport("uxtheme.dll", ExactSpelling:=True)>
+    Private Shared Function BufferedPaintStopAllAnimations(HWnd As IntPtr) As Integer
     End Function
 
     <DllImport("user32.dll")>
