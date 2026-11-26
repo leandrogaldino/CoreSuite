@@ -24,6 +24,16 @@ Public NotInheritable Class EmbeddedTextButtonLayout
     Private _Updating As Boolean
     Private _Painting As Boolean
 
+    Private _MouseOverColor As Color
+    Private _MouseDownColor As Color
+
+    Public Sub SetButtonColors(MouseOverColor As Color, MouseDownColor As Color)
+        If _MouseOverColor = MouseOverColor AndAlso _MouseDownColor = MouseDownColor Then Return
+        _MouseOverColor = MouseOverColor
+        _MouseDownColor = MouseDownColor
+        RefreshButton()
+    End Sub
+
     Public Sub New(Owner As System.Windows.Forms.TextBoxBase, Button As Control, Render As Action(Of Graphics, Size), Click As Action)
         _Owner = Owner
         _Button = Button
@@ -169,9 +179,9 @@ Public NotInheritable Class EmbeddedTextButtonLayout
             If Not _Button.Enabled Then
                 Background = SystemColors.Control
             ElseIf _Pressed Then
-                Background = SystemColors.ControlDark
+                Background = If(_MouseDownColor.IsEmpty, SystemColors.ControlDark, _MouseDownColor)
             ElseIf _Hot Then
-                Background = SystemColors.ControlLight
+                Background = If(_MouseOverColor.IsEmpty, SystemColors.ControlLight, _MouseOverColor)
             End If
             Using Brush As New SolidBrush(Background)
                 G.FillRectangle(Brush, 0, 0, Bounds.Width, Bounds.Height)

@@ -25,6 +25,35 @@ End Enum
 <Designer(GetType(ActionTextBoxControlDesigner))>
 Public Class ActionTextBox
     Inherits CTextBox
+
+    Private _ButtonMouseOverBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while the pointer is over it. Empty uses the default color.")>
+    Public Property ButtonMouseOverBackColor As Color
+        Get
+            Return _ButtonMouseOverBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseOverBackColor = value Then Return
+            _ButtonMouseOverBackColor = value
+            UpdateActionButtonAppearance()
+        End Set
+    End Property
+
+    Private _ButtonMouseDownBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while it is pressed. Empty uses the default color.")>
+    Public Property ButtonMouseDownBackColor As Color
+        Get
+            Return _ButtonMouseDownBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseDownBackColor = value Then Return
+            _ButtonMouseDownBackColor = value
+            UpdateActionButtonAppearance()
+        End Set
+    End Property
+
     Private WithEvents ActionButton As New PictureBox
     Private ReadOnly _ToolTip As New ToolTip
     Private _ActionButtonImage As Image
@@ -590,9 +619,9 @@ Public Class ActionTextBox
         If Not Enabled OrElse Not ActionButtonEnabled Then
             ActionButton.BackColor = SystemColors.Control
         ElseIf _IsButtonPressed Then
-            ActionButton.BackColor = SystemColors.ControlDark
+            ActionButton.BackColor = If(ButtonMouseDownBackColor.IsEmpty, SystemColors.ControlDark, ButtonMouseDownBackColor)
         ElseIf _IsButtonHot Then
-            ActionButton.BackColor = SystemColors.ControlLight
+            ActionButton.BackColor = If(ButtonMouseOverBackColor.IsEmpty, SystemColors.ControlLight, ButtonMouseOverBackColor)
         Else
             ActionButton.BackColor = BackColor
         End If

@@ -19,6 +19,35 @@ Imports System.Windows.Forms
 <Designer(GetType(DataGridViewFilterBoxControlDesigner))>
 Public Class DataGridViewFilterBox
     Inherits CTextBox
+
+    Private _ButtonMouseOverBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while the pointer is over it. Empty uses the default color.")>
+    Public Property ButtonMouseOverBackColor As Color
+        Get
+            Return _ButtonMouseOverBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseOverBackColor = value Then Return
+            _ButtonMouseOverBackColor = value
+            _ButtonLayout?.SetButtonColors(ButtonMouseOverBackColor, ButtonMouseDownBackColor)
+        End Set
+    End Property
+
+    Private _ButtonMouseDownBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while it is pressed. Empty uses the default color.")>
+    Public Property ButtonMouseDownBackColor As Color
+        Get
+            Return _ButtonMouseDownBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseDownBackColor = value Then Return
+            _ButtonMouseDownBackColor = value
+            _ButtonLayout?.SetButtonColors(ButtonMouseOverBackColor, ButtonMouseDownBackColor)
+        End Set
+    End Property
+
     Private Const DefaultFilterInterval As Integer = 300
     Private Const DefaultMinimumCharacters As Integer = 1
     Private ReadOnly _FilterTimer As System.Windows.Forms.Timer

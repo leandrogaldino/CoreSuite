@@ -67,6 +67,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionTextBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -82,9 +85,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <Compile Include="Source\ActionTextBox.vb">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Source\ActionTextBoxControlDesigner.vb" />
     <Compile Include="Source\ActionTextBoxControlDesignerActionList.vb" />

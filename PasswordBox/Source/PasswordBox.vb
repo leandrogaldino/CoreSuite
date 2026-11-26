@@ -11,6 +11,35 @@ Imports System.Windows.Forms
 Public Class PasswordBox
     Inherits CTextBox
 
+    Private _ButtonMouseOverBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while the pointer is over it. Empty uses the default color.")>
+    Public Property ButtonMouseOverBackColor As Color
+        Get
+            Return _ButtonMouseOverBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseOverBackColor = value Then Return
+            _ButtonMouseOverBackColor = value
+            _ButtonLayout?.SetButtonColors(ButtonMouseOverBackColor, ButtonMouseDownBackColor)
+        End Set
+    End Property
+
+    Private _ButtonMouseDownBackColor As Color
+
+    <Category("Appearance"), DefaultValue(GetType(Color), ""), Description("The button background while it is pressed. Empty uses the default color.")>
+    Public Property ButtonMouseDownBackColor As Color
+        Get
+            Return _ButtonMouseDownBackColor
+        End Get
+        Set(value As Color)
+            If _ButtonMouseDownBackColor = value Then Return
+            _ButtonMouseDownBackColor = value
+            _ButtonLayout?.SetButtonColors(ButtonMouseOverBackColor, ButtonMouseDownBackColor)
+        End Set
+    End Property
+
+
     Private Const DefaultButtonWidth As Integer = 30
     Private Const DefaultMaskLength As Integer = 8
     Private Const MinimumButtonWidth As Integer = 24
