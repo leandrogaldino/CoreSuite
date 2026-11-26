@@ -32,115 +32,112 @@ Partial Class DateTimeBoxDropDown
     ''' </summary>
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Calendar = New MonthCalendar()
-        TimePicker = New DateTimePicker()
-        ConfirmButton = New Button()
-        CancelButton = New Button()
-        TimeLabel = New Label()
-        ButtonPanel = New FlowLayoutPanel()
-        TimePanel = New TableLayoutPanel()
-        ButtonPanel.SuspendLayout()
-        TimePanel.SuspendLayout()
-        SuspendLayout()
+        Me.Calendar = New System.Windows.Forms.MonthCalendar()
+        Me.TimePicker = New System.Windows.Forms.DateTimePicker()
+        Me.ConfirmButton = New System.Windows.Forms.Button()
+        Me.CancelButton = New System.Windows.Forms.Button()
+        Me.TimeLabel = New System.Windows.Forms.Label()
+        Me.ButtonPanel = New System.Windows.Forms.FlowLayoutPanel()
+        Me.TimePanel = New System.Windows.Forms.TableLayoutPanel()
+        Me.ButtonPanel.SuspendLayout()
+        Me.TimePanel.SuspendLayout()
+        Me.SuspendLayout()
         '
-        ' Calendar
+        'Calendar
         '
-        Calendar.Location = New Point(6, 6)
-        Calendar.MaxSelectionCount = 1
-        Calendar.Name = "Calendar"
-        Calendar.ShowToday = True
-        Calendar.ShowTodayCircle = True
-        Calendar.TabIndex = 0
+        Me.Calendar.Location = New System.Drawing.Point(5, 5)
+        Me.Calendar.Margin = New System.Windows.Forms.Padding(8, 8, 8, 8)
+        Me.Calendar.MaxSelectionCount = 1
+        Me.Calendar.Name = "Calendar"
+        Me.Calendar.TabIndex = 0
         '
-        ' TimePicker
+        'TimePicker
         '
-        TimePicker.Anchor = AnchorStyles.Left Or AnchorStyles.Right
-        TimePicker.CustomFormat = "HH:mm"
-        TimePicker.Format = DateTimePickerFormat.Custom
-        TimePicker.Location = New Point(48, 3)
-        TimePicker.Name = "TimePicker"
-        TimePicker.ShowUpDown = True
-        TimePicker.Size = New Size(175, 23)
-        TimePicker.TabIndex = 1
+        Me.TimePicker.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TimePicker.CustomFormat = "HH:mm"
+        Me.TimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.TimePicker.Location = New System.Drawing.Point(44, 3)
+        Me.TimePicker.Name = "TimePicker"
+        Me.TimePicker.ShowUpDown = True
+        Me.TimePicker.Size = New System.Drawing.Size(148, 20)
+        Me.TimePicker.TabIndex = 1
         '
-        ' ConfirmButton
+        'ConfirmButton
         '
-        ConfirmButton.AutoSize = True
-        ConfirmButton.Location = New Point(65, 3)
-        ConfirmButton.Margin = New Padding(3)
-        ConfirmButton.MinimumSize = New Size(75, 27)
-        ConfirmButton.Name = "ConfirmButton"
-        ConfirmButton.Size = New Size(75, 27)
-        ConfirmButton.TabIndex = 2
-        ConfirmButton.Text = "OK"
-        ConfirmButton.UseVisualStyleBackColor = True
+        Me.ConfirmButton.AutoSize = True
+        Me.ConfirmButton.Location = New System.Drawing.Point(56, 3)
+        Me.ConfirmButton.MinimumSize = New System.Drawing.Size(64, 23)
+        Me.ConfirmButton.Name = "ConfirmButton"
+        Me.ConfirmButton.Size = New System.Drawing.Size(64, 23)
+        Me.ConfirmButton.TabIndex = 2
+        Me.ConfirmButton.Text = "OK"
+        Me.ConfirmButton.UseVisualStyleBackColor = True
         '
-        ' CancelButton
+        'CancelButton
         '
-        CancelButton.AutoSize = True
-        CancelButton.DialogResult = DialogResult.Cancel
-        CancelButton.Location = New Point(146, 3)
-        CancelButton.Margin = New Padding(3)
-        CancelButton.MinimumSize = New Size(75, 27)
-        CancelButton.Name = "CancelButton"
-        CancelButton.Size = New Size(75, 27)
-        CancelButton.TabIndex = 3
-        CancelButton.Text = "Cancel"
-        CancelButton.UseVisualStyleBackColor = True
+        Me.CancelButton.AutoSize = True
+        Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.CancelButton.Location = New System.Drawing.Point(126, 3)
+        Me.CancelButton.MinimumSize = New System.Drawing.Size(64, 23)
+        Me.CancelButton.Name = "CancelButton"
+        Me.CancelButton.Size = New System.Drawing.Size(64, 23)
+        Me.CancelButton.TabIndex = 3
+        Me.CancelButton.Text = "Cancel"
+        Me.CancelButton.UseVisualStyleBackColor = True
         '
-        ' TimeLabel
+        'TimeLabel
         '
-        TimeLabel.Anchor = AnchorStyles.Left
-        TimeLabel.AutoSize = True
-        TimeLabel.Location = New Point(3, 7)
-        TimeLabel.Margin = New Padding(3, 0, 6, 0)
-        TimeLabel.Name = "TimeLabel"
-        TimeLabel.Size = New Size(36, 15)
-        TimeLabel.TabIndex = 0
-        TimeLabel.Text = "Time:"
+        Me.TimeLabel.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.TimeLabel.AutoSize = True
+        Me.TimeLabel.Location = New System.Drawing.Point(3, 6)
+        Me.TimeLabel.Margin = New System.Windows.Forms.Padding(3, 0, 5, 0)
+        Me.TimeLabel.Name = "TimeLabel"
+        Me.TimeLabel.Size = New System.Drawing.Size(33, 13)
+        Me.TimeLabel.TabIndex = 0
+        Me.TimeLabel.Text = "Time:"
         '
-        ' ButtonPanel
+        'ButtonPanel
         '
-        ButtonPanel.Controls.Add(ConfirmButton)
-        ButtonPanel.Controls.Add(CancelButton)
-        ButtonPanel.FlowDirection = FlowDirection.LeftToRight
-        ButtonPanel.Location = New Point(6, 205)
-        ButtonPanel.Name = "ButtonPanel"
-        ButtonPanel.Padding = New Padding(62, 0, 0, 0)
-        ButtonPanel.Size = New Size(227, 33)
-        ButtonPanel.TabIndex = 2
-        ButtonPanel.WrapContents = False
+        Me.ButtonPanel.Controls.Add(Me.ConfirmButton)
+        Me.ButtonPanel.Controls.Add(Me.CancelButton)
+        Me.ButtonPanel.Location = New System.Drawing.Point(5, 178)
+        Me.ButtonPanel.Name = "ButtonPanel"
+        Me.ButtonPanel.Padding = New System.Windows.Forms.Padding(53, 0, 0, 0)
+        Me.ButtonPanel.Size = New System.Drawing.Size(195, 29)
+        Me.ButtonPanel.TabIndex = 2
+        Me.ButtonPanel.WrapContents = False
         '
-        ' TimePanel
+        'TimePanel
         '
-        TimePanel.ColumnCount = 2
-        TimePanel.ColumnStyles.Add(New ColumnStyle(SizeType.AutoSize))
-        TimePanel.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100.0F))
-        TimePanel.Controls.Add(TimeLabel, 0, 0)
-        TimePanel.Controls.Add(TimePicker, 1, 0)
-        TimePanel.Location = New Point(6, 170)
-        TimePanel.Name = "TimePanel"
-        TimePanel.RowCount = 1
-        TimePanel.RowStyles.Add(New RowStyle(SizeType.Percent, 100.0F))
-        TimePanel.Size = New Size(227, 29)
-        TimePanel.TabIndex = 1
+        Me.TimePanel.ColumnCount = 2
+        Me.TimePanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.TimePanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TimePanel.Controls.Add(Me.TimeLabel, 0, 0)
+        Me.TimePanel.Controls.Add(Me.TimePicker, 1, 0)
+        Me.TimePanel.Location = New System.Drawing.Point(5, 147)
+        Me.TimePanel.Name = "TimePanel"
+        Me.TimePanel.RowCount = 1
+        Me.TimePanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TimePanel.Size = New System.Drawing.Size(195, 25)
+        Me.TimePanel.TabIndex = 1
         '
-        ' DateTimeBoxDropDown
+        'DateTimeBoxDropDown
         '
-        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
-        AutoScaleMode = AutoScaleMode.Font
-        BackColor = SystemColors.Control
-        Controls.Add(ButtonPanel)
-        Controls.Add(TimePanel)
-        Controls.Add(Calendar)
-        MinimumSize = New Size(239, 244)
-        Name = "DateTimeBoxDropDown"
-        Padding = New Padding(6)
-        Size = New Size(239, 244)
-        ButtonPanel.ResumeLayout(False)
-        ButtonPanel.PerformLayout()
-        TimePanel.ResumeLayout(False)
-        TimePanel.PerformLayout()
-        ResumeLayout(False)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.BackColor = System.Drawing.SystemColors.Control
+        Me.Controls.Add(Me.ButtonPanel)
+        Me.Controls.Add(Me.TimePanel)
+        Me.Controls.Add(Me.Calendar)
+        Me.MinimumSize = New System.Drawing.Size(205, 211)
+        Me.Name = "DateTimeBoxDropDown"
+        Me.Padding = New System.Windows.Forms.Padding(5, 5, 5, 5)
+        Me.Size = New System.Drawing.Size(205, 211)
+        Me.ButtonPanel.ResumeLayout(False)
+        Me.ButtonPanel.PerformLayout()
+        Me.TimePanel.ResumeLayout(False)
+        Me.TimePanel.PerformLayout()
+        Me.ResumeLayout(False)
+
     End Sub
 End Class

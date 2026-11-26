@@ -12,6 +12,7 @@ Imports System.Windows.Forms
 <DefaultProperty("DateTime")>
 <DefaultBindingProperty("DateTime")>
 <Designer(GetType(DateTimeBoxControlDesigner))>
+<ToolboxItem(True)>
 Public Class DateTimeBox
     Inherits DateTimeBoxBase
     Private WithEvents ControlContainer As New ControlContainer
@@ -42,6 +43,7 @@ Public Class DateTimeBox
         Controls.Add(DropDownButton)
         ConfigureDropDownButton(DropDownButton, AddressOf RenderDropDownButton, Sub() DropDownButton_Click(DropDownButton, EventArgs.Empty))
         Controls.Add(DropDownEditor)
+        ControlContainer.DropDownEnabled = False
         ControlContainer.HostControl = DropDownButton
         ControlContainer.HostedControl = DropDownEditor
         InitializeValueText()
@@ -280,7 +282,6 @@ Public Class DateTimeBox
     ''' Displays the date and time dropdown editor.
     ''' </summary>
     Private Sub ShowDateTimeSelector()
-        DropDownEditor.Visible = True
         ControlContainer.ShowDropDown()
     End Sub
     ''' <summary>
@@ -292,11 +293,19 @@ Public Class DateTimeBox
     ''' <summary>
     ''' Initializes the dropdown editor whenever it is displayed.
     ''' </summary>
-    Private Sub ControlContainer_Dropped(sender As Object) Handles ControlContainer.Dropped
+    Private Sub ControlContainer_Dropping(sender As Object) Handles ControlContainer.Dropping
         _SelectionConfirmed = False
+        DropDownEditor.Font = Font
         DropDownEditor.DateTimeCulture = DateTimeCulture
         DropDownEditor.ShowSeconds = ShowSeconds
         DropDownEditor.SetValue(If(HasDateTime, Me.DateTime, System.DateTime.Now))
+        DropDownEditor.PrepareForDisplay()
+        DropDownEditor.Visible = True
+    End Sub
+
+    Private Sub ControlContainer_Dropped(sender As Object) Handles ControlContainer.Dropped
+        DropDownEditor.PrepareForDisplay()
+        ControlContainer.RefreshDropDownSize()
         DropDownEditor.FocusEditor()
     End Sub
     ''' <summary>
@@ -317,6 +326,7 @@ Public Class DateTimeBox
     ''' Applies a confirmed value after the dropdown editor closes.
     ''' </summary>
     Private Sub ControlContainer_Closed(sender As Object) Handles ControlContainer.Closed
+        DropDownEditor.Visible = False
         If _SelectionConfirmed Then Me.DateTime = DropDownEditor.SelectedValue
         _SelectionConfirmed = False
         [Select]()

@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Drawing
 Imports System.Globalization
 Imports System.Windows.Forms
 
@@ -103,8 +104,36 @@ Partial Friend Class DateTimeBoxDropDown
     ''' before the hosting container displays them.
     ''' </summary>
     Public Sub PrepareForDisplay()
-        CreateControl()
-        PerformLayout()
+        ' SingleMonthSize uses the native calendar's current font and DPI.
+        PerformAutoScale()
+        Dim CalendarSize As Size = Me.Calendar.SingleMonthSize
+        Dim ConfirmSize As Size = ConfirmButton.GetPreferredSize(Size.Empty)
+        Dim CancelSize As Size = CancelButton.GetPreferredSize(Size.Empty)
+        Dim ButtonWidth As Integer = ConfirmSize.Width + ConfirmButton.Margin.Horizontal +
+                                     CancelSize.Width + CancelButton.Margin.Horizontal
+        Dim ButtonHeight As Integer = Math.Max(ConfirmSize.Height + ConfirmButton.Margin.Vertical,
+                                               CancelSize.Height + CancelButton.Margin.Vertical)
+        Dim TimeHeight As Integer = Math.Max(TimeLabel.PreferredHeight + TimeLabel.Margin.Vertical,
+                                             TimePicker.PreferredHeight + TimePicker.Margin.Vertical)
+        Dim SampleTime As String = TimePicker.Value.ToString(TimePicker.CustomFormat, DateTimeCulture)
+        Dim TimeWidth As Integer = TimeLabel.PreferredWidth + TimeLabel.Margin.Horizontal +
+                                   TextRenderer.MeasureText(SampleTime, TimePicker.Font).Width +
+                                   TimePicker.PreferredHeight * 2 + TimePicker.Margin.Horizontal
+        Dim ContentWidth As Integer = Math.Max(MinimumSize.Width - Padding.Horizontal,
+                                                Math.Max(CalendarSize.Width, Math.Max(ButtonWidth, TimeWidth)))
+        Dim SectionSpacing As Integer = Padding.Top
+
+        SuspendLayout()
+        Try
+            Me.Calendar.Bounds = New Rectangle(Padding.Left, Padding.Top, CalendarSize.Width, CalendarSize.Height)
+            TimePanel.Bounds = New Rectangle(Padding.Left, Me.Calendar.Bottom + SectionSpacing, ContentWidth, TimeHeight)
+            ButtonPanel.Padding = Padding.Empty
+            ButtonPanel.Bounds = New Rectangle(Padding.Left + ContentWidth - ButtonWidth,
+                                               TimePanel.Bottom + SectionSpacing, ButtonWidth, ButtonHeight)
+            Size = New Size(ContentWidth + Padding.Horizontal, ButtonPanel.Bottom + Padding.Bottom)
+        Finally
+            ResumeLayout(True)
+        End Try
     End Sub
     ''' <summary>
     ''' Applies the configured culture, localized captions and time format

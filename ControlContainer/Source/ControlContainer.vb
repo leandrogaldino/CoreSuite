@@ -162,6 +162,27 @@ Public Class ControlContainer
             _AllowDropDownClose = False
         End Try
     End Sub
+    ''' <summary>
+    ''' Updates the open popup after the hosted control has finished its layout.
+    ''' </summary>
+    Public Sub RefreshDropDownSize()
+        If _DropDown Is Nothing OrElse HostedControl Is Nothing Then Return
+
+        Dim HostedSize As Size = HostedControl.Size
+        Dim PopupSize As New Size(HostedSize.Width + _DropDown.Padding.Horizontal,
+                                  HostedSize.Height + _DropDown.Padding.Vertical)
+        If _DropDown.Size = PopupSize AndAlso _ControlHost.Size = HostedSize AndAlso
+           _HostPanel.Size = HostedSize Then Return
+
+        _DropDown.SuspendLayout()
+        Try
+            _DropDown.Size = PopupSize
+            _ControlHost.Size = HostedSize
+            _HostPanel.Size = HostedSize
+        Finally
+            _DropDown.ResumeLayout(True)
+        End Try
+    End Sub
     Private Sub HostControl_Click(sender As Object, e As EventArgs)
         If DropDownEnabled Then ShowDropDown()
     End Sub
